@@ -1,6 +1,6 @@
 export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
-
+  devtools: { enabled: true },
   modules: ["@pinia/nuxt", "@vueuse/nuxt", "@nuxt/icon", "@element-plus/nuxt"],
 
   elementPlus: {
@@ -8,6 +8,10 @@ export default defineNuxtConfig({
   },
 
   css: ["~/assets/scss/main.scss"],
+
+  nitro: {
+    preset: "vercel",
+  },
 
   runtimeConfig: {
     public: {
