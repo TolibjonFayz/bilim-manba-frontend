@@ -22,12 +22,6 @@
               <span class="badge badge--category">
                 💻 {{ article?.category?.name }}
               </span>
-              <span
-                v-if="article?.type === 'premium'"
-                class="badge badge--premium"
-              >
-                ⭐ Premium maqola
-              </span>
             </div>
 
             <h1 class="article-header__title">{{ article?.title }}</h1>
@@ -91,42 +85,14 @@
 
           <!-- CONTENT -->
           <div class="article-content-wrap">
-            <!-- To'liq kontent (free yoki premium user) -->
-            <div
-              class="article-content"
-              :class="{ 'article-content--blurred': isLocked }"
-              v-html="article?.content"
-            />
-
-            <!-- PAYWALL — agar locked bo'lsa -->
-            <div v-if="isLocked" class="paywall">
-              <div class="paywall__card">
-                <div class="paywall__lock">🔒</div>
-                <h3 class="paywall__title">Bu maqola premium obuna uchun</h3>
-                <p class="paywall__desc">
-                  Ushbu maqolaning qolgan qismini o'qish va barcha ekskluziv
-                  materiallardan foydalanish uchun obuna bo'ling.
-                </p>
-                <div class="paywall__price">15,000 UZS<span>/oy</span></div>
-                <NuxtLink to="/premium" class="btn btn--primary paywall__btn">
-                  Premium bo'lish
-                </NuxtLink>
-                <NuxtLink to="/login" class="paywall__login">
-                  Akkauntingiz bormi? Kiring
-                </NuxtLink>
-              </div>
-            </div>
+            <div class="article-content" v-html="content?.message" />
           </div>
 
           <!-- ARTICLE FOOTER (faqat locked bo'lmasa) -->
-          <div v-if="!isLocked" class="article-footer">
+          <div class="article-footer">
             <!-- Teglar -->
             <div class="article-footer__tags">
-              <span
-                v-for="tag in article?.tags ?? []"
-                :key="tag"
-                class="tag-chip"
-              >
+              <span v-for="tag in tags" :key="tag" class="tag-chip">
                 #{{ tag }}
               </span>
             </div>
@@ -141,13 +107,11 @@
               >
                 🔗
               </button>
-              <button class="share-btn" title="Telegram">✈️</button>
-              <button class="share-btn" title="Twitter">🐦</button>
             </div>
           </div>
 
           <!-- RELATED ARTICLES -->
-          <div v-if="!isLocked" class="related-section">
+          <div class="related-section">
             <div class="related-section__header">
               <h2 class="related-section__title">O'xshash maqolalar</h2>
               <NuxtLink to="/articles" class="related-section__link">
@@ -193,24 +157,12 @@
                 {{ article?.author?.fullName[0] }}
               </div>
               <div class="author-card__info">
-                <h4 class="author-card__name">{{ article?.author?.fullName }}</h4>
+                <h4 class="author-card__name">
+                  {{ article?.author?.fullName }}
+                </h4>
                 <p class="author-card__bio">{{ article?.author?.bio }}</p>
                 <a href="#" class="author-card__link">Barcha maqolalari →</a>
               </div>
-            </div>
-          </div>
-
-          <!-- Premium CTA -->
-          <div class="sidebar-card sidebar-card--premium">
-            <div class="premium-cta">
-              <h3 class="premium-cta__title">Bilim Manba Premium</h3>
-              <p class="premium-cta__desc">
-                Cheksiz maqolalar, yopiq darslar va AI yordamchidan to'liq
-                foydalanish imkoniyatini qo'lga kiritling.
-              </p>
-              <NuxtLink to="/premium" class="premium-cta__btn"
-                >Xoziroq qo'shiling</NuxtLink
-              >
             </div>
           </div>
 
@@ -241,8 +193,8 @@
       </div>
     </div>
 
-    <!-- AI CHAT BUTTON (faqat premium user) -->
-    <div v-if="authStore.isPremium" class="ai-fab-wrap">
+    <!-- AI CHAT BUTTON -->
+    <div class="ai-fab-wrap">
       <button class="ai-fab" @click="showAiPanel = !showAiPanel">
         🤖 AI tushuntirsin
       </button>
@@ -292,8 +244,8 @@
 </template>
 
 <script setup lang="ts">
+import { ElNotification } from "element-plus";
 const route = useRoute();
-const authStore = useAuthStore();
 const articleStore = useArticleStore();
 
 const loading = ref(false);
@@ -303,6 +255,8 @@ const showAiPanel = ref(false);
 const aiQuestion = ref("");
 const aiLoading = ref(false);
 const messagesEl = ref<HTMLElement | null>(null);
+const tags = ref([]);
+const content = ref("");
 
 const gradients = [
   "linear-gradient(135deg, #667eea, #764ba2)",
@@ -312,24 +266,6 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-onMounted(async () => {
-  loading.value = true;
-  await articleStore.getArticleBySlug(route.params.slug as string);
-
-  if (articleStore.oneArticle) {
-    likeCount.value = articleStore.oneArticle.likeCount ?? 0;
-
-    // Related maqolalar — xuddi shu kategoriyadan
-    if (articleStore.oneArticle.category?.slug) {
-      //FOR NOW ITS NO NEED (14.04.2026)
-      // await articleStore.getArticleBySlug(
-      //   articleStore.oneArticle.category.slug,
-      // );
-    }
-  }
-  loading.value = false;
-});
-
 // Article computed
 const article = computed(() => articleStore.oneArticle);
 
@@ -337,14 +273,6 @@ const article = computed(() => articleStore.oneArticle);
 const articleGradient = computed(
   () => gradients[(article.value?.id ?? 0) % gradients.length],
 );
-
-// Premium lock
-const isLocked = computed(() => {
-  if (!article.value) return false;
-  if (article.value.type !== "premium") return false;
-  if (authStore.isPremium) return false;
-  return true;
-});
 
 // Related — o'zidan tashqari
 const relatedArticles = computed(() =>
@@ -392,6 +320,11 @@ const toggleLike = () => {
 const handleShare = () => {
   if (process.client) {
     navigator.clipboard.writeText(window.location.href);
+    ElNotification({
+      title: "Muvaffaqiyatli",
+      message: "Havola nusxalandi",
+      type: "success",
+    });
   }
 };
 
@@ -402,6 +335,21 @@ const aiMessages = ref([
     content: "Salom! Ushbu maqola bo'yicha savollaringizni bering.",
   },
 ]);
+
+// Fetch content from URL with error handling
+async function fetchContent(url: string): Promise<any | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`Failed to fetch content from ${url}: ${response.status}`);
+      return null;
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching content from ${url}:`, error);
+    return null;
+  }
+}
 
 const askAi = async () => {
   if (!aiQuestion.value.trim() || aiLoading.value) return;
@@ -449,6 +397,29 @@ const askAi = async () => {
     }
   }
 };
+
+onMounted(async () => {
+  loading.value = true;
+  await articleStore.getArticleBySlug(route.params.slug as string);
+  content.value = await fetchContent(articleStore?.oneArticle?.content);
+
+  tags.value = articleStore.oneArticle.tags
+    .split(",")
+    .map((t: string) => t.trim());
+
+  if (articleStore.oneArticle) {
+    likeCount.value = articleStore.oneArticle.likeCount ?? 0;
+
+    // Related maqolalar — xuddi shu kategoriyadan
+    if (articleStore.oneArticle.category?.slug) {
+      //FOR NOW ITS NO NEED (14.04.2026)
+      // await articleStore.getArticleBySlug(
+      //   articleStore.oneArticle.category.slug,
+      // );
+    }
+  }
+  loading.value = false;
+});
 </script>
 
 <style lang="scss" scoped>
@@ -620,15 +591,6 @@ const askAi = async () => {
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: uppercase;
-  }
-
-  &--premium {
-    background: linear-gradient(135deg, #ffb347, #ff6584);
-    color: #fff;
-    padding: 0.3rem 0.85rem;
-    border-radius: $border-radius-pill;
-    font-size: 0.78rem;
-    font-weight: 700;
   }
 }
 
@@ -1002,12 +964,6 @@ const askAi = async () => {
   border-radius: $border-radius;
   padding: 1.25rem;
 
-  &--premium {
-    border: none;
-    padding: 0;
-    overflow: hidden;
-  }
-
   &__title {
     font-size: 0.72rem;
     font-weight: 700;
@@ -1091,44 +1047,6 @@ const askAi = async () => {
       border-left-color: $primary;
       background: $primary-light;
       font-weight: 600;
-    }
-  }
-}
-
-// PREMIUM CTA
-.premium-cta {
-  background: linear-gradient(135deg, $primary, $secondary);
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-
-  &__title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  &__desc {
-    font-size: 0.825rem;
-    color: rgba(#fff, 0.85);
-    line-height: 1.6;
-  }
-
-  &__btn {
-    display: block;
-    text-align: center;
-    background: #fff;
-    color: $primary;
-    font-weight: 700;
-    font-size: 0.875rem;
-    padding: 0.65rem 1rem;
-    border-radius: $border-radius-pill;
-    transition: all 0.2s;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: $shadow-md;
     }
   }
 }

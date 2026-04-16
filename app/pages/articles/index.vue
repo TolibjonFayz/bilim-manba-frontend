@@ -94,12 +94,6 @@
                     class="article-card-h__cover-bg"
                     :style="{ background: article.gradient }"
                   >
-                    <span
-                      v-if="article.type === 'premium'"
-                      class="article-card-h__premium-badge"
-                    >
-                      ⭐ Premium
-                    </span>
                     <span class="article-card-h__cat-badge">
                       {{ article.category?.name }}
                     </span>
@@ -212,21 +206,6 @@
                   }}</span>
                 </li>
               </ul>
-            </div>
-
-            <!-- Premium CTA -->
-            <div class="sidebar-card sidebar-card--premium">
-              <div class="premium-cta">
-                <div class="premium-cta__icon">⭐</div>
-                <h3 class="premium-cta__title">Premium Obuna</h3>
-                <p class="premium-cta__desc">
-                  Ekskluziv maqolalar, tahlillar va yuklab olinadigan
-                  materiallarga cheksiz ruxsat oling.
-                </p>
-                <NuxtLink to="/premium" class="premium-cta__btn">
-                  Premium bo'lish
-                </NuxtLink>
-              </div>
             </div>
 
             <!-- Teglar -->
@@ -616,17 +595,6 @@ const popularTags = ref([
     }
   }
 
-  &__premium-badge {
-    align-self: flex-end;
-    background: linear-gradient(135deg, #ffb347, #ff6584);
-    color: #fff;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.5rem;
-    border-radius: $border-radius-pill;
-    width: fit-content;
-  }
-
   &__cat-badge {
     background: rgba(#fff, 0.9);
     color: $primary;
@@ -820,11 +788,7 @@ const popularTags = ref([
   border-radius: $border-radius;
   padding: 1.25rem;
 
-  &--premium {
-    border: none;
-    padding: 0;
-    overflow: hidden;
-  }
+  
 
   &__title {
     font-size: 0.72rem;
@@ -922,54 +886,6 @@ const popularTags = ref([
   }
 }
 
-// PREMIUM CTA
-.premium-cta {
-  background: linear-gradient(135deg, $primary, $secondary);
-  padding: 1.5rem;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-
-  &__icon {
-    font-size: 2rem;
-    width: 56px;
-    height: 56px;
-    background: rgba(#fff, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  &__title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: #fff;
-  }
-
-  &__desc {
-    font-size: 0.825rem;
-    color: rgba(#fff, 0.85);
-    line-height: 1.6;
-  }
-
-  &__btn {
-    background: #fff;
-    color: $primary;
-    font-weight: 700;
-    font-size: 0.875rem;
-    padding: 0.65rem 1.5rem;
-    border-radius: $border-radius-pill;
-    transition: all 0.2s;
-
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: $shadow-md;
-    }
-  }
-}
 
 // TAGS
 .tags-wrap {

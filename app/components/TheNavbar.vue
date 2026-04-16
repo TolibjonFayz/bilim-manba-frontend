@@ -16,20 +16,11 @@
       <nav class="navbar__nav">
         <NuxtLink to="/categories" class="navbar__link">Kategoriyalar</NuxtLink>
         <NuxtLink to="/articles" class="navbar__link">Maqolalar</NuxtLink>
-        <NuxtLink to="/premium" class="navbar__link">
-          Premium
-          <span class="navbar__new-badge">Yangi</span>
-        </NuxtLink>
       </nav>
 
       <!-- Actions -->
       <div class="navbar__actions">
         <template v-if="authStore.isLoggedIn">
-          <!-- Premium badge -->
-          <span v-if="authStore.isPremium" class="badge badge--premium">
-            ⭐ Premium
-          </span>
-
           <div class="navbar__user" @click="toggleDropdown">
             <div class="navbar__avatar">
               {{ authStore.user?.email?.[0]?.toUpperCase() }}
@@ -37,14 +28,26 @@
 
             <!-- Dropdown -->
             <div v-if="showDropdown" class="navbar__dropdown">
+              <!-- User info qo'shamiz -->
+              <div class="navbar__dropdown-user">
+                <div class="navbar__dropdown-avatar">
+                  {{ authStore.user?.email?.[0]?.toUpperCase() }}
+                </div>
+                <div class="navbar__dropdown-info">
+                  <span class="navbar__dropdown-name">
+                    {{ authStore.user?.email }}
+                  </span>
+                </div>
+              </div>
+              <div class="navbar__dropdown-divider" />
               <NuxtLink to="/profile" class="navbar__dropdown-item">
-                Profil
+                👤 Profil
               </NuxtLink>
               <button
                 class="navbar__dropdown-item navbar__dropdown-item--danger"
                 @click="handleLogout"
               >
-                Chiqish
+                🚪 Chiqish
               </button>
             </div>
           </div>
@@ -63,13 +66,41 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
+const userStore = useUserStore();
 const isScrolled = ref(false);
 const showDropdown = ref(false);
 
-onMounted(() => {
+// Login bo'lganda userInfo olish
+onMounted(async () => {
   window.addEventListener("scroll", () => {
     isScrolled.value = window.scrollY > 20;
   });
+
+  // Token bor bo'lsa user ma'lumotini olamiz
+  if (authStore.isLoggedIn) {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      const parts = token.split(".");
+      const payload = JSON.parse(atob(parts[1] as string));
+      await userStore.getOneUserInfo(payload.sub);
+    }
+  }
+});
+
+// Dropdown tashqarisiga bosganda yopish
+const handleClickOutside = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest(".navbar__user")) {
+    showDropdown.value = false;
+  }
+};
+
+onMounted(() => {
+  document.addEventListener("click", handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener("click", handleClickOutside);
 });
 
 const toggleDropdown = () => {
@@ -78,6 +109,7 @@ const toggleDropdown = () => {
 
 const handleLogout = () => {
   authStore.logout();
+  userStore.oneUserInfo = null;
   navigateTo("/");
 };
 </script>
@@ -212,6 +244,50 @@ const handleLogout = () => {
         background: rgba($danger, 0.05);
       }
     }
+  }
+
+  &__dropdown-user {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__dropdown-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, $primary, $secondary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+  }
+
+  &__dropdown-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  &__dropdown-name {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: $text-primary;
+  }
+
+  &__dropdown-plan {
+    font-size: 0.75rem;
+    color: $text-muted;
+  }
+
+  &__dropdown-divider {
+    height: 1px;
+    background: $border-color;
   }
 }
 </style>

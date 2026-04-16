@@ -29,7 +29,6 @@
         <NuxtLink to="/">Bosh sahifa</NuxtLink>
         <NuxtLink to="/articles">Maqolalar</NuxtLink>
         <NuxtLink to="/categories">Kategoriyalar</NuxtLink>
-        <NuxtLink to="/premium">Premium</NuxtLink>
       </div>
 
       <div class="footer__col">

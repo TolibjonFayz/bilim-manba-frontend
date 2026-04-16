@@ -64,11 +64,6 @@
 
                 <!-- Info -->
                 <div class="article-row__info">
-                  <span
-                    v-if="article.type === 'premium'"
-                    class="badge badge--premium"
-                    >⭐ Premium</span
-                  >
                   <h3 class="article-row__title">{{ article?.title }}</h3>
                   <p class="article-row__excerpt">{{ article?.excerpt }}</p>
                   <div class="article-row__meta">
@@ -237,8 +232,6 @@ const popularTags = ref([
 ]);
 
 onMounted(async () => {
-  console.log("Hkdbasj");
-
   loading.value = true;
   await categoryStore.getCategoryBySlug(route.params.slug as string);
   loading.value = false;

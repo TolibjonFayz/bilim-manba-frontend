@@ -7,16 +7,8 @@
           <NuxtLink to="/" class="auth-wrap__back">← Bosh sahifaga</NuxtLink>
           <h1 class="auth-wrap__title">{{ title }}</h1>
           <ul class="auth-wrap__features">
-            <li><span>✅</span><span>Premium maqolalar</span></li>
             <li><span>✅</span><span>PDF yuklab olish</span></li>
           </ul>
-        </div>
-        <div class="auth-wrap__price-card">
-          <span>⭐</span>
-          <div>
-            <div class="auth-wrap__price-amount">15,000 UZS/oy</div>
-            <div class="auth-wrap__price-label">Premium a'zolik narxi</div>
-          </div>
         </div>
         <div class="auth-wrap__shape auth-wrap__shape--1" />
         <div class="auth-wrap__shape auth-wrap__shape--2" />

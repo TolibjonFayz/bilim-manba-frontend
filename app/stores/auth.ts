@@ -13,7 +13,6 @@ export const useAuthStore = defineStore("auth", () => {
 
   const isLoggedIn = computed(() => !!token.value);
   const isAdmin = computed(() => user.value?.role === "admin");
-  const isPremium = computed(() => user.value?.plan === "premium");
 
   function decodeToken(t: string) {
     try {
@@ -66,7 +65,6 @@ export const useAuthStore = defineStore("auth", () => {
     token,
     isLoggedIn,
     isAdmin,
-    isPremium,
     setAuth,
     initAuth,
     logout,

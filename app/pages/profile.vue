@@ -14,20 +14,6 @@
                 <h1 class="profile-header__name">
                   {{ userStore?.oneUserInfo?.fullName }}
                 </h1>
-                <span
-                  class="profile-header__badge"
-                  :class="
-                    userStore?.oneUserInfo?.plan === 'premium'
-                      ? 'profile-header__badge--premium'
-                      : 'profile-header__badge--free'
-                  "
-                >
-                  {{
-                    userStore?.oneUserInfo?.plan === "premium"
-                      ? "⭐ Premium"
-                      : "✅ Faol"
-                  }}
-                </span>
               </div>
               <p class="profile-header__email">
                 {{ userStore?.oneUserInfo?.email }}
@@ -50,65 +36,6 @@
         <div class="profile-main__grid">
           <!-- CHAP: Sidebar -->
           <aside class="profile-sidebar">
-            <!-- Obuna holati -->
-            <div class="sidebar-card">
-              <div class="sidebar-card__header">
-                <h3 class="sidebar-card__title">Obuna holati</h3>
-                <span
-                  class="sub-badge"
-                  :class="
-                    userStore?.oneUserInfo?.plan === 'premium'
-                      ? 'sub-badge--premium'
-                      : 'sub-badge--free'
-                  "
-                >
-                  {{
-                    userStore?.oneUserInfo?.plan === "premium"
-                      ? "⭐ Premium"
-                      : "Bepul"
-                  }}
-                </span>
-              </div>
-
-              <template v-if="userStore?.oneUserInfo?.plan === 'free'">
-                <p class="sidebar-card__desc">
-                  Premium obuna bilan eksklyuziv ilmiy maqolalar va tahliliy
-                  materiallarni o'qishingiz mumkin.
-                </p>
-                <NuxtLink to="/premium" class="sub-cta-btn">
-                  Premium bo'lish →
-                  <span class="sub-cta-btn__price">15,000 UZS/oy</span>
-                </NuxtLink>
-              </template>
-
-              <template v-else>
-                <div class="sub-active">
-                  <div class="sub-active__row">
-                    <span class="sub-active__label">Tugash sanasi</span>
-                    <span class="sub-active__value">
-                      {{
-                        userStore?.oneUserInfo?.premiumExpiresAt
-                          ? new Date(
-                              userStore?.oneUserInfo?.premiumExpiresAt,
-                            ).toLocaleDateString("uz-UZ")
-                          : "—"
-                      }}
-                    </span>
-                  </div>
-                  <div class="sub-active__indicator">
-                    <span class="sub-active__dot" />
-                    Faol
-                  </div>
-                </div>
-                <button
-                  class="btn btn--outline"
-                  style="width: 100%; margin-top: 1rem"
-                >
-                  Obunani yangilash
-                </button>
-              </template>
-            </div>
-
             <!-- Tezkor statistika -->
             <div class="sidebar-card">
               <h3 class="sidebar-card__title">Tezkor statistika</h3>
@@ -252,17 +179,6 @@
                     :to="`/articles/${article.slug}`"
                     class="saved-card"
                   >
-                    <div
-                      class="saved-card__cover"
-                      :style="{ background: article.gradient }"
-                    >
-                      <span
-                        v-if="article.type === 'premium'"
-                        class="badge badge--premium"
-                      >
-                        ⭐ Premium
-                      </span>
-                    </div>
                     <div class="saved-card__body">
                       <span class="saved-card__cat">{{
                         article.category
@@ -659,10 +575,7 @@ onMounted(async () => {
       color: #1a9e5e;
     }
 
-    &--premium {
-      background: linear-gradient(135deg, #ffb347, #ff6584);
-      color: #fff;
-    }
+    
   }
 
   &__email {
@@ -754,10 +667,7 @@ onMounted(async () => {
     border: 1px solid $border-color;
   }
 
-  &--premium {
-    background: linear-gradient(135deg, #ffb347, #ff6584);
-    color: #fff;
-  }
+  
 }
 
 .sub-cta-btn {
@@ -1351,16 +1261,6 @@ onMounted(async () => {
   }
 }
 
-.badge {
-  &--premium {
-    background: linear-gradient(135deg, #ffb347, #ff6584);
-    color: #fff;
-    padding: 0.2rem 0.6rem;
-    border-radius: $border-radius-pill;
-    font-size: 0.72rem;
-    font-weight: 700;
-  }
-}
 
 .form-input-toggle {
   padding: 0 0.85rem;

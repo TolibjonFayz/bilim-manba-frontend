@@ -114,11 +114,6 @@ select {
   font-weight: 700;
   letter-spacing: 0.02em;
 
-  &--premium {
-    background: linear-gradient(135deg, #ffb347, #ff6584);
-    color: #fff;
-  }
-
   &--free {
     background: $bg-secondary;
     color: $text-secondary;

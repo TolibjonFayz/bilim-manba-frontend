@@ -14,13 +14,6 @@
       >
         {{ article.category?.icon ?? "📄" }}
       </div>
-
-      <span
-        v-if="article.type === 'premium'"
-        class="badge badge--premium article-card__badge"
-      >
-        ⭐ Premium
-      </span>
     </div>
 
     <div class="article-card__body">
@@ -55,7 +48,7 @@ const props = defineProps<{
     slug: string;
     excerpt?: string;
     coverImage?: string;
-    type: "free" | "premium";
+    type: "free";
     viewCount: number;
     category?: { name: string; slug: string; icon?: string };
     author?: { fullName: string };

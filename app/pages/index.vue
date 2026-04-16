@@ -35,7 +35,7 @@
     </section>
 
     <!-- KATEGORIYALAR -->
-    <section class="categories-section">
+    <section class="categories-section" v-loading="loading">
       <div class="container">
         <div class="section-header">
           <div class="section-header__left">
@@ -52,7 +52,7 @@
 
         <div class="categories-list">
           <NuxtLink
-            v-for="cat in categories"
+            v-for="cat in categoryStore.allCategories"
             :key="cat.id"
             :to="`/categories/${cat.name}`"
             class="category-chip"
@@ -62,7 +62,7 @@
           </NuxtLink>
 
           <!-- Skeleton -->
-          <template v-if="!categories?.length">
+          <template v-if="!categoryStore.allCategories?.length">
             <div
               v-for="i in 6"
               :key="i"
@@ -74,63 +74,25 @@
     </section>
 
     <!-- MAQOLALAR -->
-    <section class="articles-section">
+    <section class="articles-section" v-loading="loading">
       <div class="container">
         <div class="section-header">
           <div class="section-header__left">
             <h2>✨ So'nggi maqolalar</h2>
             <p>Ekspertlarimiz tomonidan yozilgan eng yangi materiallar</p>
           </div>
-          <div class="articles-section__search">
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="🔍 Maqola qidirish..."
-              class="search-input"
-            />
-          </div>
         </div>
 
         <div class="articles-grid">
           <ArticleCard
-            v-for="article in filteredArticles"
+            v-for="article in articleStore.allArticles.slice(0, 6)"
             :key="article.id"
             :article="article"
           />
         </div>
 
-        <div v-if="filteredArticles?.length" class="articles-section__more">
-          <NuxtLink to="/articles" class="btn btn--outline">
-            Yana yuklash
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
-
-    <!-- PREMIUM BANNER -->
-    <section class="premium-banner">
-      <div class="premium-banner__inner container">
-        <div class="premium-banner__left">
-          <h2 class="premium-banner__title">Bilimni cheksiz oching</h2>
-          <p class="premium-banner__desc">
-            Premium obuna bilan barcha ekskluziv maqolalar, PDF qo'llanmalar va
-            yopiq webinar-larga ruxsat oling. Atigi
-            <strong>15,000 so'm/oy.</strong>
-          </p>
-          <ul class="premium-banner__features">
-            <li>✅ Reklamasiz interfeys</li>
-            <li>✅ Yuklab olish imkoniyati</li>
-          </ul>
-        </div>
-
-        <div class="premium-banner__right">
-          <div class="premium-banner__price">
-            <span class="premium-banner__amount">15.000 UZS</span>
-            <span class="premium-banner__period">oyiga 1 marta to'lov</span>
-          </div>
-          <NuxtLink to="/premium" class="btn btn--white">
-            Premium bo'lish
-          </NuxtLink>
+        <div class="articles-section__more">
+          <NuxtLink to="/articles" class="btn btn--primary"> Ko'proq </NuxtLink>
         </div>
       </div>
     </section>
@@ -139,104 +101,15 @@
 
 <script setup lang="ts">
 const authStore = useAuthStore();
-const searchQuery = ref("");
+const articleStore = useArticleStore();
+const categoryStore = useCategoryStore();
+const loading = ref(false);
 
-const categories = ref([
-  { id: 1, name: "Sport", slug: "sport", icon: "⚽" },
-  { id: 2, name: "Kompyuter fanlari", slug: "kompyuter-fanlari", icon: "💻" },
-  { id: 3, name: "Tarix", slug: "tarix", icon: "⚔️" },
-  { id: 4, name: "O'yinlar", slug: "oyinlar", icon: "🎮" },
-  { id: 5, name: "Kino", slug: "kino", icon: "🎬" },
-  { id: 6, name: "Matematika", slug: "matematika", icon: "📐" },
-  { id: 7, name: "Geografiya", slug: "geografiya", icon: "🌍" },
-  { id: 8, name: "Biologiya", slug: "biologiya", icon: "🧬" },
-  { id: 9, name: "Fizika", slug: "fizika", icon: "🔋" },
-  { id: 10, name: "San'at", slug: "sanat", icon: "🎨" },
-  { id: 11, name: "Umumiy", slug: "umumiy", icon: "⚖️" },
-]);
-
-const articles = ref([
-  {
-    id: 1,
-    title: "Zamonaviy veb-ishlab chiqishda React o'rni va kelajagi",
-    slug: "react-orni-va-kelajagi",
-    excerpt:
-      "Veb texnologiyalar kundan-kunga rivojlanib bormoqda. React dasturlash sohasida o'z pozitsiyasini ushlab turolarmikan?",
-    coverImage: null,
-    type: "free",
-    viewCount: 1200,
-    category: { name: "Texnologiya", slug: "texnologiya", icon: "💻" },
-    author: { fullName: "Azizbek Toshmatov" },
-  },
-  {
-    id: 2,
-    title: "Sun'iy intellekt: Insoniyat uchun imkoniyat yoki tahdid?",
-    slug: "suniy-intellekt",
-    excerpt:
-      "AI hayotimizning har bir jabhaziga kirib bormoqda. Bu o'zgarishlar bizga qanday ta'sir qiladi?",
-    coverImage: null,
-    type: "premium",
-    viewCount: 2400,
-    category: { name: "Ilm-Fan", slug: "ilm-fan", icon: "🔬" },
-    author: { fullName: "Madina Aliyeva" },
-  },
-  {
-    id: 3,
-    title: "Muvaffaqiyatli startap qurish: G'oyadan real loyihagacha",
-    slug: "startap-qurish",
-    excerpt:
-      "Startap olami sodda ko'rinsa-da, aslida murakkab. Qanday qilib xatolardan qochish mumkin?",
-    coverImage: null,
-    type: "free",
-    viewCount: 860,
-    category: { name: "Biznes", slug: "biznes", icon: "💼" },
-    author: { fullName: "Jamshid Karimov" },
-  },
-  {
-    id: 4,
-    title: "Kvant fizikasi sirlari: Eng sodda tushuntirish",
-    slug: "kvant-fizikasi",
-    excerpt:
-      "Muazzam va oddiy tilda tushuntirish: Kvant olamining qonuniyatlari bizning olamdan qanchalik farq qiladi?",
-    coverImage: null,
-    type: "premium",
-    viewCount: 2100,
-    category: { name: "Fizika", slug: "fizika", icon: "🧪" },
-    author: { fullName: "Sardor Rahimov" },
-  },
-  {
-    id: 5,
-    title: "Ma'lumotlar xavfsizligi: Shaxsiy ma'lumotlarni qanday saqlash",
-    slug: "malumotlar-xavfsizligi",
-    excerpt:
-      "Kiberxavfsizlik dunyoda shiddat bilan rivojlanib, eng muhim 10 ta qoida haqida tanishing.",
-    coverImage: null,
-    type: "free",
-    viewCount: 4100,
-    category: { name: "Kiberxavfsizlik", slug: "kiberxavfsizlik", icon: "🔐" },
-    author: { fullName: "Nilufar Ortiqova" },
-  },
-  {
-    id: 6,
-    title: "Samarali vaqt boshqaruvi: Pomodoro texnikasidan tashqari",
-    slug: "vaqt-boshqaruvi",
-    excerpt:
-      "Vaqtingizni to'g'ri boshqarish uchun 3 ta kamtarona strategiyani o'rganib, zamonaviy vositalar bilan tanishing.",
-    coverImage: null,
-    type: "free",
-    viewCount: 5200,
-    category: { name: "Psixologiya", slug: "psixologiya", icon: "🧠" },
-    author: { fullName: "Jasur Odilov" },
-  },
-]);
-
-const filteredArticles = computed(() => {
-  if (!searchQuery.value) return articles.value;
-  const q = searchQuery.value.toLowerCase();
-  return articles.value.filter(
-    (a) =>
-      a.title.toLowerCase().includes(q) || a.excerpt?.toLowerCase().includes(q),
-  );
+onMounted(async () => {
+  loading.value = true;
+  await categoryStore.getCategories();
+  await articleStore.getAllArticles();
+  loading.value = false;
 });
 </script>
 
@@ -401,90 +274,6 @@ const filteredArticles = computed(() => {
 
   @media (max-width: $tablet) {
     grid-template-columns: 1fr;
-  }
-}
-
-// PREMIUM BANNER
-.premium-banner {
-  margin: 3rem 0;
-
-  &__inner {
-    background: linear-gradient(135deg, #6c63ff 0%, #ff6584 100%);
-    border-radius: $border-radius-lg;
-    padding: 3.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 3rem;
-
-    @media (max-width: $tablet) {
-      flex-direction: column;
-      text-align: center;
-    }
-  }
-
-  &__left {
-    flex: 1;
-  }
-
-  &__title {
-    font-size: 2rem;
-    font-weight: 800;
-    color: #fff;
-    line-height: 1.2;
-    margin-bottom: 1rem;
-  }
-
-  &__desc {
-    color: rgba(#fff, 0.85);
-    line-height: 1.7;
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-
-    strong {
-      color: #fff;
-    }
-  }
-
-  &__features {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-
-    li {
-      color: rgba(#fff, 0.9);
-      font-size: 0.9rem;
-    }
-  }
-
-  &__right {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1.25rem;
-    flex-shrink: 0;
-  }
-
-  &__price {
-    background: rgba(#fff, 0.15);
-    border: 1px solid rgba(#fff, 0.3);
-    border-radius: $border-radius;
-    padding: 1rem 2rem;
-    text-align: center;
-    backdrop-filter: blur(8px);
-  }
-
-  &__amount {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: #fff;
-  }
-
-  &__period {
-    font-size: 0.8rem;
-    color: rgba(#fff, 0.8);
   }
 }
 
