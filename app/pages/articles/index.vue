@@ -112,12 +112,11 @@
                       <div class="article-card-h__avatar">
                         {{ article.author?.fullName?.[0] }}
                       </div>
-                      <span class="article-card-h__author-name">{{
-                        article.author?.fullName
-                      }}</span>
+                      <span class="article-card-h__author-name">
+                        {{ article.author?.fullName }}
+                      </span>
                     </div>
                     <div class="article-card-h__stats">
-                      <span>🕐 {{ article.readTime ?? 5 }} min</span>
                       <span>👁 {{ article.viewCount }}</span>
                     </div>
                     <span class="article-card-h__read">O'qish →</span>
@@ -167,31 +166,31 @@
           <!-- O'NG: Sidebar -->
           <aside class="articles-sidebar">
             <!-- Mashhur maqolalar -->
-            <div class="sidebar-card">
-              <h3 class="sidebar-card__title">🔥 MASHHUR MAQOLALAR</h3>
+            <div class="sidebar-card popular-card">
+              <div class="popular-card__header">
+                <span class="popular-card__icon">🔥</span>
+                <h3 class="popular-card__title">MASHHUR MAQOLALAR</h3>
+              </div>
               <ol class="popular-list">
                 <NuxtLink
-                  v-for="item in popularArticles"
+                  v-for="(item, idx) in popularArticles"
                   :key="item.id"
                   :to="`/articles/${item.slug}`"
                   class="popular-item"
                 >
-                  <div
-                    class="popular-item__cover"
-                    :style="{ background: item.gradient }"
-                  />
-                  <div class="popular-item__info">
+                  <span class="popular-item__num">0{{ idx + 1 }}</span>
+                  <div class="popular-item__content">
                     <p class="popular-item__title">{{ item.title }}</p>
-                    <span class="popular-item__views"
-                      >👁 {{ item.viewCount }}</span
-                    >
+                    <span class="popular-item__views">
+                      👁 {{ item.viewCount }}
+                    </span>
                   </div>
                 </NuxtLink>
               </ol>
             </div>
 
             <!-- Kategoriyalar -->
-            <div class="sidebar-card">
+            <div class="sidebar-card categories-card">
               <h3 class="sidebar-card__title">📂 KATEGORIYALAR</h3>
               <ul class="sidebar-cats">
                 <li
@@ -202,25 +201,10 @@
                 >
                   <span class="sidebar-cats__name">{{ cat.name }}</span>
                   <span class="sidebar-cats__count">{{
-                    cat.articleCount ?? 0
+                    cat.articles.length ?? 0
                   }}</span>
                 </li>
               </ul>
-            </div>
-
-            <!-- Teglar -->
-            <div class="sidebar-card">
-              <h3 class="sidebar-card__title">🏷 TEGLAR</h3>
-              <div class="tags-wrap">
-                <span
-                  v-for="tag in popularTags"
-                  :key="tag.name"
-                  class="tag-pill"
-                  :style="{ background: tag.bg, color: tag.color }"
-                >
-                  #{{ tag.name }}
-                </span>
-              </div>
             </div>
           </aside>
         </div>
@@ -238,7 +222,7 @@ const searchQuery = ref("");
 const activeCategory = ref("barchasi");
 const sortBy = ref("newest");
 const currentPage = ref(1);
-const perPage = 4;
+const perPage = 10;
 const loading = ref(false);
 
 const gradients = [
@@ -313,9 +297,7 @@ watch(activeCategory, () => {
 });
 
 // Sidebar
-const sidebarCategories = computed(() =>
-  (categoryStore.allCategories ?? []).slice(0, 5),
-);
+const sidebarCategories = computed(() => categoryStore.allCategories ?? []);
 
 const popularArticles = computed(() =>
   [...(articleStore.allArticles ?? [])]
@@ -326,15 +308,6 @@ const popularArticles = computed(() =>
       gradient: gradients[i % gradients.length],
     })),
 );
-
-const popularTags = ref([
-  { name: "javascript", bg: "rgba(108,99,255,0.1)", color: "#6C63FF" },
-  { name: "python", bg: "rgba(67,233,123,0.12)", color: "#22a85a" },
-  { name: "algebra", bg: "rgba(255,101,132,0.1)", color: "#FF6584" },
-  { name: "kvant", bg: "rgba(79,172,254,0.12)", color: "#2176d2" },
-  { name: "tarix", bg: "rgba(250,112,154,0.1)", color: "#d94f82" },
-  { name: "biologiya", bg: "rgba(161,140,209,0.12)", color: "#7b5ea7" },
-]);
 </script>
 
 <style lang="scss" scoped>
@@ -344,6 +317,10 @@ const popularTags = ref([
   padding: 2.5rem 0;
   border-bottom: 1px solid $border-color;
 
+  @media (max-width: $mobile) {
+    padding: 1.5rem 0;
+  }
+
   &__inner {
     display: flex;
     align-items: flex-start;
@@ -352,6 +329,7 @@ const popularTags = ref([
 
     @media (max-width: $tablet) {
       flex-direction: column;
+      gap: 1rem;
     }
   }
 
@@ -360,6 +338,11 @@ const popularTags = ref([
     font-weight: 800;
     letter-spacing: -0.02em;
     margin: 0.75rem 0 0.5rem;
+
+    @media (max-width: $mobile) {
+      font-size: 1.75rem;
+      margin: 0.5rem 0 0.35rem;
+    }
   }
 
   &__subtitle {
@@ -367,6 +350,10 @@ const popularTags = ref([
     font-size: 0.95rem;
     max-width: 360px;
     line-height: 1.6;
+
+    @media (max-width: $mobile) {
+      font-size: 0.875rem;
+    }
   }
 
   &__search {
@@ -445,6 +432,10 @@ const popularTags = ref([
 .articles-section {
   padding: 2.5rem 0 4rem;
 
+  @media (max-width: $mobile) {
+    padding: 1.5rem 0 2.5rem;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: 1fr 300px;
@@ -457,6 +448,11 @@ const popularTags = ref([
   }
 }
 
+// Constrain articles main column — without min-width: 0, a grid child can overflow 1fr
+.articles-main {
+  min-width: 0;
+}
+
 // FILTER BAR
 .filter-bar {
   margin-bottom: 1.25rem;
@@ -465,6 +461,17 @@ const popularTags = ref([
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
+
+    @media (max-width: $mobile) {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-bottom: 0.5rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
   }
 }
 
@@ -479,6 +486,7 @@ const popularTags = ref([
   cursor: pointer;
   transition: all 0.2s;
   font-family: $font-primary;
+  flex-shrink: 0;
 
   &:hover {
     border-color: $primary;
@@ -502,6 +510,8 @@ const popularTags = ref([
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
 
   &__count {
     font-size: 0.875rem;
@@ -543,6 +553,7 @@ const popularTags = ref([
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  min-width: 0;
 }
 
 .article-card-h {
@@ -553,6 +564,7 @@ const popularTags = ref([
   border-radius: $border-radius;
   overflow: hidden;
   transition: all 0.25s ease;
+  min-width: 0; // flex child: prevent growing past container
 
   &:hover {
     transform: translateY(-3px);
@@ -614,6 +626,11 @@ const popularTags = ref([
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    min-width: 0; // prevent overflow
+
+    @media (max-width: $mobile) {
+      padding: 1rem;
+    }
   }
 
   &__cat-label {
@@ -688,6 +705,10 @@ const popularTags = ref([
     gap: 0.75rem;
     font-size: 0.78rem;
     color: $text-muted;
+
+    @media (max-width: $mobile) {
+      display: none;
+    }
   }
 
   &__read {
@@ -780,6 +801,10 @@ const popularTags = ref([
   gap: 1.25rem;
   position: sticky;
   top: 80px;
+
+  @media (max-width: $mobile) {
+    display: none; // sidebar below article list = too much scroll on mobile
+  }
 }
 
 .sidebar-card {
@@ -787,8 +812,6 @@ const popularTags = ref([
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
-
-  
 
   &__title {
     font-size: 0.72rem;
@@ -799,31 +822,70 @@ const popularTags = ref([
   }
 }
 
+// POPULAR CARD
+.popular-card {
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__icon {
+    font-size: 1.25rem;
+  }
+
+  &__title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: $text-secondary;
+  }
+}
+
 // POPULAR LIST
 .popular-list {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
+  gap: 0.75rem;
+}
 
-  &__item {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
+.popular-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  padding: 0.75rem;
+  border-radius: $border-radius-sm;
+  transition: all 0.2s;
+  cursor: pointer;
+  border-bottom: 2px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &:hover {
+    background: $bg-secondary;
+
+    .popular-item__title {
+      color: $primary;
+    }
   }
 
   &__num {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 700;
     color: $text-muted;
     flex-shrink: 0;
-    min-width: 22px;
+    min-width: 28px;
   }
 
-  &__info {
+  &__content {
     display: flex;
     flex-direction: column;
     gap: 0.2rem;
+    min-width: 0;
   }
 
   &__title {
@@ -832,10 +894,11 @@ const popularTags = ref([
     color: $text-primary;
     line-height: 1.4;
     transition: color 0.15s;
-
-    &:hover {
-      color: $primary;
-    }
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
 
   &__views {
@@ -849,19 +912,22 @@ const popularTags = ref([
   list-style: none;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
 
   &__item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.6rem 0.5rem;
+    padding: 0.75rem 1rem;
     border-radius: $border-radius-sm;
     cursor: pointer;
     transition: all 0.15s;
+    background: $bg-secondary;
+    border: 1px solid transparent;
 
     &:hover {
       background: $primary-light;
-      padding-left: 0.85rem;
+      border-color: $primary;
 
       .sidebar-cats__name {
         color: $primary;
@@ -871,21 +937,20 @@ const popularTags = ref([
 
   &__name {
     font-size: 0.875rem;
-    font-weight: 500;
+    font-weight: 600;
     color: $text-primary;
     transition: color 0.15s;
   }
 
   &__count {
-    font-size: 0.78rem;
-    font-weight: 600;
+    font-size: 0.8rem;
+    font-weight: 700;
     color: $text-muted;
-    background: $bg-secondary;
-    padding: 0.1rem 0.5rem;
+    background: #fff;
+    padding: 0.2rem 0.6rem;
     border-radius: $border-radius-pill;
   }
 }
-
 
 // TAGS
 .tags-wrap {
@@ -896,15 +961,17 @@ const popularTags = ref([
 
 .tag-pill {
   display: inline-flex;
-  padding: 0.3rem 0.7rem;
+  padding: 0.4rem 0.85rem;
   border-radius: $border-radius-pill;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s;
+  border: none;
 
   &:hover {
-    opacity: 0.75;
+    opacity: 0.85;
+    transform: translateY(-2px);
   }
 }
 </style>

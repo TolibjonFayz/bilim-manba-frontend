@@ -122,6 +122,14 @@ onMounted(async () => {
   overflow: hidden;
   text-align: center;
 
+  @media (max-width: $tablet) {
+    padding: 4rem 0 3.5rem;
+  }
+
+  @media (max-width: $mobile) {
+    padding: 3rem 0 2.5rem;
+  }
+
   &__inner {
     position: relative;
     z-index: 2;
@@ -162,6 +170,11 @@ onMounted(async () => {
     max-width: 560px;
     margin: 0 auto 2.5rem;
     line-height: 1.7;
+
+    @media (max-width: $mobile) {
+      font-size: 1rem;
+      margin-bottom: 2rem;
+    }
   }
 
   &__actions {

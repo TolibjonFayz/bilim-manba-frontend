@@ -66,10 +66,23 @@
     display: grid;
     grid-template-columns: 2fr 1fr 1fr 2fr;
     gap: 3rem;
-    padding: 4rem 0;
+    // padding shorthand would zero out .container's horizontal padding (specificity bug)
+    // so use top/bottom only — let .container handle left/right
+    padding-top: 4rem;
+    padding-bottom: 4rem;
 
     @media (max-width: $tablet) {
       grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+
+    @media (max-width: $mobile) {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      padding-top: 2.5rem;
+      padding-bottom: 2.5rem;
     }
   }
 
@@ -147,16 +160,24 @@
       gap: 0.5rem;
 
       input {
+        width: 100%; // stretch to container width
         padding: 0.65rem 1rem;
         border: 1.5px solid $border-color;
         border-radius: $border-radius-pill;
         font-size: 0.875rem;
         outline: none;
         background: #fff;
+        box-sizing: border-box;
 
         &:focus {
           border-color: $primary;
         }
+      }
+
+      // Subscribe button stretches full-width in column flex
+      .btn {
+        width: 100%;
+        justify-content: center;
       }
     }
   }
@@ -165,7 +186,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 1.5rem 0;
+    // same fix: avoid shorthand that zeroes .container horizontal padding
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
     border-top: 1px solid $border-color;
     font-size: 0.8rem;
     color: $text-muted;

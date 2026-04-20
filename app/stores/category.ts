@@ -2,7 +2,7 @@ import { defineStore } from "pinia";
 
 export const useCategoryStore = defineStore("categories", () => {
   const allCategories = ref<any[]>([]);
-  const oneCategory = ref<any>(null);
+  const categoryBySlug = ref<any>(null);
 
   // Barcha kategoriyalar
   async function getCategories() {
@@ -28,7 +28,7 @@ export const useCategoryStore = defineStore("categories", () => {
         method: "GET",
         baseURL: useRuntimeConfig().public.apiBase,
       });
-      oneCategory.value = res;
+      categoryBySlug.value = res;
       return { success: true, data: res };
     } catch (error: any) {
       return {
@@ -40,8 +40,8 @@ export const useCategoryStore = defineStore("categories", () => {
 
   return {
     allCategories,
-    oneCategory,
     getCategories,
     getCategoryBySlug,
+    categoryBySlug,
   };
 });

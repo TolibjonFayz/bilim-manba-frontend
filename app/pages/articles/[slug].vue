@@ -1,4 +1,3 @@
-<!-- app/pages/articles/[slug].vue -->
 <template>
   <div class="article-page" v-loading="loading">
     <div class="container">
@@ -49,7 +48,7 @@
               </div>
 
               <div class="article-header__stats">
-                <span>🕐 {{ article?.readTime ?? 5 }} daqiqa</span>
+                <span>🕐 {{ readTime }} daqiqa</span>
                 <span>👁 {{ article?.viewCount }}</span>
               </div>
 
@@ -88,7 +87,7 @@
             <div class="article-content" v-html="content?.message" />
           </div>
 
-          <!-- ARTICLE FOOTER (faqat locked bo'lmasa) -->
+          <!-- ARTICLE FOOTER -->
           <div class="article-footer">
             <!-- Teglar -->
             <div class="article-footer__tags">
@@ -129,9 +128,9 @@
                   class="related-card__cover"
                   :style="{ background: rel?.gradient }"
                 >
-                  <span class="related-card__cat">{{
-                    rel?.category?.name
-                  }}</span>
+                  <span class="related-card__cat">
+                    {{ rel?.category?.name }}
+                  </span>
                 </div>
                 <div class="related-card__body">
                   <span class="related-card__date">
@@ -154,7 +153,7 @@
           <div class="sidebar-card">
             <div class="author-card">
               <div class="author-card__avatar">
-                {{ article?.author?.fullName[0] }}
+                {{ article?.author?.fullName?.[0] }}
               </div>
               <div class="author-card__info">
                 <h4 class="author-card__name">
@@ -208,7 +207,7 @@
           </button>
         </div>
 
-        <div class="ai-panel__messages" ref="messagesEl">
+        <div ref="messagesEl" class="ai-panel__messages">
           <div
             v-for="msg in aiMessages"
             :key="msg.id"
@@ -219,11 +218,7 @@
           </div>
           <div v-if="aiLoading" class="ai-msg">
             <div class="ai-msg__bubble ai-msg__bubble--loading">
-              <span class="ai-typing">
-                <span />
-                <span />
-                <span />
-              </span>
+              <span class="ai-typing"> <span /><span /><span /> </span>
             </div>
           </div>
         </div>
@@ -245,8 +240,11 @@
 
 <script setup lang="ts">
 import { ElNotification } from "element-plus";
+
 const route = useRoute();
 const articleStore = useArticleStore();
+const likeStore = useLikeStore();
+const authStore = useAuthStore();
 
 const loading = ref(false);
 const isLiked = ref(false);
@@ -255,8 +253,8 @@ const showAiPanel = ref(false);
 const aiQuestion = ref("");
 const aiLoading = ref(false);
 const messagesEl = ref<HTMLElement | null>(null);
-const tags = ref([]);
-const content = ref("");
+const tags = ref<string[]>([]);
+const content = ref<any>(null);
 
 const gradients = [
   "linear-gradient(135deg, #667eea, #764ba2)",
@@ -266,15 +264,12 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-// Article computed
 const article = computed(() => articleStore.oneArticle);
 
-// Gradient
 const articleGradient = computed(
   () => gradients[(article.value?.id ?? 0) % gradients.length],
 );
 
-// Related — o'zidan tashqari
 const relatedArticles = computed(() =>
   (articleStore.allArticles ?? [])
     .filter((a: any) => a.id !== article.value?.id)
@@ -285,22 +280,8 @@ const relatedArticles = computed(() =>
     })),
 );
 
-// Table of contents — content ichidagi h2/h3 lardan
-const tableOfContents = computed(() => {
-  if (!article.value?.content) return [];
-  const matches = [
-    ...article.value.content.matchAll(
-      /<h([23])[^>]*id="([^"]*)"[^>]*>([^<]*)<\/h[23]>/g,
-    ),
-  ];
-  return matches.map((m: any) => ({
-    level: parseInt(m[1]),
-    id: m[2],
-    title: m[3],
-  }));
-});
+const readTime = computed(() => calcReadTime(content.value?.message ?? ""));
 
-// Sidebar popular
 const popularArticles = computed(() =>
   (articleStore.allArticles ?? [])
     .filter((a: any) => a.id !== article.value?.id)
@@ -312,9 +293,43 @@ const popularArticles = computed(() =>
     })),
 );
 
-const toggleLike = () => {
+// ✅ OPTIMISTIC TOGGLE LIKE — backend ulangan
+const toggleLike = async () => {
+  // Login bo'lmasa — login pagega
+  if (!authStore.isLoggedIn) {
+    ElNotification({
+      title: "Diqqat",
+      message: "Like bosish uchun avval kiring",
+      type: "warning",
+    });
+    navigateTo("/login");
+    return;
+  }
+
+  if (!article.value?.id) return;
+
+  // 1. UI darhol yangilanadi (optimistic)
   isLiked.value = !isLiked.value;
   likeCount.value += isLiked.value ? 1 : -1;
+
+  // 2. Backend ga so'rov
+  const res = await likeStore.toggle(article.value.id);
+
+  // 3. Xato bo'lsa qaytaramiz
+  if (!res.success) {
+    isLiked.value = !isLiked.value;
+    likeCount.value += isLiked.value ? 1 : -1;
+
+    ElNotification({
+      title: "Xato",
+      message: res.message,
+      type: "error",
+    });
+  } else {
+    // Backend dan keladigan aniq qiymat
+    isLiked.value = res.data.isLiked;
+    likeCount.value = res.data.likeCount;
+  }
 };
 
 const handleShare = () => {
@@ -336,7 +351,6 @@ const aiMessages = ref([
   },
 ]);
 
-// Fetch content from URL with error handling
 async function fetchContent(url: string): Promise<any | null> {
   try {
     const response = await fetch(url);
@@ -373,7 +387,7 @@ const askAi = async () => {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: {
         text:
-          article.value?.content?.replace(/<[^>]*>/g, "").slice(0, 500) ?? "",
+          content.value?.message?.replace(/<[^>]*>/g, "").slice(0, 500) ?? "",
         question,
       },
     });
@@ -400,24 +414,33 @@ const askAi = async () => {
 
 onMounted(async () => {
   loading.value = true;
+
+  // 1. Maqolani olish
   await articleStore.getArticleBySlug(route.params.slug as string);
-  content.value = await fetchContent(articleStore?.oneArticle?.content);
 
-  tags.value = articleStore.oneArticle.tags
-    .split(",")
-    .map((t: string) => t.trim());
+  // 2. Content (HTML) URL orqali olish
+  if (articleStore.oneArticle?.content) {
+    content.value = await fetchContent(articleStore.oneArticle.content);
+  }
 
+  // 3. Tags parsing
+  if (articleStore.oneArticle?.tags) {
+    tags.value = articleStore.oneArticle.tags
+      .split(",")
+      .map((t: string) => t.trim());
+  }
+
+  // 4. Like state ni backend dan olish
   if (articleStore.oneArticle) {
     likeCount.value = articleStore.oneArticle.likeCount ?? 0;
-
-    // Related maqolalar — xuddi shu kategoriyadan
-    if (articleStore.oneArticle.category?.slug) {
-      //FOR NOW ITS NO NEED (14.04.2026)
-      // await articleStore.getArticleBySlug(
-      //   articleStore.oneArticle.category.slug,
-      // );
-    }
+    isLiked.value = articleStore.oneArticle.isLiked ?? false;
   }
+
+  // 5. Related maqolalar — xuddi shu kategoriyadan
+  if (articleStore.oneArticle?.category?.slug) {
+    await articleStore.getArticleBySlug(articleStore.oneArticle.category.slug);
+  }
+
   loading.value = false;
 });
 </script>

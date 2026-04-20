@@ -7,7 +7,7 @@
         <div class="profile-header__inner">
           <div class="profile-header__left">
             <div class="profile-header__avatar">
-              {{ userStore?.oneUserInfo?.[0]?.toUpperCase() ?? "?" }}
+              <Icon name="mdi:user" size="1em" mode="css" />
             </div>
             <div class="profile-header__info">
               <div class="profile-header__name-row">
@@ -360,6 +360,7 @@
 <script setup lang="ts">
 definePageMeta({ middleware: "auth" });
 
+const likeStore = useLikeStore();
 const userStore = useUserStore();
 const activeTab = ref("activity");
 
@@ -457,9 +458,6 @@ const handleUpdatePassword = async () => {
   }
 };
 
-// Static ma'lumotlar
-const stats = ref({ readCount: 24, totalTime: 4.2, savedCount: 8 });
-
 const recentArticles = ref([
   {
     id: 1,
@@ -487,8 +485,6 @@ const recentArticles = ref([
   },
 ]);
 
-const savedArticles = ref<any[]>([]);
-
 const weeklyData = ref([
   { label: "Du", value: 2 },
   { label: "Se", value: 4 },
@@ -503,13 +499,38 @@ const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
 const weeklyTotal = computed(() =>
   weeklyData.value.reduce((a, b) => a + b.value, 0),
 );
+
 onMounted(async () => {
   loading.value = true;
-  const res = await userStore.getOneUserInfo(
-    Number(localStorage.getItem("userid")),
-  );
+  await Promise.all([
+    userStore.getOneUserInfo(Number(localStorage.getItem("userid"))),
+    likeStore.getUserLikes(),
+  ]);
   loading.value = false;
 });
+
+// savedArticles ni likeStore dan olamiz
+const savedArticles = computed(() =>
+  likeStore.userLikes.map((a: any, i: number) => ({
+    ...a,
+    gradient: [
+      "linear-gradient(135deg, #667eea, #764ba2)",
+      "linear-gradient(135deg, #43e97b, #38f9d7)",
+      "linear-gradient(135deg, #4facfe, #00f2fe)",
+      "linear-gradient(135deg, #fa709a, #fee140)",
+    ][i % 4],
+    category: a.category?.name ?? "Maqola",
+    date: a.createdAt ? new Date(a.createdAt).toLocaleDateString("uz-UZ") : "",
+    readTime: 5,
+  })),
+);
+
+// Stats ham real — likes soni
+const stats = computed(() => ({
+  readCount: 24,
+  totalTime: 4.2,
+  savedCount: likeStore.userLikes.length, // 👈 real son
+}));
 </script>
 
 <style lang="scss" scoped>
@@ -534,6 +555,7 @@ onMounted(async () => {
     display: flex;
     align-items: center;
     gap: 1.25rem;
+    min-width: 0;
   }
 
   &__avatar {
@@ -562,6 +584,10 @@ onMounted(async () => {
     font-size: 1.5rem;
     font-weight: 800;
     letter-spacing: -0.02em;
+
+    @media (max-width: $mobile) {
+      font-size: 1.25rem;
+    }
   }
 
   &__badge {
@@ -574,8 +600,6 @@ onMounted(async () => {
       background: rgba(#43d98b, 0.12);
       color: #1a9e5e;
     }
-
-    
   }
 
   &__email {
@@ -603,11 +627,21 @@ onMounted(async () => {
       border-color: $primary;
       color: $primary;
     }
+
+    // Full-width when stacked below profile info on tablet/mobile
+    @media (max-width: $tablet) {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }
 
 .profile-main {
   padding: 2.5rem 0 4rem;
+
+  @media (max-width: $mobile) {
+    padding: 1.5rem 0 3rem;
+  }
 
   &__grid {
     display: grid;
@@ -666,8 +700,6 @@ onMounted(async () => {
     color: $text-muted;
     border: 1px solid $border-color;
   }
-
-  
 }
 
 .sub-cta-btn {
@@ -797,6 +829,11 @@ onMounted(async () => {
   display: flex;
   border-bottom: 2px solid $border-color;
   margin-bottom: 2rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
 
   &__item {
     padding: 0.75rem 1.5rem;
@@ -810,6 +847,8 @@ onMounted(async () => {
     border-bottom: 2px solid transparent;
     margin-bottom: -2px;
     transition: all 0.2s;
+    white-space: nowrap;
+    flex-shrink: 0;
 
     &:hover {
       color: $primary;
@@ -818,6 +857,11 @@ onMounted(async () => {
     &--active {
       color: $primary;
       border-bottom-color: $primary;
+    }
+
+    @media (max-width: $mobile) {
+      padding: 0.65rem 1rem;
+      font-size: 0.875rem;
     }
   }
 }
@@ -853,7 +897,11 @@ onMounted(async () => {
   gap: 1rem;
 
   @media (max-width: $tablet) {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); // 3 → 2 on tablet
+  }
+
+  @media (max-width: $mobile) {
+    grid-template-columns: 1fr; // 2 → 1 on mobile
   }
 }
 
@@ -917,11 +965,18 @@ onMounted(async () => {
   border-radius: $border-radius;
   padding: 1.5rem;
 
+  @media (max-width: $mobile) {
+    padding: 1rem;
+    overflow-x: auto; // chart won't squish into unreadable bars
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
     margin-bottom: 1.5rem;
+    gap: 1rem;
+    flex-wrap: wrap;
   }
 
   &__label {
@@ -1131,6 +1186,10 @@ onMounted(async () => {
   padding: 1.75rem;
   margin-bottom: 1rem;
 
+  @media (max-width: $mobile) {
+    padding: 1.25rem;
+  }
+
   &__title {
     font-size: 1.05rem;
     font-weight: 700;
@@ -1260,7 +1319,6 @@ onMounted(async () => {
     color: $danger;
   }
 }
-
 
 .form-input-toggle {
   padding: 0 0.85rem;

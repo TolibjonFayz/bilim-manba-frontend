@@ -43,7 +43,7 @@
             </div>
 
             <!-- Article list -->
-            <div class="article-list">
+            <div class="article-list" v-if="filteredArticles.length">
               <NuxtLink
                 v-for="article in filteredArticles"
                 :key="article.id"
@@ -52,14 +52,11 @@
               >
                 <!-- Cover -->
                 <div class="article-row__cover">
-                  <div
+                  <img
+                    :src="article?.coverImage"
                     class="article-row__cover-placeholder"
-                    :style="{ background: category?.gradient }"
-                  >
-                    <span class="article-row__cat-badge">{{
-                      category?.name
-                    }}</span>
-                  </div>
+                    loading="lazy"
+                  />
                 </div>
 
                 <!-- Info -->
@@ -67,12 +64,20 @@
                   <h3 class="article-row__title">{{ article?.title }}</h3>
                   <p class="article-row__excerpt">{{ article?.excerpt }}</p>
                   <div class="article-row__meta">
-                    <span class="article-row__meta-item"
-                      >📅 {{ article?.date }}</span
-                    >
-                    <span class="article-row__meta-item"
-                      >🕐 {{ article?.readTime }} daqiqa</span
-                    >
+                    <span class="article-row__meta-item">
+                      📅
+                      {{
+                        article?.createdAt
+                          ? new Date(article?.createdAt).toLocaleDateString(
+                              "uz-UZ",
+                            )
+                          : ""
+                      }}
+                    </span>
+                    <span class="article-row__meta-item">
+                      👁 {{ article?.viewCount }}
+                    </span>
+
                     <NuxtLink
                       :to="`/articles/${article.slug}`"
                       class="article-row__read-link"
@@ -83,21 +88,22 @@
                   </div>
                 </div>
               </NuxtLink>
+
+              <!-- Load more -->
+              <button class="load-more-btn">Ko'proq yuklash →</button>
             </div>
 
-            <!-- Load more -->
-            <button class="load-more-btn">Ko'proq yuklash →</button>
-
+            <el-empty v-else description="Maqolalar topilmadi" />
             <!-- Breadcrumb -->
             <nav class="breadcrumb breadcrumb--bottom">
               <NuxtLink to="/" class="breadcrumb__item">Bosh sahifa</NuxtLink>
               <span class="breadcrumb__sep">›</span>
-              <NuxtLink to="/categories" class="breadcrumb__item"
-                >Kategoriyalar</NuxtLink
-              >
+              <NuxtLink to="/categories" class="breadcrumb__item">
+                Kategoriyalar
+              </NuxtLink>
               <span class="breadcrumb__sep">›</span>
               <span class="breadcrumb__item breadcrumb__item--active">
-                {{ category?.name }} va texnologiya
+                {{ category?.name }}
               </span>
             </nav>
           </div>
@@ -127,18 +133,6 @@
                   </NuxtLink>
                 </li>
               </ol>
-            </div>
-
-            <!-- Haftalik xat -->
-            <div class="sidebar-block sidebar-block--gradient">
-              <h3 class="sidebar-block__title sidebar-block__title--white">
-                Haftalik xat
-              </h3>
-              <p class="sidebar-block__desc">
-                Eng so'nggi ilmiy yangiliklar va maqolalarni har dushanba
-                elektron pochtangizda qabul qiling.
-              </p>
-              <button class="btn sidebar-block__btn">Obuna bo'lish</button>
             </div>
 
             <!-- Ommabop teglar -->
@@ -179,11 +173,10 @@
 <script setup lang="ts">
 const route = useRoute();
 const categoryStore = useCategoryStore();
-const articleStore = useArticleStore();
 const loading = ref(false);
 const sortBy = ref("newest");
 
-const category = computed(() => categoryStore.oneCategory);
+const category = computed(() => categoryStore.categoryBySlug);
 
 const gradients = [
   "linear-gradient(135deg, #667eea, #764ba2)",
@@ -195,10 +188,12 @@ const gradients = [
 ];
 
 const filteredArticles = computed(() => {
-  let list = [...(articleStore.allArticles ?? [])].map((a, i) => ({
-    ...a,
-    gradient: gradients[i % gradients.length],
-  }));
+  let list = [...(categoryStore.categoryBySlug?.articles ?? [])].map(
+    (a, i) => ({
+      ...a,
+      gradient: gradients[i % gradients.length],
+    }),
+  );
 
   if (sortBy.value === "popular") {
     list.sort((a, b) => b.viewCount - a.viewCount);
@@ -233,7 +228,9 @@ const popularTags = ref([
 
 onMounted(async () => {
   loading.value = true;
-  await categoryStore.getCategoryBySlug(route.params.slug as string);
+  const res = await categoryStore.getCategoryBySlug(
+    route.params.slug as string,
+  );
   loading.value = false;
 });
 </script>
@@ -412,15 +409,10 @@ onMounted(async () => {
   }
 
   &__cover-placeholder {
+    width: 100%;
     height: 100%;
-    min-height: 160px;
-    display: flex;
-    align-items: flex-end;
-    padding: 0.75rem;
-
-    @media (max-width: $mobile) {
-      min-height: 0;
-    }
+    object-fit: cover;
+    object-position: center;
   }
 
   &__cat-badge {

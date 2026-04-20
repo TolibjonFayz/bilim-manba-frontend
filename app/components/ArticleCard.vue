@@ -21,16 +21,16 @@
 
       <h3 class="article-card__title">{{ article.title }}</h3>
 
-      <p v-if="article.excerpt" class="article-card__excerpt">
+      <!-- <p v-if="article.excerpt" class="article-card__excerpt">
         {{ article.excerpt }}
-      </p>
+      </p> -->
 
       <div class="article-card__meta">
         <div class="article-card__author">
           <div class="article-card__author-avatar">
-            {{ article.author?.fullName?.[0] }}
+            {{ article.excerpt?.[0] }}
           </div>
-          <span>{{ article.author?.fullName }}</span>
+          <span>{{ article.excerpt }}</span>
         </div>
         <div class="article-card__stats">
           <span>👁 {{ article.viewCount }}</span>
