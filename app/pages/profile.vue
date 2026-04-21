@@ -45,7 +45,7 @@
                   <div class="stats-item__info">
                     <span class="stats-item__label">O'QILGAN MAQOLALAR</span>
                     <span class="stats-item__value"
-                      >{{ stats.readCount }} ta</span
+                      >{{ stats?.readCount }} ta</span
                     >
                   </div>
                 </div>
@@ -54,7 +54,7 @@
                   <div class="stats-item__info">
                     <span class="stats-item__label">UMUMIY VAQT</span>
                     <span class="stats-item__value"
-                      >{{ stats.totalTime }} soat</span
+                      >{{ stats?.totalTime }} soat</span
                     >
                   </div>
                 </div>
@@ -63,7 +63,7 @@
                   <div class="stats-item__info">
                     <span class="stats-item__label">SAQLANGAN</span>
                     <span class="stats-item__value"
-                      >{{ stats.savedCount }} ta</span
+                      >{{ stats?.savedCount }} ta</span
                     >
                   </div>
                 </div>
@@ -82,7 +82,7 @@
                 :class="{ 'tab-bar__item--active': activeTab === tab.key }"
                 @click="activeTab = tab.key"
               >
-                {{ tab.label }}
+                {{ tab?.label }}
               </button>
             </div>
 
@@ -92,31 +92,40 @@
               <div class="content-section">
                 <div class="content-section__header">
                   <h2 class="content-section__title">So'nggi o'qilganlar</h2>
-                  <NuxtLink to="/articles" class="content-section__link">
-                    Barchasini ko'rish →
-                  </NuxtLink>
                 </div>
-                <div class="recent-grid">
-                  <NuxtLink
-                    v-for="article in recentArticles"
-                    :key="article.id"
-                    :to="`/articles/${article.slug}`"
-                    class="recent-card"
+                <div v-if="recentArticles?.length" class="recent-grid">
+                  <div
+                    v-for="a in getLatestByArticleId(recentArticles)"
+                    :key="a?.article?.id"
+                    class="recent-card-wrapper"
                   >
-                    <div
-                      class="recent-card__cover"
-                      :style="{ background: article.gradient }"
+                    <NuxtLink
+                      :to="`/articles/${a?.article?.slug}`"
+                      class="recent-card"
                     >
-                      <span class="recent-card__cat">{{
-                        article.category
-                      }}</span>
-                    </div>
-                    <div class="recent-card__body">
-                      <h4 class="recent-card__title">{{ article.title }}</h4>
-                      <span class="recent-card__date"
-                        >🕐 {{ article.date }}</span
-                      >
-                    </div>
+                      <img :src="a?.article?.coverImage" alt="image" />
+                      <div class="recent-card__body">
+                        <h4 class="recent-card__title">
+                          {{ a?.article?.title }}
+                        </h4>
+                        <p class="recent-card__excerpt">
+                          {{ a?.article?.excerpt }}
+                        </p>
+                        <div class="recent-card__meta">
+                          <span> 📅 {{ a?.date }} </span>
+                        </div>
+                      </div>
+                    </NuxtLink>
+                  </div>
+                </div>
+                <div v-else class="empty-state">
+                  <span class="empty-state__emoji">📚</span>
+                  <h3 class="empty-state__title">Hali o'qilgan maqola yo'q</h3>
+                  <p class="empty-state__desc">
+                    Maqolalarni o'qiy boshlang va bu yerda ular ko'rinadi
+                  </p>
+                  <NuxtLink to="/articles" class="empty-state__link">
+                    Maqolalarni ko'rish →
                   </NuxtLink>
                 </div>
               </div>
@@ -132,12 +141,26 @@
                         Bu hafta {{ weeklyTotal }} ta maqola o'qidingiz
                       </h3>
                     </div>
-                    <span class="chart-card__range">Oktyabr 20-27</span>
+                    <span class="chart-card__range">{{ weekRange }}</span>
                   </div>
+
                   <div class="bar-chart">
+                    <!-- Y labels — dynamic max -->
                     <div class="bar-chart__y-labels">
-                      <span v-for="y in [8, 6, 4, 2, 0]" :key="y">{{ y }}</span>
+                      <span
+                        v-for="y in [
+                          maxValue,
+                          Math.round(maxValue * 0.75),
+                          Math.round(maxValue * 0.5),
+                          Math.round(maxValue * 0.25),
+                          0,
+                        ]"
+                        :key="y"
+                      >
+                        {{ y }}
+                      </span>
                     </div>
+
                     <div class="bar-chart__bars">
                       <div
                         v-for="(day, i) in weeklyData"
@@ -150,7 +173,9 @@
                             :class="{
                               'bar-chart__bar--active': i === todayIndex,
                             }"
-                            :style="{ height: `${(day.value / 8) * 100}%` }"
+                            :style="{
+                              height: `${maxValue > 0 ? (day.value / maxValue) * 100 : 0}%`,
+                            }"
                           >
                             <span
                               v-if="day.value > 0"
@@ -172,25 +197,44 @@
             <div v-else-if="activeTab === 'saved'">
               <div class="content-section">
                 <h2 class="content-section__title">Saqlangan maqolalar</h2>
-                <div v-if="savedArticles.length" class="saved-grid">
-                  <NuxtLink
-                    v-for="article in savedArticles"
-                    :key="article.id"
-                    :to="`/articles/${article.slug}`"
-                    class="saved-card"
+                <div v-if="likeStore?.userLikes?.length" class="saved-grid">
+                  <div
+                    v-for="a in likeStore?.userLikes"
+                    :key="a.articleId"
+                    class="saved-card-wrapper"
                   >
-                    <div class="saved-card__body">
-                      <span class="saved-card__cat">{{
-                        article.category
-                      }}</span>
-                      <h4 class="saved-card__title">{{ article.title }}</h4>
-                      <p class="saved-card__excerpt">{{ article.excerpt }}</p>
-                      <div class="saved-card__meta">
-                        <span>{{ article.date }}</span>
-                        <span>🕐 {{ article.readTime }} min</span>
+                    <NuxtLink
+                      :to="`/articles/${a.article.slug}`"
+                      class="saved-card"
+                    >
+                      <img :src="a?.article?.coverImage" alt="image" />
+                      <div class="saved-card__body">
+                        <h4 class="saved-card__title">{{ a.article.title }}</h4>
+                        <p class="saved-card__excerpt">
+                          {{ a.article.excerpt }}
+                        </p>
+                        <div class="saved-card__meta">
+                          <span>
+                            📅
+                            {{
+                              a?.createdAt
+                                ? new Date(a?.createdAt).toLocaleDateString(
+                                    "uz-UZ",
+                                  )
+                                : ""
+                            }}
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </NuxtLink>
+                    </NuxtLink>
+                    <button
+                      class="saved-card__like-btn"
+                      :class="{ 'saved-card__like-btn--liked': true }"
+                      @click.prevent="handleToggleLike(a.articleId)"
+                    >
+                      ❤️
+                    </button>
+                  </div>
                 </div>
                 <div v-else class="empty-state">
                   <span class="empty-state__emoji">📚</span>
@@ -374,14 +418,6 @@ const tabs = [
   { key: "settings", label: "Sozlamalar" },
 ];
 
-// Backend — subscription holati
-const { data: subscription } = await useAsyncData(
-  "subscription-status",
-  () => api.get<any>("/subscription/status"),
-  { default: () => null },
-);
-
-// Settings form
 const settingsForm = reactive({
   fullName: userStore.oneUserInfo?.fullName ?? "",
 });
@@ -443,10 +479,7 @@ const handleUpdatePassword = async () => {
       Number(localStorage.getItem("userid")),
       passwordForm,
     );
-
-    if (!res.success) {
-      throw new Error(res.message || "Parolni o'zgartirishda xatolik");
-    }
+    if (!res.success) throw new Error(res.message);
     passwordSuccess.value = "Parol muvaffaqiyatli o'zgartirildi!";
     passwordForm.current = "";
     passwordForm.new = "";
@@ -458,46 +491,88 @@ const handleUpdatePassword = async () => {
   }
 };
 
-const recentArticles = ref([
-  {
-    id: 1,
-    title: "Sun'iy intellektning kelajagi va insoniyat",
-    slug: "suniy-intellekt",
-    category: "Texnologiya",
-    date: "24-oktabr, 2023",
-    gradient: "linear-gradient(135deg, #667eea, #764ba2)",
-  },
-  {
-    id: 2,
-    title: "O'zbekistonda ekoturizmni rivojlantirish istiqbollari",
-    slug: "ekoturizm",
-    category: "Ekologiya",
-    date: "22-oktabr, 2023",
-    gradient: "linear-gradient(135deg, #43e97b, #38f9d7)",
-  },
-  {
-    id: 3,
-    title: "Kvant kompyuterlari: Qanday ishlashini tushunamiz",
-    slug: "kvant-kompyuter",
-    category: "Ilm-fan",
-    date: "20-oktabr, 2023",
-    gradient: "linear-gradient(135deg, #4facfe, #00f2fe)",
-  },
-]);
+const handleToggleLike = async (articleId: number) => {
+  try {
+    const result = await likeStore.toggle(articleId);
+    if (result?.data?.isLiked === false) {
+      likeStore.userLikes = likeStore.userLikes.filter(
+        (like: any) => like.articleId !== articleId,
+      );
+    }
+  } catch (e: any) {
+    console.error("Like toggle error:", e.message);
+  }
+};
 
-const weeklyData = ref([
-  { label: "Du", value: 2 },
-  { label: "Se", value: 4 },
-  { label: "Ch", value: 1 },
-  { label: "Pa", value: 5 },
-  { label: "Ju", value: 3 },
-  { label: "Sh", value: 0 },
-  { label: "Ya", value: 0 },
-]);
+// Backend dan kelgan ma'lumotlar
+const stats = computed(() => userStore?.stats);
 
-const todayIndex = new Date().getDay() === 0 ? 6 : new Date().getDay() - 1;
-const weeklyTotal = computed(() =>
-  weeklyData.value.reduce((a, b) => a + b.value, 0),
+const recentArticles = computed(() =>
+  (userStore.recentReads ?? []).map((a: any, i: number) => ({
+    // 👈 ?? []
+    ...a,
+    gradient: [
+      "linear-gradient(135deg, #667eea, #764ba2)",
+      "linear-gradient(135deg, #43e97b, #38f9d7)",
+      "linear-gradient(135deg, #4facfe, #00f2fe)",
+    ][i % 3],
+    date: a.createdAt ? new Date(a.createdAt).toLocaleDateString("uz-UZ") : "",
+  })),
+);
+
+function getLatestByArticleId(data) {
+  const map = new Map();
+
+  for (const item of data) {
+    const key = item.articleId;
+
+    if (!map.has(key)) {
+      map.set(key, item);
+    } else {
+      const existing = map.get(key);
+
+      // createdAt ni taqqoslaymiz
+      if (new Date(item.createdAt) > new Date(existing.createdAt)) {
+        map.set(key, item);
+      }
+    }
+  }
+
+  return Array.from(map.values());
+}
+
+// Weekly chart — backend dan
+const weeklyData = computed(() =>
+  (userStore.weeklyActivity?.days ?? []).length
+    ? userStore.weeklyActivity.days
+    : [
+        { label: "Du", value: 0 },
+        { label: "Se", value: 0 },
+        { label: "Ch", value: 0 },
+        { label: "Pa", value: 0 },
+        { label: "Ju", value: 0 },
+        { label: "Sh", value: 0 },
+        { label: "Ya", value: 0 },
+      ],
+);
+
+const todayIndex = computed(() => (weeklyData.value?.length ?? 1) - 1);
+
+const maxValue = computed(() => {
+  const values = weeklyData.value?.map((d: any) => d.value) ?? [0];
+  return Math.max(...values, 4); // minimum 4
+});
+
+const weekRange = computed(() => {
+  const days = userStore.weeklyActivity?.days;
+  if (!days?.length) return "";
+  const first = new Date(days[0].date).toLocaleDateString("uz-UZ");
+  const last = new Date(days[days.length - 1].date).toLocaleDateString("uz-UZ");
+  return `${first} — ${last}`;
+});
+
+const weeklyTotal = computed(
+  () => userStore.weeklyActivity?.totalThisWeek ?? 0,
 );
 
 onMounted(async () => {
@@ -505,32 +580,14 @@ onMounted(async () => {
   await Promise.all([
     userStore.getOneUserInfo(Number(localStorage.getItem("userid"))),
     likeStore.getUserLikes(),
+    userStore.getStats(),
+    userStore.getRecentReads(),
+    userStore.getWeeklyActivity(),
   ]);
+  // Settings form ni user ma'lumoti bilan to'ldirish
+  settingsForm.fullName = userStore.oneUserInfo?.fullName ?? "";
   loading.value = false;
 });
-
-// savedArticles ni likeStore dan olamiz
-const savedArticles = computed(() =>
-  likeStore.userLikes.map((a: any, i: number) => ({
-    ...a,
-    gradient: [
-      "linear-gradient(135deg, #667eea, #764ba2)",
-      "linear-gradient(135deg, #43e97b, #38f9d7)",
-      "linear-gradient(135deg, #4facfe, #00f2fe)",
-      "linear-gradient(135deg, #fa709a, #fee140)",
-    ][i % 4],
-    category: a.category?.name ?? "Maqola",
-    date: a.createdAt ? new Date(a.createdAt).toLocaleDateString("uz-UZ") : "",
-    readTime: 5,
-  })),
-);
-
-// Stats ham real — likes soni
-const stats = computed(() => ({
-  readCount: 24,
-  totalTime: 4.2,
-  savedCount: likeStore.userLikes.length, // 👈 real son
-}));
 </script>
 
 <style lang="scss" scoped>
@@ -773,6 +830,18 @@ const stats = computed(() => ({
   }
 }
 
+@keyframes heart-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .stats-list {
   display: flex;
   flex-direction: column;
@@ -893,16 +962,24 @@ const stats = computed(() => ({
 
 .recent-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: $desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
   @media (max-width: $tablet) {
-    grid-template-columns: repeat(2, 1fr); // 3 → 2 on tablet
+    grid-template-columns: repeat(2, 1fr);
   }
 
   @media (max-width: $mobile) {
-    grid-template-columns: 1fr; // 2 → 1 on mobile
+    grid-template-columns: 1fr;
   }
+}
+
+.recent-card-wrapper {
+  position: relative;
 }
 
 .recent-card {
@@ -911,51 +988,67 @@ const stats = computed(() => ({
   border-radius: $border-radius;
   overflow: hidden;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: $shadow-md;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba($primary, 0.4);
+
+    img {
+      transform: scale(1.05);
+    }
   }
 
-  &__cover {
-    height: 140px;
-    display: flex;
-    align-items: flex-end;
-    padding: 0.75rem;
-  }
-
-  &__cat {
-    background: rgba(#fff, 0.9);
-    color: $primary;
-    font-size: 0.7rem;
-    font-weight: 700;
-    padding: 0.2rem 0.6rem;
-    border-radius: $border-radius-pill;
-    text-transform: uppercase;
+  img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
   }
 
   &__body {
-    padding: 1rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
+    flex: 1;
   }
 
   &__title {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    line-height: 1.4;
-    color: $text-primary;
+    line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: $text-primary;
+  }
+
+  &__excerpt {
+    font-size: 0.7rem;
+    color: $text-secondary;
+    line-height: 1.3;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
-  &__date {
-    font-size: 0.78rem;
+  &__meta {
+    display: flex;
+    gap: 0.5rem;
+    font-size: 0.7rem;
     color: $text-muted;
+    margin-top: auto;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba($border-color, 0.5);
   }
 }
 
@@ -1081,12 +1174,24 @@ const stats = computed(() => ({
 
 .saved-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.25rem;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+
+  @media (max-width: $desktop) {
+    grid-template-columns: repeat(3, 1fr);
+  }
 
   @media (max-width: $tablet) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: $mobile) {
     grid-template-columns: 1fr;
   }
+}
+
+.saved-card-wrapper {
+  position: relative;
 }
 
 .saved-card {
@@ -1095,61 +1200,100 @@ const stats = computed(() => ({
   border-radius: $border-radius;
   overflow: hidden;
   transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 
   &:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     box-shadow: $shadow-md;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba($primary, 0.4);
+
+    img {
+      transform: scale(1.05);
+    }
   }
 
-  &__cover {
-    height: 140px;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 0.75rem;
+  img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    display: block;
   }
 
   &__body {
-    padding: 1.25rem;
+    padding: 0.75rem;
     display: flex;
     flex-direction: column;
     gap: 0.4rem;
-  }
-
-  &__cat {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: $primary;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    flex: 1;
   }
 
   &__title {
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 700;
-    line-height: 1.4;
+    line-height: 1.3;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    color: $text-primary;
   }
 
   &__excerpt {
-    font-size: 0.825rem;
+    font-size: 0.7rem;
     color: $text-secondary;
-    line-height: 1.5;
+    line-height: 1.3;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
 
   &__meta {
     display: flex;
-    gap: 1rem;
-    font-size: 0.78rem;
+    gap: 0.5rem;
+    font-size: 0.7rem;
     color: $text-muted;
+    margin-top: auto;
+    padding-top: 0.4rem;
+    border-top: 1px solid rgba($border-color, 0.5);
+  }
+
+  &__like-btn {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(#fff, 0.95);
+    border: 1px solid rgba($border-color, 0.6);
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      background: rgba(#fff, 1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+
+    &--liked {
+      animation: heart-bounce 0.4s ease;
+    }
   }
 }
 

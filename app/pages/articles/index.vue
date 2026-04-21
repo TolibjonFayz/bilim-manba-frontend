@@ -216,7 +216,6 @@
 <script setup lang="ts">
 const articleStore = useArticleStore();
 const categoryStore = useCategoryStore();
-const authStore = useAuthStore();
 
 const searchQuery = ref("");
 const activeCategory = ref("barchasi");

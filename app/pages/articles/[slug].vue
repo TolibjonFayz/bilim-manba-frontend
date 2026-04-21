@@ -113,7 +113,10 @@
           <div class="related-section">
             <div class="related-section__header">
               <h2 class="related-section__title">O'xshash maqolalar</h2>
-              <NuxtLink to="/articles" class="related-section__link">
+              <NuxtLink
+                :to="`/categories/${article?.category?.name}`"
+                class="related-section__link"
+              >
                 Barchasini ko'rish →
               </NuxtLink>
             </div>
@@ -124,14 +127,14 @@
                 :to="`/articles/${rel.slug}`"
                 class="related-card"
               >
-                <div
-                  class="related-card__cover"
-                  :style="{ background: rel?.gradient }"
-                >
-                  <span class="related-card__cat">
-                    {{ rel?.category?.name }}
-                  </span>
+                <div class="related-card__cover">
+                  <img
+                    :src="rel?.coverImage"
+                    :alt="rel?.title"
+                    class="related-card__cover-img"
+                  />
                 </div>
+
                 <div class="related-card__body">
                   <span class="related-card__date">
                     {{
@@ -152,15 +155,14 @@
           <!-- Author card -->
           <div class="sidebar-card">
             <div class="author-card">
+              <div class="author-card__source">Manba</div>
               <div class="author-card__avatar">
-                {{ article?.author?.fullName?.[0] }}
+                {{ article?.excerpt?.[0] }}
               </div>
               <div class="author-card__info">
                 <h4 class="author-card__name">
-                  {{ article?.author?.fullName }}
+                  {{ article?.excerpt }}
                 </h4>
-                <p class="author-card__bio">{{ article?.author?.bio }}</p>
-                <a href="#" class="author-card__link">Barcha maqolalari →</a>
               </div>
             </div>
           </div>
@@ -168,22 +170,31 @@
           <!-- Mashhur maqolalar -->
           <div class="sidebar-card">
             <h3 class="sidebar-card__title">🔥 Mashhur maqolalar</h3>
-            <div class="popular-list">
+            <div class="popular-items-list">
               <NuxtLink
                 v-for="item in popularArticles"
                 :key="item?.id"
                 :to="`/articles/${item?.slug}`"
                 class="popular-item"
               >
-                <div
-                  class="popular-item__cover"
-                  :style="{ background: item?.gradient }"
-                />
+                <div class="popular-item__cover">
+                  <img
+                    v-if="item?.coverImage"
+                    :src="item?.coverImage"
+                    :alt="item?.title"
+                    class="popular-item__cover-img"
+                  />
+                  <div
+                    v-else
+                    class="popular-item__cover-placeholder"
+                    :style="{ background: item?.gradient }"
+                  />
+                </div>
                 <div class="popular-item__info">
                   <p class="popular-item__title">{{ item?.title }}</p>
-                  <span class="popular-item__views"
-                    >👁 {{ item?.viewCount }}</span
-                  >
+                  <span class="popular-item__views">
+                    👁 {{ item?.viewCount }}
+                  </span>
                 </div>
               </NuxtLink>
             </div>
@@ -241,10 +252,11 @@
 <script setup lang="ts">
 import { ElNotification } from "element-plus";
 
-const route = useRoute();
+const categoryStore = useCategoryStore();
 const articleStore = useArticleStore();
 const likeStore = useLikeStore();
 const authStore = useAuthStore();
+const route = useRoute();
 
 const loading = ref(false);
 const isLiked = ref(false);
@@ -271,7 +283,7 @@ const articleGradient = computed(
 );
 
 const relatedArticles = computed(() =>
-  (articleStore.allArticles ?? [])
+  (categoryStore.categoryBySlug?.articles ?? [])
     .filter((a: any) => a.id !== article.value?.id)
     .slice(0, 3)
     .map((a: any, i: number) => ({
@@ -286,7 +298,7 @@ const popularArticles = computed(() =>
   (articleStore.allArticles ?? [])
     .filter((a: any) => a.id !== article.value?.id)
     .sort((a: any, b: any) => b.viewCount - a.viewCount)
-    .slice(0, 3)
+    .slice(0, 5)
     .map((a: any, i: number) => ({
       ...a,
       gradient: gradients[i % gradients.length],
@@ -437,9 +449,13 @@ onMounted(async () => {
   }
 
   // 5. Related maqolalar — xuddi shu kategoriyadan
-  if (articleStore.oneArticle?.category?.slug) {
-    await articleStore.getArticleBySlug(articleStore.oneArticle.category.slug);
+  if (articleStore.oneArticle?.category?.name) {
+    await categoryStore.getCategoryBySlug(
+      articleStore.oneArticle.category.name,
+    );
   }
+
+  await articleStore.getAllArticles();
 
   loading.value = false;
 });
@@ -928,25 +944,55 @@ onMounted(async () => {
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: $shadow-md;
+    box-shadow: $shadow-lg;
     border-color: rgba($primary, 0.3);
   }
 
+  &:hover .related-card__cover-img {
+    transform: scale(1.05);
+  }
+
   &__cover {
-    height: 130px;
+    position: relative;
+    height: 160px;
     display: flex;
     align-items: flex-end;
     padding: 0.75rem;
+    overflow: hidden;
+  }
+
+  &__cover-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+    z-index: 1;
+  }
+
+  &__cover-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
   }
 
   &__cat {
-    background: rgba(#fff, 0.9);
+    position: relative;
+    z-index: 2;
+    background: rgba(#fff, 0.95);
     color: $primary;
     font-size: 0.7rem;
     font-weight: 700;
-    padding: 0.2rem 0.6rem;
+    padding: 0.3rem 0.7rem;
     border-radius: $border-radius-pill;
     text-transform: uppercase;
+    backdrop-filter: blur(4px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   }
 
   &__body {
@@ -1003,6 +1049,12 @@ onMounted(async () => {
   align-items: center;
   text-align: center;
   gap: 0.75rem;
+
+  &__source {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: $text-muted;
+  }
 
   &__avatar {
     width: 56px;
@@ -1075,7 +1127,7 @@ onMounted(async () => {
 }
 
 // POPULAR
-.popular-list {
+.popular-items-list {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -1086,16 +1138,37 @@ onMounted(async () => {
   gap: 0.75rem;
   align-items: center;
   transition: all 0.15s;
+  border-radius: $border-radius-sm;
+  padding: 0.5rem;
+  margin: -0.5rem;
 
-  &:hover .popular-item__title {
-    color: $primary;
+  &:hover {
+    background: $bg-secondary;
+  }
+
+  &:hover .popular-item__cover-img {
+    transform: scale(1.05);
   }
 
   &__cover {
-    width: 52px;
-    height: 52px;
+    position: relative;
+    width: 60px;
+    height: 60px;
     border-radius: $border-radius-sm;
+    overflow: hidden;
     flex-shrink: 0;
+  }
+
+  &__cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &__cover-placeholder {
+    width: 100%;
+    height: 100%;
   }
 
   &__info {
@@ -1113,11 +1186,50 @@ onMounted(async () => {
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    &:hover {
+      color: $primary;
+    }
   }
 
   &__views {
     font-size: 0.75rem;
     color: $text-muted;
+    display: block;
+    margin-top: 0.25rem;
+  }
+}
+
+.popular-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  &__item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  &__num {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: $text-muted;
+    flex-shrink: 0;
+    min-width: 24px;
+  }
+
+  &__title {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: $text-primary;
+    line-height: 1.4;
+    transition: color 0.15s;
+
+    &:hover {
+      color: $primary;
+    }
   }
 }
 

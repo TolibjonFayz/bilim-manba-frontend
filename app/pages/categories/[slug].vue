@@ -113,55 +113,91 @@
             <!-- Mashhur maqolalar -->
             <div class="sidebar-block">
               <h3 class="sidebar-block__title">
-                <span class="sidebar-block__title-icon">📈</span>
+                <span class="sidebar-block__title-icon">🔥</span>
                 MASHHUR MAQOLALAR
               </h3>
-              <ol class="popular-list">
-                <li
-                  v-for="(item, i) in popularArticles"
-                  :key="item.id"
-                  class="popular-list__item"
+              <div class="popular-items-list">
+                <NuxtLink
+                  v-for="item in popularArticles"
+                  :key="item?.id"
+                  :to="`/articles/${item?.slug}`"
+                  class="popular-item"
                 >
-                  <span class="popular-list__num">{{
-                    String(i + 1).padStart(2, "0")
-                  }}</span>
-                  <NuxtLink
-                    :to="`/articles/${item?.slug}`"
-                    class="popular-list__title"
-                  >
-                    {{ item?.title }}
-                  </NuxtLink>
-                </li>
-              </ol>
-            </div>
-
-            <!-- Ommabop teglar -->
-            <div class="sidebar-block">
-              <h3 class="sidebar-block__title">OMMABOP TEGLAR</h3>
-              <div class="tags-list">
-                <span v-for="tag in popularTags" :key="tag" class="tag-chip">
-                  #{{ tag }}
-                </span>
+                  <div class="popular-item__cover">
+                    <img
+                      v-if="item?.coverImage"
+                      :src="item?.coverImage"
+                      :alt="item?.title"
+                      class="popular-item__cover-img"
+                    />
+                    <div
+                      v-else
+                      class="popular-item__cover-placeholder"
+                      :style="{ background: item?.gradient }"
+                    />
+                  </div>
+                  <div class="popular-item__info">
+                    <p class="popular-item__title">{{ item?.title }}</p>
+                    <span class="popular-item__views">
+                      👁 {{ item?.viewCount }}
+                    </span>
+                  </div>
+                </NuxtLink>
               </div>
             </div>
 
             <!-- Tavsiya etilgan -->
-            <div class="sidebar-block">
-              <h3 class="sidebar-block__title">TAVSIYA ETILGAN</h3>
-              <div class="featured-card">
-                <div
-                  class="featured-card__image"
-                  :style="{ background: category?.gradient }"
-                />
-                <div class="featured-card__body">
-                  <h4 class="featured-card__title">Ilmiy Ekspozitsiya 2024</h4>
-                  <p class="featured-card__desc">
-                    Toshkentda bo'lib o'tadigan yirik ilmiy ko'rgazmada ishtirok
-                    eting.
-                  </p>
-                  <button class="featured-card__btn">Batafsil ma'lumot</button>
+            <div class="sidebar-block" v-if="featuredArticle">
+              <h3 class="sidebar-block__title">
+                <span class="sidebar-block__title-icon">✨</span>
+                TAVSIYA ETILGAN
+              </h3>
+              <NuxtLink
+                :to="`/articles/${featuredArticle?.slug}`"
+                class="featured-card"
+              >
+                <div class="featured-card__header">
+                  <img
+                    v-if="featuredArticle?.coverImage"
+                    :src="featuredArticle?.coverImage"
+                    :alt="featuredArticle?.title"
+                    class="featured-card__image"
+                  />
+                  <div
+                    v-else
+                    class="featured-card__image featured-card__image--placeholder"
+                    :style="{ background: featuredArticle?.gradient }"
+                  />
+                  <div class="featured-card__badge">👑 TOP</div>
                 </div>
-              </div>
+                <div class="featured-card__body">
+                  <h4 class="featured-card__title">
+                    {{ featuredArticle?.title }}
+                  </h4>
+                  <p class="featured-card__desc">
+                    {{ featuredArticle?.excerpt }}
+                  </p>
+                  <div class="featured-card__meta">
+                    <span class="featured-card__meta-item">
+                      👁 {{ featuredArticle?.viewCount }}
+                    </span>
+                    <span class="featured-card__meta-item">
+                      📅
+                      {{
+                        featuredArticle?.createdAt
+                          ? new Date(
+                              featuredArticle?.createdAt,
+                            ).toLocaleDateString("uz-UZ")
+                          : ""
+                      }}
+                    </span>
+                  </div>
+                  <button class="featured-card__btn">
+                    <span>O'qish</span>
+                    <span class="featured-card__btn-arrow">→</span>
+                  </button>
+                </div>
+              </NuxtLink>
             </div>
           </aside>
         </div>
@@ -172,9 +208,10 @@
 
 <script setup lang="ts">
 const route = useRoute();
-const categoryStore = useCategoryStore();
 const loading = ref(false);
 const sortBy = ref("newest");
+const articleStore = useArticleStore();
+const categoryStore = useCategoryStore();
 
 const category = computed(() => categoryStore.categoryBySlug);
 
@@ -186,6 +223,19 @@ const gradients = [
   "linear-gradient(135deg, #f093fb, #f5576c)",
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
+
+const article = computed(() => articleStore.oneArticle);
+
+const popularArticles = computed(() =>
+  (articleStore.allArticles ?? [])
+    .filter((a: any) => a.id !== article.value?.id)
+    .sort((a: any, b: any) => b.viewCount - a.viewCount)
+    .slice(0, 5)
+    .map((a: any, i: number) => ({
+      ...a,
+      gradient: gradients[i % gradients.length],
+    })),
+);
 
 const filteredArticles = computed(() => {
   let list = [...(categoryStore.categoryBySlug?.articles ?? [])].map(
@@ -204,33 +254,19 @@ const filteredArticles = computed(() => {
   return list;
 });
 
-// Sidebar static
-const popularArticles = ref([
-  {
-    id: 1,
-    title: "Koinot qanday paydo bo'lgan?",
-    slug: "koinot",
-    views: "15k",
-  },
-  { id: 2, title: "Sun'iy intellekt va kelajak", slug: "ai", views: "12k" },
-  { id: 3, title: "Inson miyasi qanday ishlaydi?", slug: "miya", views: "10k" },
-  { id: 4, title: "Qora tuynuklar siri", slug: "qora-tuynuk", views: "8k" },
-]);
-
-const popularTags = ref([
-  "Astronomiya",
-  "Fizika",
-  "Biologiya",
-  "Robototexnika",
-  "Koinot",
-  "Ekologiya",
-]);
+const featuredArticle = computed(() => {
+  const articles = articleStore.allArticles ?? [];
+  if (articles.length === 0) return null;
+  const randomIndex = Math.floor(Math.random() * articles.length);
+  return articles[randomIndex];
+});
 
 onMounted(async () => {
   loading.value = true;
   const res = await categoryStore.getCategoryBySlug(
     route.params.slug as string,
   );
+  await articleStore.getAllArticles();
   loading.value = false;
 });
 </script>
@@ -610,6 +646,79 @@ onMounted(async () => {
 }
 
 // POPULAR LIST
+.popular-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.popular-item {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  transition: all 0.15s;
+  border-radius: $border-radius-sm;
+  padding: 0.5rem;
+  margin: -0.5rem;
+
+  &:hover {
+    background: $bg-secondary;
+  }
+
+  &:hover .popular-item__cover-img {
+    transform: scale(1.05);
+  }
+
+  &__cover {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: $border-radius-sm;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
+
+  &__cover-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  &__cover-placeholder {
+    width: 100%;
+    height: 100%;
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 0.825rem;
+    font-weight: 600;
+    color: $text-primary;
+    line-height: 1.4;
+    transition: color 0.15s;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__views {
+    font-size: 0.75rem;
+    color: $text-muted;
+    display: block;
+    margin-top: 0.25rem;
+  }
+}
+
 .popular-list {
   list-style: none;
   display: flex;
@@ -671,48 +780,165 @@ onMounted(async () => {
 
 // FEATURED CARD
 .featured-card {
-  border-radius: $border-radius-sm;
+  border-radius: $border-radius;
   overflow: hidden;
-  border: 1px solid $border-color;
+  border: 1.5px solid transparent;
+  background: #fff;
+  transition: all 0.3s ease;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba($primary, 0.05),
+      rgba($secondary, 0.05)
+    );
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba($primary, 0.15);
+    border-color: rgba($primary, 0.2);
+
+    &::before {
+      opacity: 1;
+    }
+
+    .featured-card__image {
+      transform: scale(1.08);
+    }
+
+    .featured-card__btn {
+      background: $primary;
+      color: #fff;
+      border-color: $primary;
+
+      .featured-card__btn-arrow {
+        transform: translateX(3px);
+      }
+    }
+  }
+
+  &__header {
+    position: relative;
+    overflow: hidden;
+  }
 
   &__image {
-    height: 120px;
+    height: 140px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s ease;
+    overflow: hidden;
+    width: 100%;
+    object-fit: cover;
+
+    &--placeholder {
+      background-size: cover;
+      background-position: center;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(
+        circle at 30% 30%,
+        rgba(#fff, 0.2),
+        transparent 60%
+      );
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(#fff, 0.95);
+    color: $primary;
+    font-size: 0.7rem;
+    font-weight: 800;
+    padding: 0.4rem 0.8rem;
+    border-radius: $border-radius-pill;
+    z-index: 2;
+    letter-spacing: 0.08em;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   }
 
   &__body {
-    padding: 1rem;
+    padding: 1.25rem;
+    position: relative;
+    z-index: 1;
   }
 
   &__title {
-    font-size: 0.9rem;
-    font-weight: 700;
-    margin-bottom: 0.4rem;
+    font-size: 0.95rem;
+    font-weight: 800;
+    margin-bottom: 0.6rem;
+    background: linear-gradient(135deg, $primary, $secondary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.01em;
   }
 
   &__desc {
     font-size: 0.8rem;
     color: $text-secondary;
-    line-height: 1.5;
-    margin-bottom: 0.75rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  &__meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+
+  &__meta-item {
+    font-size: 0.75rem;
+    color: $text-muted;
   }
 
   &__btn {
     width: 100%;
-    padding: 0.55rem;
-    border: 1.5px solid $border-color;
-    border-radius: $border-radius-sm;
+    padding: 0.7rem;
+    border: 1.5px solid $primary;
+    border-radius: $border-radius-pill;
     font-size: 0.8rem;
-    font-weight: 600;
-    color: $text-primary;
-    background: #fff;
+    font-weight: 700;
+    color: $primary;
+    background: rgba($primary, 0.05);
     cursor: pointer;
     font-family: $font-primary;
-    transition: all 0.15s;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    letter-spacing: 0.05em;
 
-    &:hover {
-      border-color: $primary;
-      color: $primary;
+    &:active {
+      transform: scale(0.98);
     }
+  }
+
+  &__btn-arrow {
+    transition: transform 0.3s ease;
+    display: inline-block;
   }
 }
 </style>
