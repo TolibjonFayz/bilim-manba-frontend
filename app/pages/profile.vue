@@ -185,7 +185,14 @@
                             </span>
                           </div>
                         </div>
-                        <span class="bar-chart__label">{{ day.label }}</span>
+
+                        <!-- Label: Du (21.04) -->
+                        <span class="bar-chart__label">
+                          {{ day.label }}
+                          <span class="bar-chart__label-date">
+                            {{ day.date ? formatChartDate(day.date) : "" }}
+                          </span>
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -541,6 +548,13 @@ function getLatestByArticleId(data) {
   return Array.from(map.values());
 }
 
+const formatChartDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  const day = String(d.getDate()).padStart(2, "0");
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  return `${day}.${month}`;
+};
+
 // Weekly chart — backend dan
 const weeklyData = computed(() =>
   (userStore.weeklyActivity?.days ?? []).length
@@ -556,7 +570,10 @@ const weeklyData = computed(() =>
       ],
 );
 
-const todayIndex = computed(() => (weeklyData.value?.length ?? 1) - 1);
+const todayIndex = computed(() => {
+  const day = new Date().getDay();
+  return day === 0 ? 6 : day - 1;
+});
 
 const maxValue = computed(() => {
   const values = weeklyData.value?.map((d: any) => d.value) ?? [0];
@@ -1169,6 +1186,16 @@ onMounted(async () => {
     font-size: 0.75rem;
     color: $text-muted;
     flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+
+    &-date {
+      font-size: 0.65rem;
+      opacity: 0.7;
+      color: $text-muted;
+    }
   }
 }
 

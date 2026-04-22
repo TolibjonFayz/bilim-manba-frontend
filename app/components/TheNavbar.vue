@@ -20,43 +20,55 @@
 
       <!-- Desktop Actions -->
       <div class="navbar__actions">
-        <template v-if="authStore.isLoggedIn">
-          <div class="navbar__user" @click="toggleDropdown">
-            <div class="navbar__avatar">
-              {{ authStore.user?.email?.[0]?.toUpperCase() }}
-            </div>
-
-            <div v-if="showDropdown" class="navbar__dropdown">
-              <div class="navbar__dropdown-user">
-                <div class="navbar__dropdown-avatar">
+        <ClientOnly>
+          <template #default>
+            <template v-if="authStore.isLoggedIn">
+              <div class="navbar__user" @click="toggleDropdown">
+                <div class="navbar__avatar">
                   {{ authStore.user?.email?.[0]?.toUpperCase() }}
                 </div>
-                <div class="navbar__dropdown-info">
-                  <span class="navbar__dropdown-name">
-                    {{ authStore.user?.email }}
-                  </span>
+
+                <div v-if="showDropdown" class="navbar__dropdown">
+                  <div class="navbar__dropdown-user">
+                    <div class="navbar__dropdown-avatar">
+                      {{ authStore.user?.email?.[0]?.toUpperCase() }}
+                    </div>
+                    <div class="navbar__dropdown-info">
+                      <span class="navbar__dropdown-name">
+                        {{
+                          userStore.oneUserInfo?.fullName ??
+                          authStore.user?.email
+                        }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="navbar__dropdown-divider" />
+                  <NuxtLink to="/profile" class="navbar__dropdown-item">
+                    👤 Profil
+                  </NuxtLink>
+                  <button
+                    class="navbar__dropdown-item navbar__dropdown-item--danger"
+                    @click="handleLogout"
+                  >
+                    🚪 Chiqish
+                  </button>
                 </div>
               </div>
-              <div class="navbar__dropdown-divider" />
-              <NuxtLink to="/profile" class="navbar__dropdown-item">
-                👤 Profil
-              </NuxtLink>
-              <button
-                class="navbar__dropdown-item navbar__dropdown-item--danger"
-                @click="handleLogout"
-              >
-                🚪 Chiqish
-              </button>
-            </div>
-          </div>
-        </template>
+            </template>
 
-        <template v-else>
-          <NuxtLink to="/login" class="navbar__link">Kirish</NuxtLink>
-          <NuxtLink to="/register" class="btn btn--primary">
-            Ro'yxatdan o'tish
-          </NuxtLink>
-        </template>
+            <template v-else>
+              <NuxtLink to="/login" class="navbar__link">Kirish</NuxtLink>
+              <NuxtLink to="/register" class="btn btn--primary">
+                Ro'yxatdan o'tish
+              </NuxtLink>
+            </template>
+          </template>
+
+          <!-- SSR da hech narsa ko'rinmaydi -->
+          <template #fallback>
+            <div style="width: 130px; height: 36px" />
+          </template>
+        </ClientOnly>
       </div>
 
       <!-- Hamburger button (mobile only) -->
@@ -73,12 +85,23 @@
     </div>
 
     <!-- Mobile Menu -->
-    <div class="navbar__mobile-menu" :class="{ 'navbar__mobile-menu--open': menuOpen }">
+    <div
+      class="navbar__mobile-menu"
+      :class="{ 'navbar__mobile-menu--open': menuOpen }"
+    >
       <nav class="navbar__mobile-nav">
-        <NuxtLink to="/categories" class="navbar__mobile-link" @click="menuOpen = false">
+        <NuxtLink
+          to="/categories"
+          class="navbar__mobile-link"
+          @click="menuOpen = false"
+        >
           📂 Kategoriyalar
         </NuxtLink>
-        <NuxtLink to="/articles" class="navbar__mobile-link" @click="menuOpen = false">
+        <NuxtLink
+          to="/articles"
+          class="navbar__mobile-link"
+          @click="menuOpen = false"
+        >
           📄 Maqolalar
         </NuxtLink>
       </nav>
@@ -86,36 +109,54 @@
       <div class="navbar__mobile-divider" />
 
       <div class="navbar__mobile-actions">
-        <template v-if="authStore.isLoggedIn">
-          <div class="navbar__mobile-user-info">
-            <div class="navbar__mobile-avatar">
-              {{ authStore.user?.email?.[0]?.toUpperCase() }}
-            </div>
-            <span class="navbar__mobile-email">{{ authStore.user?.email }}</span>
-          </div>
-          <NuxtLink to="/profile" class="navbar__mobile-link" @click="menuOpen = false">
-            👤 Profil
-          </NuxtLink>
-          <button
-            class="navbar__mobile-link navbar__mobile-link--danger"
-            @click="handleLogout"
-          >
-            🚪 Chiqish
-          </button>
-        </template>
+        <ClientOnly>
+          <template #default>
+            <template v-if="authStore.isLoggedIn">
+              <div class="navbar__mobile-user-info">
+                <div class="navbar__mobile-avatar">
+                  {{ authStore.user?.email?.[0]?.toUpperCase() }}
+                </div>
+                <span class="navbar__mobile-email">
+                  {{ userStore.oneUserInfo?.fullName ?? authStore.user?.email }}
+                </span>
+              </div>
+              <NuxtLink
+                to="/profile"
+                class="navbar__mobile-link"
+                @click="menuOpen = false"
+              >
+                👤 Profil
+              </NuxtLink>
+              <button
+                class="navbar__mobile-link navbar__mobile-link--danger"
+                @click="handleLogout"
+              >
+                🚪 Chiqish
+              </button>
+            </template>
 
-        <template v-else>
-          <NuxtLink to="/login" class="navbar__mobile-link" @click="menuOpen = false">
-            Kirish
-          </NuxtLink>
-          <NuxtLink
-            to="/register"
-            class="btn btn--primary navbar__mobile-register"
-            @click="menuOpen = false"
-          >
-            Ro'yxatdan o'tish
-          </NuxtLink>
-        </template>
+            <template v-else>
+              <NuxtLink
+                to="/login"
+                class="navbar__mobile-link"
+                @click="menuOpen = false"
+              >
+                Kirish
+              </NuxtLink>
+              <NuxtLink
+                to="/register"
+                class="btn btn--primary navbar__mobile-register"
+                @click="menuOpen = false"
+              >
+                Ro'yxatdan o'tish
+              </NuxtLink>
+            </template>
+          </template>
+
+          <template #fallback>
+            <div style="height: 40px" />
+          </template>
+        </ClientOnly>
       </div>
     </div>
   </header>
@@ -124,11 +165,31 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const userStore = useUserStore();
-const isScrolled = ref(false);
+
 const showDropdown = ref(false);
+const isScrolled = ref(false);
 const menuOpen = ref(false);
 
+const handleClickOutside = (e: Event) => {
+  const target = e.target as HTMLElement;
+  if (!target.closest(".navbar__user")) {
+    showDropdown.value = false;
+  }
+};
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
+
+const handleLogout = () => {
+  authStore.logout();
+  userStore.oneUserInfo = null;
+  menuOpen.value = false;
+  navigateTo("/");
+};
+
 onMounted(async () => {
+  document.addEventListener("click", handleClickOutside);
   window.addEventListener("scroll", () => {
     isScrolled.value = window.scrollY > 20;
   });
@@ -143,31 +204,9 @@ onMounted(async () => {
   }
 });
 
-const handleClickOutside = (e: Event) => {
-  const target = e.target as HTMLElement;
-  if (!target.closest(".navbar__user")) {
-    showDropdown.value = false;
-  }
-};
-
-onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
-});
-
 onUnmounted(() => {
   document.removeEventListener("click", handleClickOutside);
 });
-
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
-};
-
-const handleLogout = () => {
-  authStore.logout();
-  userStore.oneUserInfo = null;
-  menuOpen.value = false;
-  navigateTo("/");
-};
 </script>
 
 <style lang="scss" scoped>
@@ -342,7 +381,6 @@ const handleLogout = () => {
     background: $border-color;
   }
 
-  // Hamburger button
   &__hamburger {
     display: none;
     flex-direction: column;
@@ -386,7 +424,6 @@ const handleLogout = () => {
     }
   }
 
-  // Mobile menu
   &__mobile-menu {
     display: none;
     overflow: hidden;

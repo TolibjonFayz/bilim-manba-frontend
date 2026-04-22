@@ -154,6 +154,17 @@ const filteredCategories = computed(() => {
   );
 });
 
+useHead({
+  title: "Kategoriyalar — Bilim Manba",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Bilim Manba kategoriyalari — o'zingizga yoqqan yo'nalishni tanlang",
+    },
+  ],
+});
+
 onMounted(async () => {
   loading.value = true;
   await categoryStore.getCategories();

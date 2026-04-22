@@ -105,6 +105,23 @@ const articleStore = useArticleStore();
 const categoryStore = useCategoryStore();
 const loading = ref(false);
 
+useHead({
+  title: "Bilim Manba — O'zbek tilidagi bilim platformasi",
+  meta: [
+    {
+      name: "description",
+      content:
+        "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar",
+    },
+    { property: "og:title", content: "Bilim Manba" },
+    {
+      property: "og:description",
+      content: "O'zbek tilidagi eng yaxshi bilim platformasi",
+    },
+    { property: "og:type", content: "website" },
+  ],
+});
+
 onMounted(async () => {
   loading.value = true;
   await categoryStore.getCategories();

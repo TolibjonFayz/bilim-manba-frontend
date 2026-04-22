@@ -261,6 +261,15 @@ const featuredArticle = computed(() => {
   return articles[randomIndex];
 });
 
+watchEffect(() => {
+  if (category.value) {
+    useHead({
+      title: `${category.value.name} — Bilim Manba`,
+      meta: [{ name: "description", content: category.value.slug ?? "" }],
+    });
+  }
+});
+
 onMounted(async () => {
   loading.value = true;
   const res = await categoryStore.getCategoryBySlug(

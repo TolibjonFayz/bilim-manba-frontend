@@ -393,6 +393,15 @@ const askAi = async () => {
   try {
     const token = process.client ? localStorage.getItem("access_token") : null;
 
+    // Tarixni Groq formatida yuboramiz
+    const history = aiMessages.value
+      .filter((m) => m.role === "user" || m.role === "assistant")
+      .slice(0, -1) // oxirgi user savolni tashlaymiz — alohida yuboriladi
+      .map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+
     const res = await $fetch<any>("/ai/explain", {
       method: "POST",
       baseURL: useRuntimeConfig().public.apiBase,
@@ -401,6 +410,7 @@ const askAi = async () => {
         text:
           content.value?.message?.replace(/<[^>]*>/g, "").slice(0, 500) ?? "",
         question,
+        history, // 👈 qo'shildi
       },
     });
 
@@ -409,7 +419,7 @@ const askAi = async () => {
       role: "assistant",
       content: res.explanation,
     });
-  } catch {
+  } catch (e: any) {
     aiMessages.value.push({
       id: Date.now() + 1,
       role: "assistant",
@@ -423,6 +433,21 @@ const askAi = async () => {
     }
   }
 };
+
+watchEffect(() => {
+  if (article.value) {
+    useHead({
+      title: `${article.value.title} — Bilim Manba`,
+      meta: [
+        { name: "description", content: article.value.excerpt ?? "" },
+        { property: "og:title", content: article.value.title },
+        { property: "og:description", content: article.value.excerpt ?? "" },
+        { property: "og:image", content: article.value.coverImage ?? "" },
+        { property: "og:type", content: "article" },
+      ],
+    });
+  }
+});
 
 onMounted(async () => {
   loading.value = true;
@@ -1260,10 +1285,52 @@ onMounted(async () => {
   cursor: pointer;
   box-shadow: $shadow-lg;
   transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  animation: ai-bounce 2s ease-in-out infinite;
 
   &:hover {
     background: $primary-dark;
     transform: translateY(-2px);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(
+      120deg,
+      transparent 0%,
+      rgba(#fff, 0.4) 50%,
+      transparent 100%
+    );
+    animation: ai-shimmer 2.5s ease-in-out infinite;
+  }
+}
+
+@keyframes ai-bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+/* Shimmer o'tish */
+@keyframes ai-shimmer {
+  0% {
+    left: -100%;
+  }
+  50% {
+    left: 150%;
+  }
+  100% {
+    left: 150%;
   }
 }
 

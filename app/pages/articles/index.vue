@@ -233,15 +233,6 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-onMounted(async () => {
-  loading.value = true;
-  await Promise.all([
-    articleStore.getAllArticles(),
-    categoryStore.getCategories(),
-  ]);
-  loading.value = false;
-});
-
 // Kategoriyalar filter uchun "Barchasi" qo'shamiz
 const allCategories = computed(() => [
   { name: "Barchasi", slug: "barchasi" },
@@ -307,6 +298,25 @@ const popularArticles = computed(() =>
       gradient: gradients[i % gradients.length],
     })),
 );
+
+useHead({
+  title: "Maqolalar — Bilim Manba",
+  meta: [
+    {
+      name: "description",
+      content: "Barcha maqolalar — texnologiya, ilm-fan, shaxsiy rivojlanish",
+    },
+  ],
+});
+
+onMounted(async () => {
+  loading.value = true;
+  await Promise.all([
+    articleStore.getAllArticles(),
+    categoryStore.getCategories(),
+  ]);
+  loading.value = false;
+});
 </script>
 
 <style lang="scss" scoped>

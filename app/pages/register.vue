@@ -211,7 +211,7 @@ const handleRegister = async () => {
   loading.value = false;
 
   if (res.success) {
-    authStore.setAuth(res.data.access_token);
+    authStore.setAuth(res.data);
     navigateTo("/");
   } else {
     serverError.value = res.message;
