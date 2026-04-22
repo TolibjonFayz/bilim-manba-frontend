@@ -9,6 +9,18 @@ export default defineNuxtConfig({
     "nuxt-gtag",
   ],
 
+  app: {
+    head: {
+      meta: [
+        {
+          name: "google-site-verification",
+          content:
+            "google-site-verification=cp5qkEakZ-AwmJ5KrJ2Y5jWyO2UODfk09v8iUFwTP-4",
+        },
+      ],
+    },
+  },
+
   elementPlus: {
     importStyle: "scss",
   },
