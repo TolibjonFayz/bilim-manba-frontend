@@ -287,6 +287,14 @@ onMounted(async () => {
   padding: 2.5rem 0 2rem;
   border-bottom: 1px solid $border-color;
 
+  @media (max-width: $tablet) {
+    padding: 2rem 0 1.5rem;
+  }
+
+  @media (max-width: $mobile) {
+    padding: 1.5rem 0 1rem;
+  }
+
   &__label {
     font-size: 0.75rem;
     font-weight: 700;
@@ -297,6 +305,10 @@ onMounted(async () => {
     gap: 0.5rem;
     margin-bottom: 1rem;
 
+    @media (max-width: $mobile) {
+      font-size: 0.7rem;
+    }
+
     &::after {
       content: "";
       display: inline-block;
@@ -304,6 +316,10 @@ onMounted(async () => {
       height: 2px;
       background: $primary;
       border-radius: 2px;
+
+      @media (max-width: $mobile) {
+        width: 30px;
+      }
     }
   }
 
@@ -312,6 +328,11 @@ onMounted(async () => {
     align-items: center;
     gap: 1rem;
     margin-bottom: 1rem;
+    flex-wrap: wrap;
+
+    @media (max-width: $mobile) {
+      gap: 0.75rem;
+    }
   }
 
   &__icon {
@@ -324,12 +345,33 @@ onMounted(async () => {
     justify-content: center;
     font-size: 1.75rem;
     flex-shrink: 0;
+
+    @media (max-width: $tablet) {
+      width: 48px;
+      height: 48px;
+      font-size: 1.5rem;
+    }
+
+    @media (max-width: $mobile) {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+    }
   }
 
   &__title {
     font-size: 2.5rem;
     font-weight: 800;
     letter-spacing: -0.02em;
+    line-height: 1.2;
+
+    @media (max-width: $tablet) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: $mobile) {
+      font-size: 1.5rem;
+    }
   }
 
   &__desc {
@@ -337,6 +379,14 @@ onMounted(async () => {
     font-size: 0.95rem;
     line-height: 1.7;
     max-width: 620px;
+
+    @media (max-width: $tablet) {
+      font-size: 0.9rem;
+    }
+
+    @media (max-width: $mobile) {
+      font-size: 0.85rem;
+    }
   }
 }
 
@@ -344,14 +394,32 @@ onMounted(async () => {
 .cat-content {
   padding: 2.5rem 0 4rem;
 
+  @media (max-width: $tablet) {
+    padding: 1.75rem 0 3rem;
+  }
+
+  @media (max-width: $mobile) {
+    padding: 1.5rem 0 2rem;
+  }
+
   &__grid {
     display: grid;
     grid-template-columns: 1fr 320px;
     gap: 3rem;
     align-items: start;
 
-    @media (max-width: $desktop) {
+    @media (max-width: 1200px) {
+      grid-template-columns: 1fr 280px;
+      gap: 2rem;
+    }
+
+    @media (max-width: $tablet) {
       grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    @media (max-width: $mobile) {
+      gap: 1.5rem;
     }
   }
 }
@@ -362,16 +430,38 @@ onMounted(async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @media (max-width: $tablet) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  @media (max-width: $mobile) {
+    gap: 0.75rem;
+  }
 
   &__left {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
+
+    @media (max-width: $mobile) {
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+    }
   }
 
   &__title {
     font-size: 1.25rem;
     font-weight: 700;
+
+    @media (max-width: $mobile) {
+      font-size: 1.1rem;
+    }
   }
 
   &__count {
@@ -389,6 +479,23 @@ onMounted(async () => {
     gap: 0.5rem;
     font-size: 0.875rem;
     color: $text-secondary;
+
+    @media (max-width: $tablet) {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: $mobile) {
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+
+  &__sort-label {
+    @media (max-width: $mobile) {
+      display: none;
+    }
   }
 
   &__select {
@@ -401,9 +508,15 @@ onMounted(async () => {
     outline: none;
     cursor: pointer;
     background: #fff;
+    transition: all 0.2s;
+
+    @media (max-width: $mobile) {
+      width: 100%;
+    }
 
     &:focus {
       border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
     }
   }
 }
@@ -424,6 +537,7 @@ onMounted(async () => {
   border-radius: $border-radius;
   overflow: hidden;
   transition: all 0.2s ease;
+  padding: 1.25rem;
 
   &:hover {
     transform: translateY(-2px);
@@ -437,19 +551,29 @@ onMounted(async () => {
 
   @media (max-width: $tablet) {
     grid-template-columns: 140px 1fr;
+    padding: 1rem;
+    gap: 1rem;
   }
 
   @media (max-width: $mobile) {
     grid-template-columns: 1fr;
+    gap: 1rem;
+    padding: 1rem;
   }
 
   // Cover
   &__cover {
     position: relative;
     overflow: hidden;
+    border-radius: $border-radius-sm;
+
+    @media (max-width: $tablet) {
+      height: 140px;
+    }
 
     @media (max-width: $mobile) {
       height: 160px;
+      width: 100%;
     }
   }
 
@@ -460,24 +584,14 @@ onMounted(async () => {
     object-position: center;
   }
 
-  &__cat-badge {
-    background: rgba(#fff, 0.9);
-    color: $primary;
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 0.2rem 0.6rem;
-    border-radius: $border-radius-pill;
-  }
-
   // Info
   &__info {
-    padding: 1.25rem 1.25rem 1.25rem 0;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 
     @media (max-width: $mobile) {
-      padding: 1rem;
+      padding: 0;
     }
   }
 
@@ -488,8 +602,13 @@ onMounted(async () => {
     color: $text-primary;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    @media (max-width: $mobile) {
+      font-size: 0.95rem;
+    }
   }
 
   &__excerpt {
@@ -498,9 +617,16 @@ onMounted(async () => {
     line-height: 1.6;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     flex: 1;
+
+    @media (max-width: $mobile) {
+      font-size: 0.8rem;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
   }
 
   &__meta {
@@ -508,11 +634,21 @@ onMounted(async () => {
     align-items: center;
     gap: 1rem;
     flex-wrap: wrap;
+    margin-top: 0.5rem;
+
+    @media (max-width: $mobile) {
+      gap: 0.75rem;
+      font-size: 0.75rem;
+    }
   }
 
   &__meta-item {
     font-size: 0.8rem;
     color: $text-muted;
+
+    @media (max-width: $mobile) {
+      font-size: 0.75rem;
+    }
   }
 
   &__read-link {
@@ -522,6 +658,11 @@ onMounted(async () => {
     margin-left: auto;
     white-space: nowrap;
     transition: color 0.15s;
+
+    @media (max-width: $mobile) {
+      margin-left: 0;
+      font-size: 0.8rem;
+    }
 
     &:hover {
       text-decoration: underline;
@@ -595,6 +736,15 @@ onMounted(async () => {
   gap: 1.5rem;
   position: sticky;
   top: 80px;
+
+  @media (max-width: $tablet) {
+    gap: 1.25rem;
+  }
+
+  @media (max-width: $mobile) {
+    gap: 1rem;
+    position: static;
+  }
 }
 
 .sidebar-block {
@@ -602,6 +752,10 @@ onMounted(async () => {
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
+
+  @media (max-width: $mobile) {
+    padding: 1rem;
+  }
 
   &--gradient {
     background: linear-gradient(135deg, $primary, $secondary);
@@ -618,6 +772,11 @@ onMounted(async () => {
     align-items: center;
     gap: 0.4rem;
 
+    @media (max-width: $mobile) {
+      font-size: 0.7rem;
+      margin-bottom: 0.75rem;
+    }
+
     &--white {
       color: rgba(#fff, 0.85);
     }
@@ -632,6 +791,11 @@ onMounted(async () => {
     color: rgba(#fff, 0.85);
     line-height: 1.6;
     margin-bottom: 1.25rem;
+
+    @media (max-width: $mobile) {
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
   }
 
   &__btn {
@@ -646,6 +810,11 @@ onMounted(async () => {
     border: none;
     font-family: $font-primary;
     transition: all 0.2s;
+
+    @media (max-width: $mobile) {
+      font-size: 0.8rem;
+      padding: 0.6rem;
+    }
 
     &:hover {
       transform: translateY(-1px);
@@ -685,6 +854,11 @@ onMounted(async () => {
     border-radius: $border-radius-sm;
     overflow: hidden;
     flex-shrink: 0;
+
+    @media (max-width: $mobile) {
+      width: 50px;
+      height: 50px;
+    }
   }
 
   &__cover-img {
@@ -712,8 +886,15 @@ onMounted(async () => {
     transition: color 0.15s;
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+
+    @media (max-width: $mobile) {
+      font-size: 0.8rem;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
 
     &:hover {
       color: $primary;
@@ -725,6 +906,10 @@ onMounted(async () => {
     color: $text-muted;
     display: block;
     margin-top: 0.25rem;
+
+    @media (max-width: $mobile) {
+      font-size: 0.7rem;
+    }
   }
 }
 
@@ -853,6 +1038,10 @@ onMounted(async () => {
     width: 100%;
     object-fit: cover;
 
+    @media (max-width: $mobile) {
+      height: 120px;
+    }
+
     &--placeholder {
       background-size: cover;
       background-position: center;
@@ -889,6 +1078,10 @@ onMounted(async () => {
     padding: 1.25rem;
     position: relative;
     z-index: 1;
+
+    @media (max-width: $mobile) {
+      padding: 1rem;
+    }
   }
 
   &__title {
@@ -900,6 +1093,10 @@ onMounted(async () => {
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: -0.01em;
+
+    @media (max-width: $mobile) {
+      font-size: 0.85rem;
+    }
   }
 
   &__desc {
@@ -907,6 +1104,18 @@ onMounted(async () => {
     color: $text-secondary;
     line-height: 1.6;
     margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    @media (max-width: $mobile) {
+      font-size: 0.75rem;
+      margin-bottom: 0.75rem;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
   }
 
   &__meta {
@@ -915,11 +1124,20 @@ onMounted(async () => {
     gap: 0.75rem;
     margin-bottom: 1rem;
     flex-wrap: wrap;
+
+    @media (max-width: $mobile) {
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
   }
 
   &__meta-item {
     font-size: 0.75rem;
     color: $text-muted;
+
+    @media (max-width: $mobile) {
+      font-size: 0.7rem;
+    }
   }
 
   &__btn {
@@ -939,6 +1157,11 @@ onMounted(async () => {
     justify-content: center;
     gap: 0.5rem;
     letter-spacing: 0.05em;
+
+    @media (max-width: $mobile) {
+      padding: 0.6rem;
+      font-size: 0.75rem;
+    }
 
     &:active {
       transform: scale(0.98);

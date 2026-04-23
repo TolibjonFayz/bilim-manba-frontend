@@ -33,10 +33,10 @@
 
       <div class="footer__col">
         <h4>Yordam</h4>
-        <a href="#">FAQ</a>
-        <a href="#">Blog</a>
-        <a href="#">Qo'llab-quvvatlash</a>
-        <a href="#">Maxfiylik siyosati</a>
+        <NuxtLink to="/faq">FAQ</NuxtLink>
+        <NuxtLink to="/support">Qo'llab-quvvatlash</NuxtLink>
+        <NuxtLink to="/privacy-policy">Maxfiylik siyosati</NuxtLink>
+        <NuxtLink to="/terms">Foydalanish shartlari</NuxtLink>
       </div>
 
       <div class="footer__col footer__subscribe">

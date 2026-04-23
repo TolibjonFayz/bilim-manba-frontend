@@ -101,7 +101,9 @@
           <span class="form-checkbox__box" />
           <span>
             Foydalanish
-            <a href="#" class="form-checkbox__link">shartlariga</a>
+            <NuxtLink to="/terms" target="_blank" class="form-checkbox__link"
+              >shartlariga</NuxtLink
+            >
             roziman
           </span>
         </label>
