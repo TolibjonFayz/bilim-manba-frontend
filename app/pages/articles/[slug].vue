@@ -446,22 +446,18 @@ useHead({
     { property: "og:description", content: () => article.value?.excerpt ?? "" },
     {
       property: "og:image",
-      content: () =>
-        article.value?.coverImage ??
-        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png",
+      content: () => article.value.coverImage,
     },
     {
       property: "og:url",
       content: () =>
-        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
+        `https://bilimmanba.uz/articles/${article.value.slug ?? ""}`,
     },
     { property: "og:type", content: "article" },
     { name: "twitter:card", content: "summary_large_image" },
     {
       name: "twitter:image",
-      content: () =>
-        article.value?.coverImage ??
-        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png",
+      content: () => article.value.coverImage,
     },
   ],
 });
@@ -498,7 +494,6 @@ onMounted(async () => {
   }
   await articleStore.getAllArticles();
   loading.value = false;
-  console.log(article.value);
 });
 </script>
 
