@@ -7,7 +7,18 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@element-plus/nuxt",
     "nuxt-gtag",
+    "nuxt-simple-sitemap",
+    "@nuxtjs/sitemap",
   ],
+
+  sitemap: {
+    siteUrl: "https://bilimmanba.uz",
+  },
+
+  site: {
+    url: "https://bilimmanba.uz",
+    name: "Bilim Manba",
+  },
 
   app: {
     head: {
