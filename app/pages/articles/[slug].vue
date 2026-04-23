@@ -434,19 +434,23 @@ const askAi = async () => {
   }
 };
 
-watchEffect(() => {
-  if (article.value) {
-    useHead({
-      title: `${article.value.title} — Bilim Manba`,
-      meta: [
-        { name: "description", content: article.value.excerpt ?? "" },
-        { property: "og:title", content: article.value.title },
-        { property: "og:description", content: article.value.excerpt ?? "" },
-        { property: "og:image", content: article.value.coverImage ?? "" },
-        { property: "og:type", content: "article" },
-      ],
-    });
-  }
+//SEO
+const image = computed(
+  () =>
+    article.value?.coverImage ??
+    "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
+);
+
+useSeoMeta({
+  title: () => `${article.value?.title ?? ""} — Bilim Manba`,
+  description: () => article.value?.excerpt ?? "",
+  ogTitle: () => article.value?.title ?? "",
+  ogDescription: () => article.value?.excerpt ?? "",
+  ogImage: () => image.value,
+  ogUrl: () => `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
+  ogType: "article",
+  twitterCard: "summary_large_image",
+  twitterImage: () => image.value,
 });
 
 onMounted(async () => {
@@ -479,10 +483,9 @@ onMounted(async () => {
       articleStore.oneArticle.category.name,
     );
   }
-
   await articleStore.getAllArticles();
-
   loading.value = false;
+  console.log(article.value);
 });
 </script>
 

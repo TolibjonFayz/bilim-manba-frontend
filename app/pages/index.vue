@@ -106,19 +106,30 @@ const categoryStore = useCategoryStore();
 const loading = ref(false);
 
 useHead({
-  title: "Bilim Manba — O'zbek tilidagi bilim platformasi",
+  title: "Bilim Manba — O'zbek tilidagi bilim ulashish platformasi",
   meta: [
     {
       name: "description",
       content:
-        "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar",
+        "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida bepul o'qing.",
     },
-    { property: "og:title", content: "Bilim Manba" },
+    {
+      property: "og:title",
+      content: "Bilim Manba — O'zbek tilidagi bilim ulashish platformasi",
+    },
     {
       property: "og:description",
-      content: "O'zbek tilidagi eng yaxshi bilim platformasi",
+      content:
+        "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar.",
     },
+    {
+      property: "og:image",
+      content:
+        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
+    },
+    { property: "og:url", content: "https://bilimmanba.uz" },
     { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary_large_image" },
   ],
 });
 
