@@ -27,7 +27,7 @@ export default defineNuxtConfig({
         {
           name: "description",
           content:
-            "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida bepul o'qing.",
+            "Zamonaviy texnologiyalar, ilm-fan, matematika va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida mutlaqo bepul o'qish va bilim olish imkoniyatidan foydalaning!",
         },
         {
           property: "og:title",
@@ -36,7 +36,7 @@ export default defineNuxtConfig({
         {
           property: "og:description",
           content:
-            "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar.",
+            "Zamonaviy texnologiyalar, ilm-fan, matematika va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida mutlaqo bepul o'qish va bilim olish imkoniyatidan foydalaning!",
         },
         {
           name: "google-site-verification",

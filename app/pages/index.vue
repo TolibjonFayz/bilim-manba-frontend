@@ -111,7 +111,7 @@ useHead({
     {
       name: "description",
       content:
-        "Zamonaviy texnologiyalar, ilm-fan va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida bepul o'qing.",
+        "Zamonaviy texnologiyalar, ilm-fan, matematika va shaxsiy rivojlanishga oid eng saralangan maqolalar. O'zbek tilida mutlaqo bepul o'qish va bilim olish imkoniyatidan foydalaning!",
     },
     {
       property: "og:title",
@@ -125,7 +125,7 @@ useHead({
     {
       property: "og:image",
       content:
-        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
+        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png",
     },
     { property: "og:url", content: "https://bilimmanba.uz" },
     { property: "og:type", content: "website" },
