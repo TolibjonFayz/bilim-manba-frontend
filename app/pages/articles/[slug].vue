@@ -446,18 +446,18 @@ useHead({
     { property: "og:description", content: () => article.value?.excerpt ?? "" },
     {
       property: "og:image",
-      content: () => article.value.coverImage,
+      content: () => article.value?.coverImage,
     },
     {
       property: "og:url",
       content: () =>
-        `https://bilimmanba.uz/articles/${article.value.slug ?? ""}`,
+        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
     },
     { property: "og:type", content: "article" },
     { name: "twitter:card", content: "summary_large_image" },
     {
       name: "twitter:image",
-      content: () => article.value.coverImage,
+      content: () => article.value?.coverImage,
     },
   ],
 });
