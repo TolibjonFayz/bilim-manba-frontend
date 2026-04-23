@@ -435,22 +435,35 @@ const askAi = async () => {
 };
 
 //SEO
-const image = computed(
-  () =>
-    article.value?.coverImage ??
-    "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
-);
-
-useSeoMeta({
-  title: () => `${article.value?.title ?? ""} — Bilim Manba`,
-  description: () => article.value?.excerpt ?? "",
-  ogTitle: () => article.value?.title ?? "",
-  ogDescription: () => article.value?.excerpt ?? "",
-  ogImage: () => image.value,
-  ogUrl: () => `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
-  ogType: "article",
-  twitterCard: "summary_large_image",
-  twitterImage: () => image.value,
+useHead({
+  title: () => `${article.value?.title ?? "Maqola"} — Bilim Manba`,
+  meta: [
+    { name: "description", content: () => article.value?.excerpt ?? "" },
+    {
+      property: "og:title",
+      content: () => article.value?.title ?? "Bilim Manba",
+    },
+    { property: "og:description", content: () => article.value?.excerpt ?? "" },
+    {
+      property: "og:image",
+      content: () =>
+        article.value?.coverImage ??
+        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png",
+    },
+    {
+      property: "og:url",
+      content: () =>
+        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
+    },
+    { property: "og:type", content: "article" },
+    { name: "twitter:card", content: "summary_large_image" },
+    {
+      name: "twitter:image",
+      content: () =>
+        article.value?.coverImage ??
+        "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png",
+    },
+  ],
 });
 
 onMounted(async () => {
