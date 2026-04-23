@@ -276,6 +276,11 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
+// ✅ SSR da ham ishlaydi
+await useAsyncData(`article-${route.params.slug}`, () =>
+  articleStore.getArticleBySlug(route.params.slug as string),
+);
+
 const article = computed(() => articleStore.oneArticle);
 
 const articleGradient = computed(
@@ -305,9 +310,37 @@ const popularArticles = computed(() =>
     })),
 );
 
-// ✅ OPTIMISTIC TOGGLE LIKE — backend ulangan
+const fallbackImage =
+  "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png";
+
+useHead({
+  title: () => `${article.value?.title ?? "Maqola"} — Bilim Manba`,
+  meta: [
+    { name: "description", content: () => article.value?.excerpt ?? "" },
+    {
+      property: "og:title",
+      content: () => article.value?.title ?? "Bilim Manba",
+    },
+    { property: "og:description", content: () => article.value?.excerpt ?? "" },
+    {
+      property: "og:image",
+      content: () => article.value?.coverImage ?? fallbackImage,
+    },
+    {
+      property: "og:url",
+      content: () =>
+        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
+    },
+    { property: "og:type", content: "article" },
+    { name: "twitter:card", content: "summary_large_image" },
+    {
+      name: "twitter:image",
+      content: () => article.value?.coverImage ?? fallbackImage,
+    },
+  ],
+});
+
 const toggleLike = async () => {
-  // Login bo'lmasa — login pagega
   if (!authStore.isLoggedIn) {
     ElNotification({
       title: "Diqqat",
@@ -320,25 +353,16 @@ const toggleLike = async () => {
 
   if (!article.value?.id) return;
 
-  // 1. UI darhol yangilanadi (optimistic)
   isLiked.value = !isLiked.value;
   likeCount.value += isLiked.value ? 1 : -1;
 
-  // 2. Backend ga so'rov
   const res = await likeStore.toggle(article.value.id);
 
-  // 3. Xato bo'lsa qaytaramiz
   if (!res.success) {
     isLiked.value = !isLiked.value;
     likeCount.value += isLiked.value ? 1 : -1;
-
-    ElNotification({
-      title: "Xato",
-      message: res.message,
-      type: "error",
-    });
+    ElNotification({ title: "Xato", message: res.message, type: "error" });
   } else {
-    // Backend dan keladigan aniq qiymat
     isLiked.value = res.data.isLiked;
     likeCount.value = res.data.likeCount;
   }
@@ -393,14 +417,10 @@ const askAi = async () => {
   try {
     const token = process.client ? localStorage.getItem("access_token") : null;
 
-    // Tarixni Groq formatida yuboramiz
     const history = aiMessages.value
       .filter((m) => m.role === "user" || m.role === "assistant")
-      .slice(0, -1) // oxirgi user savolni tashlaymiz — alohida yuboriladi
-      .map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
+      .slice(0, -1)
+      .map((m) => ({ role: m.role, content: m.content }));
 
     const res = await $fetch<any>("/ai/explain", {
       method: "POST",
@@ -410,7 +430,7 @@ const askAi = async () => {
         text:
           content.value?.message?.replace(/<[^>]*>/g, "").slice(0, 500) ?? "",
         question,
-        history, // 👈 qo'shildi
+        history,
       },
     });
 
@@ -428,70 +448,39 @@ const askAi = async () => {
   } finally {
     aiLoading.value = false;
     await nextTick();
-    if (messagesEl.value) {
+    if (messagesEl.value)
       messagesEl.value.scrollTop = messagesEl.value.scrollHeight;
-    }
   }
 };
-
-//SEO
-useHead({
-  title: () => `${article.value?.title ?? "Maqola"} — Bilim Manba`,
-  meta: [
-    { name: "description", content: () => article.value?.excerpt ?? "" },
-    {
-      property: "og:title",
-      content: () => article.value?.title ?? "Bilim Manba",
-    },
-    { property: "og:description", content: () => article.value?.excerpt ?? "" },
-    {
-      property: "og:image",
-      content: () => article.value?.coverImage,
-    },
-    {
-      property: "og:url",
-      content: () =>
-        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
-    },
-    { property: "og:type", content: "article" },
-    { name: "twitter:card", content: "summary_large_image" },
-    {
-      name: "twitter:image",
-      content: () => article.value?.coverImage,
-    },
-  ],
-});
 
 onMounted(async () => {
   loading.value = true;
 
-  // 1. Maqolani olish
-  await articleStore.getArticleBySlug(route.params.slug as string);
-
-  // 2. Content (HTML) URL orqali olish
+  // Content (HTML) URL orqali olish
   if (articleStore.oneArticle?.content) {
     content.value = await fetchContent(articleStore.oneArticle.content);
   }
 
-  // 3. Tags parsing
+  // Tags parsing
   if (articleStore.oneArticle?.tags) {
     tags.value = articleStore.oneArticle.tags
       .split(",")
       .map((t: string) => t.trim());
   }
 
-  // 4. Like state ni backend dan olish
+  // Like state
   if (articleStore.oneArticle) {
     likeCount.value = articleStore.oneArticle.likeCount ?? 0;
     isLiked.value = articleStore.oneArticle.isLiked ?? false;
   }
 
-  // 5. Related maqolalar — xuddi shu kategoriyadan
+  // Related
   if (articleStore.oneArticle?.category?.name) {
     await categoryStore.getCategoryBySlug(
       articleStore.oneArticle.category.name,
     );
   }
+
   await articleStore.getAllArticles();
   loading.value = false;
 });
