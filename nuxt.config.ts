@@ -9,7 +9,7 @@ export default defineNuxtConfig({
     "nuxt-gtag",
     "nuxt-simple-sitemap",
     "@nuxtjs/sitemap",
-    "@vercel/analytics/nuxt",
+    "@vercel/analytics",
   ],
 
   sitemap: {
