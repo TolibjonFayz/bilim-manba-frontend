@@ -245,10 +245,18 @@ const filteredArticles = computed(() => {
     }),
   );
 
-  if (sortBy.value === "popular") {
-    list.sort((a, b) => b.viewCount - a.viewCount);
+  if (sortBy.value === "newest") {
+    list.sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   } else if (sortBy.value === "oldest") {
-    list.reverse();
+    list.sort(
+      (a: any, b: any) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+  } else if (sortBy.value === "popular") {
+    list.sort((a: any, b: any) => b.viewCount - a.viewCount);
   }
 
   return list;
