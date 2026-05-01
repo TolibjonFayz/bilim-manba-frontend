@@ -7,7 +7,6 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@element-plus/nuxt",
     "nuxt-gtag",
-    "nuxt-simple-sitemap",
     "@nuxtjs/sitemap",
     "@vercel/analytics",
   ],
@@ -96,6 +95,8 @@ export default defineNuxtConfig({
   nitro: {
     preset: "vercel",
   },
+
+  plugins: ["~/plugins/auth.interceptor.ts"],
 
   gtag: {
     id: "G-CSHHXTH27V",

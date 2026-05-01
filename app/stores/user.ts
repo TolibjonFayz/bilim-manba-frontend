@@ -53,7 +53,7 @@ export const useUserStore = defineStore("users", () => {
     }
   }
 
-  async function getOneUserInfo(userId: string) {
+  async function getOneUserInfo(userId: number) {
     try {
       const res = await $fetch<any>(`/users/one/${userId}`, {
         method: "GET",
@@ -70,7 +70,7 @@ export const useUserStore = defineStore("users", () => {
     }
   }
 
-  async function UpdateOneUserInfo(userId: string, payload: any) {
+  async function UpdateOneUserInfo(userId: number, payload: any) {
     try {
       const res = await $fetch<any>(`/users/one/${userId}`, {
         method: "PUT",

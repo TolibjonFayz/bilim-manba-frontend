@@ -43,8 +43,26 @@
         <h4>Yangiliklarga obuna bo'ling</h4>
         <p>Eng yangi maqolalar va yangiliklar haqida xabardor bo'ling.</p>
         <div class="footer__subscribe-form">
-          <input type="email" placeholder="Email manzilingiz" />
-          <button class="btn btn--primary">Obuna bo'lish</button>
+          <input
+            v-model="email"
+            type="email"
+            placeholder="Email manzilingiz"
+            :disabled="loading"
+            @keyup.enter="handleSubscribe"
+          />
+          <button
+            class="btn btn--primary"
+            :disabled="loading || !email"
+            @click="handleSubscribe"
+          >
+            {{ loading ? "Yuborilmoqda..." : "Obuna bo'lish" }}
+          </button>
+          <p v-if="success" class="footer__msg footer__msg--success">
+            ✅ Muvaffaqiyatli obuna bo'ldingiz!
+          </p>
+          <p v-if="error" class="footer__msg footer__msg--error">
+            ⚠️ {{ error }}
+          </p>
         </div>
       </div>
     </div>
@@ -55,6 +73,49 @@
     </div>
   </footer>
 </template>
+
+<script setup lang="ts">
+const email = ref("");
+const loading = ref(false);
+const success = ref(false);
+const error = ref("");
+
+const handleSubscribe = async () => {
+  if (!email.value || !email.value.includes("@")) {
+    error.value = "To'g'ri email kiriting";
+    return;
+  }
+
+  loading.value = true;
+  success.value = false;
+  error.value = "";
+
+  try {
+    const res = await $fetch<any>("/subscribers/subscribe", {
+      method: "POST",
+      baseURL: useRuntimeConfig().public.apiBase,
+      body: { email: email.value },
+    });
+
+    // Message ga qarab farqlaymiz
+    if (res.message === "Obuna qayta faollashtirildi!") {
+      error.value = "Siz allaqachon obuna bo'lgansiz!";
+    } else {
+      success.value = true;
+      email.value = "";
+    }
+  } catch (err: any) {
+    const status = err?.response?.status;
+    if (status === 409) {
+      error.value = "⚠️ Bu email allaqachon obuna bo'lgan!";
+    } else {
+      error.value = "⚠️ Xato yuz berdi, qayta urinib ko'ring";
+    }
+  } finally {
+    loading.value = false;
+  }
+};
+</script>
 
 <style lang="scss" scoped>
 .footer {
@@ -83,6 +144,18 @@
       gap: 2rem;
       padding-top: 2.5rem;
       padding-bottom: 2.5rem;
+    }
+  }
+
+  &__msg {
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+
+    &--success {
+      color: #1a9e5e;
+    }
+    &--danger {
+      color: $danger;
     }
   }
 

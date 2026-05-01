@@ -28,22 +28,13 @@
 
             <div class="article-header__meta">
               <div class="article-header__author">
-                <div class="article-header__avatar">
-                  {{ article?.author?.fullName?.[0] }}
-                </div>
-                <div>
-                  <div class="article-header__author-name">
-                    {{ article?.author?.fullName }}
-                  </div>
-                  <div class="article-header__author-date">
-                    {{
-                      article?.createdAt
-                        ? new Date(article?.createdAt).toLocaleDateString(
-                            "uz-UZ",
-                          )
-                        : ""
-                    }}
-                  </div>
+                <div class="article-header__author-date">
+                  ⌛
+                  {{
+                    article?.createdAt
+                      ? new Date(article?.createdAt).toLocaleDateString("uz-UZ")
+                      : ""
+                  }}
                 </div>
               </div>
 

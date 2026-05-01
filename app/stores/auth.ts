@@ -34,14 +34,14 @@ export const useAuthStore = defineStore("auth", () => {
   function setAuth(t: any) {
     token.value = t.token.access_token;
     decodeToken(t.token.access_token);
-    if (process.client) {
+    if (import.meta.client) {
       localStorage.setItem("access_token", t.token.access_token);
       localStorage.setItem("userid", t.userId?.toString() || "");
     }
   }
 
   function initAuth() {
-    if (process.client) {
+    if (import.meta.client) {
       const t = localStorage.getItem("access_token");
       const userId = localStorage.getItem("userid");
       if (t && userId) {
@@ -52,12 +52,12 @@ export const useAuthStore = defineStore("auth", () => {
   }
 
   function logout() {
-    user.value = null;
-    token.value = null;
-    if (process.client) {
+    try {
       localStorage.removeItem("access_token");
       localStorage.removeItem("userid");
-    }
+    } catch {}
+    token.value = null;
+    user.value = null;
   }
 
   return {
