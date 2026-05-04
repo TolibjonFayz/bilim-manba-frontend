@@ -136,20 +136,20 @@
               </button>
 
               <div class="pagination__pages">
-                <template v-for="page in totalPages" :key="page">
+                <template v-for="page in visiblePages" :key="page">
+                  <span v-if="page === '...'" class="pagination__dots"
+                    >...</span
+                  >
                   <button
-                    v-if="page <= 3 || page === totalPages"
+                    v-else
                     class="pagination__page"
                     :class="{
                       'pagination__page--active': currentPage === page,
                     }"
-                    @click="currentPage = page"
+                    @click="currentPage = page as number"
                   >
                     {{ page }}
                   </button>
-                  <span v-else-if="page === 4" class="pagination__dots"
-                    >...</span
-                  >
                 </template>
               </div>
 
@@ -263,13 +263,47 @@ const filteredArticles = computed(() => {
     );
   }
 
-  if (sortBy.value === "popular") {
-    list.sort((a: any, b: any) => b.viewCount - a.viewCount);
+  if (sortBy.value === "newest") {
+    list.sort(
+      (a: any, b: any) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+    );
   } else if (sortBy.value === "oldest") {
-    list.reverse();
+    list.sort(
+      (a: any, b: any) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    );
+  } else if (sortBy.value === "popular") {
+    list.sort((a: any, b: any) => b.viewCount - a.viewCount);
   }
 
   return list;
+});
+
+const visiblePages = computed(() => {
+  const total = totalPages.value;
+  const current = currentPage.value;
+  const pages: (number | "...")[] = [];
+
+  if (total <= 7) {
+    for (let i = 1; i <= total; i++) pages.push(i);
+    return pages;
+  }
+
+  pages.push(1);
+
+  if (current > 3) pages.push("...");
+
+  const start = Math.max(2, current - 1);
+  const end = Math.min(total - 1, current + 1);
+
+  for (let i = start; i <= end; i++) pages.push(i);
+
+  if (current < total - 2) pages.push("...");
+
+  pages.push(total);
+
+  return pages;
 });
 
 const totalPages = computed(() =>
@@ -283,6 +317,10 @@ const paginatedArticles = computed(() => {
 
 // Kategoriya o'zgarganda sahifani reset qilish
 watch(activeCategory, () => {
+  currentPage.value = 1;
+});
+
+watch([activeCategory, searchQuery, sortBy], () => {
   currentPage.value = 1;
 });
 
