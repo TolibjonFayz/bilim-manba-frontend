@@ -56,7 +56,11 @@
             class="form-input-toggle"
             @click="showPassword = !showPassword"
           >
-            {{ showPassword ? "🙈" : "👁️" }}
+            <Icon
+              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
+              size="1.1em"
+              mode="css"
+            />
           </button>
         </div>
         <span v-if="errors.password" class="form-error">{{
@@ -83,7 +87,11 @@
             class="form-input-toggle"
             @click="showConfirm = !showConfirm"
           >
-            {{ showConfirm ? "🙈" : "👁️" }}
+            <Icon
+              :name="showConfirm ? 'lucide:eye-off' : 'lucide:eye'"
+              size="1.1em"
+              mode="css"
+            />
           </button>
         </div>
         <span v-if="errors.confirmPassword" class="form-error">{{
@@ -303,6 +311,7 @@ const handleRegister = async () => {
   border-radius: $border-radius-sm;
   background: #fff;
   transition: all 0.2s;
+  overflow: hidden;
 
   &:focus-within {
     border-color: $primary;
@@ -310,9 +319,12 @@ const handleRegister = async () => {
   }
 
   input {
+    min-width: 0;
     flex: 1;
     padding: 0.75rem 0.5rem;
     border: none;
+    flex-shrink: 0;
+    min-width: 40px;
     outline: none;
     font-size: 0.9rem;
     background: transparent;
@@ -332,11 +344,20 @@ const handleRegister = async () => {
 
 .form-input-toggle {
   padding: 0 0.85rem;
-  font-size: 0.9rem;
   cursor: pointer;
   background: none;
   border: none;
   flex-shrink: 0;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $primary;
+  }
 }
 
 .form-error {

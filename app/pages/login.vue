@@ -40,7 +40,11 @@
             class="form-input-toggle"
             @click="showPassword = !showPassword"
           >
-            {{ showPassword ? "🙈" : "👁️" }}
+            <Icon
+              :name="showPassword ? 'lucide:eye-off' : 'lucide:eye'"
+              size="1.1em"
+              mode="css"
+            />
           </button>
         </div>
         <span v-if="errors.password" class="form-error">{{
@@ -232,6 +236,7 @@ const handleLogin = async () => {
 
   input {
     flex: 1;
+    min-width: 0;
     padding: 0.75rem 0.5rem;
     border: none;
     outline: none;
@@ -253,11 +258,20 @@ const handleLogin = async () => {
 
 .form-input-toggle {
   padding: 0 0.85rem;
-  font-size: 0.9rem;
   cursor: pointer;
   flex-shrink: 0;
   background: none;
   border: none;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $text-muted;
+  transition: color 0.2s;
+
+  &:hover {
+    color: $primary;
+  }
 }
 
 .form-error {
