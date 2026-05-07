@@ -1,239 +1,247 @@
 <template>
-  <div class="article-page" v-loading="loading">
-    <div class="container">
-      <!-- BREADCRUMB -->
-      <nav class="breadcrumb">
-        <NuxtLink to="/" class="breadcrumb__item">Bosh sahifa</NuxtLink>
-        <span class="breadcrumb__sep">›</span>
-        <NuxtLink to="/articles" class="breadcrumb__item">Maqolalar</NuxtLink>
-        <span class="breadcrumb__sep">›</span>
-        <span class="breadcrumb__item breadcrumb__item--active">
-          {{ article?.category?.name }}
-        </span>
-      </nav>
+  <div>
+    <ArticleProgressBar />
+    <div class="article-page" v-loading="loading">
+      <div class="container">
+        <!-- BREADCRUMB -->
+        <nav class="breadcrumb">
+          <NuxtLink to="/" class="breadcrumb__item">Bosh sahifa</NuxtLink>
+          <span class="breadcrumb__sep">›</span>
+          <NuxtLink to="/articles" class="breadcrumb__item">Maqolalar</NuxtLink>
+          <span class="breadcrumb__sep">›</span>
+          <span class="breadcrumb__item breadcrumb__item--active">
+            {{ article?.category?.name }}
+          </span>
+        </nav>
 
-      <div class="article-page__grid">
-        <!-- CHAP: Asosiy kontent -->
-        <div class="article-main">
-          <!-- HEADER -->
-          <div class="article-header">
-            <div class="article-header__badges">
-              <span class="badge badge--category">
-                💻 {{ article?.category?.name }}
-              </span>
-            </div>
-
-            <h1 class="article-header__title">{{ article?.title }}</h1>
-            <p class="article-header__excerpt">{{ article?.excerpt }}</p>
-
-            <div class="article-header__meta">
-              <div class="article-header__author">
-                <div class="article-header__author-date">
-                  ⌛
-                  {{
-                    article?.createdAt
-                      ? new Date(article?.createdAt).toLocaleDateString("uz-UZ")
-                      : ""
-                  }}
-                </div>
+        <div class="article-page__grid">
+          <!-- CHAP: Asosiy kontent -->
+          <div class="article-main">
+            <!-- HEADER -->
+            <div class="article-header">
+              <div class="article-header__badges">
+                <span class="badge badge--category">
+                  💻 {{ article?.category?.name }}
+                </span>
               </div>
 
-              <div class="article-header__stats">
-                <span>🕐 {{ readTime }} daqiqa</span>
-                <span>👁 {{ article?.viewCount }}</span>
-              </div>
+              <h1 class="article-header__title">{{ article?.title }}</h1>
+              <p class="article-header__excerpt">{{ article?.excerpt }}</p>
 
-              <div class="article-header__actions">
-                <button class="article-header__action-btn" @click="handleShare">
-                  <span>⤴</span> Ulashish
-                </button>
-                <button
-                  class="article-header__action-btn article-header__action-btn--like"
-                  :class="{ 'article-header__action-btn--liked': isLiked }"
-                  @click="toggleLike"
-                >
-                  {{ isLiked ? "❤️" : "🤍" }} {{ likeCount }}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <!-- COVER IMAGE -->
-          <div class="article-cover">
-            <img
-              v-if="article?.coverImage"
-              :src="article?.coverImage"
-              :alt="article?.title"
-              class="article-cover__img"
-            />
-            <div
-              v-else
-              class="article-cover__placeholder"
-              :style="{ background: articleGradient }"
-            />
-          </div>
-
-          <!-- CONTENT -->
-          <div class="article-content-wrap">
-            <div class="article-content" v-html="content?.message" />
-          </div>
-
-          <!-- ARTICLE FOOTER -->
-          <div class="article-footer">
-            <!-- Teglar -->
-            <div class="article-footer__tags">
-              <span v-for="tag in tags" :key="tag" class="tag-chip">
-                #{{ tag }}
-              </span>
-            </div>
-
-            <!-- Share -->
-            <div class="article-footer__share">
-              <span class="article-footer__share-label">Ulashish:</span>
-              <button
-                class="share-btn"
-                title="Havolani nusxalash"
-                @click="handleShare"
-              >
-                🔗
-              </button>
-            </div>
-          </div>
-
-          <!-- RELATED ARTICLES -->
-          <div class="related-section">
-            <div class="related-section__header">
-              <h2 class="related-section__title">O'xshash maqolalar</h2>
-              <NuxtLink
-                :to="`/categories/${article?.category?.name}`"
-                class="related-section__link"
-              >
-                Barchasini ko'rish →
-              </NuxtLink>
-            </div>
-            <div class="related-grid">
-              <NuxtLink
-                v-for="rel in relatedArticles"
-                :key="rel.id"
-                :to="`/articles/${rel.slug}`"
-                class="related-card"
-              >
-                <div class="related-card__cover">
-                  <img
-                    :src="rel?.coverImage"
-                    :alt="rel?.title"
-                    class="related-card__cover-img"
-                  />
-                </div>
-
-                <div class="related-card__body">
-                  <span class="related-card__date">
+              <div class="article-header__meta">
+                <div class="article-header__author">
+                  <div class="article-header__author-date">
+                    ⌛
                     {{
-                      rel.createdAt
-                        ? new Date(rel.createdAt).toLocaleDateString("uz-UZ")
+                      article?.createdAt
+                        ? new Date(article?.createdAt).toLocaleDateString(
+                            "uz-UZ",
+                          )
                         : ""
                     }}
-                  </span>
-                  <h4 class="related-card__title">{{ rel?.title }}</h4>
+                  </div>
                 </div>
-              </NuxtLink>
+
+                <div class="article-header__stats">
+                  <span>🕐 {{ readTime }} daqiqa</span>
+                  <span>👁 {{ article?.viewCount }}</span>
+                </div>
+
+                <div class="article-header__actions">
+                  <button
+                    class="article-header__action-btn"
+                    @click="handleShare"
+                  >
+                    <span>⤴</span> Ulashish
+                  </button>
+                  <button
+                    class="article-header__action-btn article-header__action-btn--like"
+                    :class="{ 'article-header__action-btn--liked': isLiked }"
+                    @click="toggleLike"
+                  >
+                    {{ isLiked ? "❤️" : "🤍" }} {{ likeCount }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- COVER IMAGE -->
+            <div class="article-cover">
+              <img
+                v-if="article?.coverImage"
+                :src="article?.coverImage"
+                :alt="article?.title"
+                class="article-cover__img"
+              />
+              <div
+                v-else
+                class="article-cover__placeholder"
+                :style="{ background: articleGradient }"
+              />
+            </div>
+
+            <!-- CONTENT -->
+            <div class="article-content-wrap">
+              <div class="article-content" v-html="content?.message" />
+            </div>
+
+            <!-- ARTICLE FOOTER -->
+            <div class="article-footer">
+              <!-- Teglar -->
+              <div class="article-footer__tags">
+                <span v-for="tag in tags" :key="tag" class="tag-chip">
+                  #{{ tag }}
+                </span>
+              </div>
+
+              <!-- Share -->
+              <div class="article-footer__share">
+                <span class="article-footer__share-label">Ulashish:</span>
+                <button
+                  class="share-btn"
+                  title="Havolani nusxalash"
+                  @click="handleShare"
+                >
+                  🔗
+                </button>
+              </div>
+            </div>
+
+            <!-- RELATED ARTICLES -->
+            <div class="related-section">
+              <div class="related-section__header">
+                <h2 class="related-section__title">O'xshash maqolalar</h2>
+                <NuxtLink
+                  :to="`/categories/${article?.category?.name}`"
+                  class="related-section__link"
+                >
+                  Barchasini ko'rish →
+                </NuxtLink>
+              </div>
+              <div class="related-grid">
+                <NuxtLink
+                  v-for="rel in relatedArticles"
+                  :key="rel.id"
+                  :to="`/articles/${rel.slug}`"
+                  class="related-card"
+                >
+                  <div class="related-card__cover">
+                    <img
+                      :src="rel?.coverImage"
+                      :alt="rel?.title"
+                      class="related-card__cover-img"
+                    />
+                  </div>
+
+                  <div class="related-card__body">
+                    <span class="related-card__date">
+                      {{
+                        rel.createdAt
+                          ? new Date(rel.createdAt).toLocaleDateString("uz-UZ")
+                          : ""
+                      }}
+                    </span>
+                    <h4 class="related-card__title">{{ rel?.title }}</h4>
+                  </div>
+                </NuxtLink>
+              </div>
             </div>
           </div>
+
+          <!-- O'NG: Sidebar -->
+          <aside class="article-sidebar">
+            <!-- Author card -->
+            <div class="sidebar-card">
+              <div class="author-card">
+                <div class="author-card__source">Manba</div>
+                <div class="author-card__avatar">
+                  {{ article?.excerpt?.[0] }}
+                </div>
+                <div class="author-card__info">
+                  <h4 class="author-card__name">
+                    {{ article?.excerpt }}
+                  </h4>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mashhur maqolalar -->
+            <div class="sidebar-card">
+              <h3 class="sidebar-card__title">🔥 Mashhur maqolalar</h3>
+              <div class="popular-items-list">
+                <NuxtLink
+                  v-for="item in popularArticles"
+                  :key="item?.id"
+                  :to="`/articles/${item?.slug}`"
+                  class="popular-item"
+                >
+                  <div class="popular-item__cover">
+                    <img
+                      v-if="item?.coverImage"
+                      :src="item?.coverImage"
+                      :alt="item?.title"
+                      class="popular-item__cover-img"
+                    />
+                    <div
+                      v-else
+                      class="popular-item__cover-placeholder"
+                      :style="{ background: item?.gradient }"
+                    />
+                  </div>
+                  <div class="popular-item__info">
+                    <p class="popular-item__title">{{ item?.title }}</p>
+                    <span class="popular-item__views">
+                      👁 {{ item?.viewCount }}
+                    </span>
+                  </div>
+                </NuxtLink>
+              </div>
+            </div>
+          </aside>
         </div>
-
-        <!-- O'NG: Sidebar -->
-        <aside class="article-sidebar">
-          <!-- Author card -->
-          <div class="sidebar-card">
-            <div class="author-card">
-              <div class="author-card__source">Manba</div>
-              <div class="author-card__avatar">
-                {{ article?.excerpt?.[0] }}
-              </div>
-              <div class="author-card__info">
-                <h4 class="author-card__name">
-                  {{ article?.excerpt }}
-                </h4>
-              </div>
-            </div>
-          </div>
-
-          <!-- Mashhur maqolalar -->
-          <div class="sidebar-card">
-            <h3 class="sidebar-card__title">🔥 Mashhur maqolalar</h3>
-            <div class="popular-items-list">
-              <NuxtLink
-                v-for="item in popularArticles"
-                :key="item?.id"
-                :to="`/articles/${item?.slug}`"
-                class="popular-item"
-              >
-                <div class="popular-item__cover">
-                  <img
-                    v-if="item?.coverImage"
-                    :src="item?.coverImage"
-                    :alt="item?.title"
-                    class="popular-item__cover-img"
-                  />
-                  <div
-                    v-else
-                    class="popular-item__cover-placeholder"
-                    :style="{ background: item?.gradient }"
-                  />
-                </div>
-                <div class="popular-item__info">
-                  <p class="popular-item__title">{{ item?.title }}</p>
-                  <span class="popular-item__views">
-                    👁 {{ item?.viewCount }}
-                  </span>
-                </div>
-              </NuxtLink>
-            </div>
-          </div>
-        </aside>
       </div>
-    </div>
 
-    <!-- AI CHAT BUTTON -->
-    <div class="ai-fab-wrap">
-      <button class="ai-fab" @click="showAiPanel = !showAiPanel">
-        🤖 AI tushuntirsin
-      </button>
+      <!-- AI CHAT BUTTON -->
+      <div class="ai-fab-wrap">
+        <button class="ai-fab" @click="showAiPanel = !showAiPanel">
+          🤖 AI tushuntirsin
+        </button>
 
-      <!-- AI Panel -->
-      <div v-if="showAiPanel" class="ai-panel">
-        <div class="ai-panel__header">
-          <span>🤖 AI tushuntirma</span>
-          <button class="ai-panel__close" @click="showAiPanel = false">
-            ✕
-          </button>
-        </div>
-
-        <div ref="messagesEl" class="ai-panel__messages">
-          <div
-            v-for="msg in aiMessages"
-            :key="msg.id"
-            class="ai-msg"
-            :class="{ 'ai-msg--user': msg.role === 'user' }"
-          >
-            <div class="ai-msg__bubble">{{ msg?.content }}</div>
+        <!-- AI Panel -->
+        <div v-if="showAiPanel" class="ai-panel">
+          <div class="ai-panel__header">
+            <span>🤖 AI tushuntirma</span>
+            <button class="ai-panel__close" @click="showAiPanel = false">
+              ✕
+            </button>
           </div>
-          <div v-if="aiLoading" class="ai-msg">
-            <div class="ai-msg__bubble ai-msg__bubble--loading">
-              <span class="ai-typing"> <span /><span /><span /> </span>
+
+          <div ref="messagesEl" class="ai-panel__messages">
+            <div
+              v-for="msg in aiMessages"
+              :key="msg.id"
+              class="ai-msg"
+              :class="{ 'ai-msg--user': msg.role === 'user' }"
+            >
+              <div class="ai-msg__bubble">{{ msg?.content }}</div>
+            </div>
+            <div v-if="aiLoading" class="ai-msg">
+              <div class="ai-msg__bubble ai-msg__bubble--loading">
+                <span class="ai-typing"> <span /><span /><span /> </span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="ai-panel__input-wrap">
-          <input
-            v-model="aiQuestion"
-            type="text"
-            placeholder="Savolingizni yozing..."
-            class="ai-panel__input"
-            @keyup.enter="askAi"
-          />
-          <button class="ai-panel__send" @click="askAi">→</button>
+          <div class="ai-panel__input-wrap">
+            <input
+              v-model="aiQuestion"
+              type="text"
+              placeholder="Savolingizni yozing..."
+              class="ai-panel__input"
+              @keyup.enter="askAi"
+            />
+            <button class="ai-panel__send" @click="askAi">→</button>
+          </div>
         </div>
       </div>
     </div>
@@ -267,7 +275,7 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-// ✅ SSR da ham ishlaydi
+// SSR — SEO uchun
 await useAsyncData(`article-${route.params.slug}`, () =>
   articleStore.getArticleBySlug(route.params.slug as string),
 );
@@ -278,15 +286,21 @@ const articleGradient = computed(
   () => gradients[(article.value?.id ?? 0) % gradients.length],
 );
 
-const relatedArticles = computed(() =>
-  (categoryStore.categoryBySlug?.articles ?? [])
-    .filter((a: any) => a.id !== article.value?.id)
+// Related — categoryStore dan emas, allArticles dan olamiz
+const relatedArticles = computed(() => {
+  const categoryId = article.value?.category?.id;
+  if (!categoryId) return [];
+
+  return (articleStore.allArticles ?? [])
+    .filter(
+      (a: any) => a.category?.id === categoryId && a.id !== article.value?.id,
+    )
     .slice(0, 3)
     .map((a: any, i: number) => ({
       ...a,
       gradient: gradients[i % gradients.length],
-    })),
-);
+    }));
+});
 
 const readTime = computed(() => calcReadTime(content.value?.message ?? ""));
 
@@ -312,7 +326,10 @@ useHead({
       property: "og:title",
       content: () => article.value?.title ?? "Bilim Manba",
     },
-    { property: "og:description", content: () => article.value?.excerpt ?? "" },
+    {
+      property: "og:description",
+      content: () => article.value?.excerpt ?? "",
+    },
     {
       property: "og:image",
       content: () => article.value?.coverImage ?? fallbackImage,
@@ -331,6 +348,16 @@ useHead({
   ],
 });
 
+async function fetchContent(url: string): Promise<any | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 const toggleLike = async () => {
   if (!authStore.isLoggedIn) {
     ElNotification({
@@ -344,12 +371,14 @@ const toggleLike = async () => {
 
   if (!article.value?.id) return;
 
+  // Optimistic update
   isLiked.value = !isLiked.value;
   likeCount.value += isLiked.value ? 1 : -1;
 
   const res = await likeStore.toggle(article.value.id);
 
   if (!res.success) {
+    // Rollback
     isLiked.value = !isLiked.value;
     likeCount.value += isLiked.value ? 1 : -1;
     ElNotification({ title: "Xato", message: res.message, type: "error" });
@@ -377,20 +406,6 @@ const aiMessages = ref([
     content: "Salom! Ushbu maqola bo'yicha savollaringizni bering.",
   },
 ]);
-
-async function fetchContent(url: string): Promise<any | null> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error(`Failed to fetch content from ${url}: ${response.status}`);
-      return null;
-    }
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching content from ${url}:`, error);
-    return null;
-  }
-}
 
 const askAi = async () => {
   if (!aiQuestion.value.trim() || aiLoading.value) return;
@@ -430,7 +445,7 @@ const askAi = async () => {
       role: "assistant",
       content: res.explanation,
     });
-  } catch (e: any) {
+  } catch {
     aiMessages.value.push({
       id: Date.now() + 1,
       role: "assistant",
@@ -447,32 +462,30 @@ const askAi = async () => {
 onMounted(async () => {
   loading.value = true;
 
-  // Content (HTML) URL orqali olish
+  // Parallel — tez ishlash uchun
+  await Promise.all([
+    // Client da token bilan qayta so'rov — isLiked to'g'ri keladi
+    articleStore.getArticleBySlug(route.params.slug as string),
+    // Barcha maqolalar — related va popular uchun
+    articleStore.getAllArticles(),
+  ]);
+
+  // Like state
+  likeCount.value = articleStore.oneArticle?.likeCount ?? 0;
+  isLiked.value = articleStore.oneArticle?.isLiked ?? false;
+
+  // Content
   if (articleStore.oneArticle?.content) {
     content.value = await fetchContent(articleStore.oneArticle.content);
   }
 
-  // Tags parsing
+  // Tags
   if (articleStore.oneArticle?.tags) {
     tags.value = articleStore.oneArticle.tags
       .split(",")
       .map((t: string) => t.trim());
   }
 
-  // Like state
-  if (articleStore.oneArticle) {
-    likeCount.value = articleStore.oneArticle.likeCount ?? 0;
-    isLiked.value = articleStore.oneArticle.isLiked ?? false;
-  }
-
-  // Related
-  if (articleStore.oneArticle?.category?.name) {
-    await categoryStore.getCategoryBySlug(
-      articleStore.oneArticle.category.name,
-    );
-  }
-
-  await articleStore.getAllArticles();
   loading.value = false;
 });
 </script>
