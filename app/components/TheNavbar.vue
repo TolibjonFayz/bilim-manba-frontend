@@ -23,6 +23,13 @@
         <ClientOnly>
           <template #default>
             <template v-if="authStore.isLoggedIn">
+              <button
+                class="navbar__search-btn"
+                @click="searchOpen = true"
+                title="Qidirish"
+              >
+                <Icon name="lucide:search" size="1.1em" mode="css" />
+              </button>
               <div class="navbar__user" @click="toggleDropdown">
                 <div class="navbar__avatar">
                   {{ authStore.user?.email?.[0]?.toUpperCase() }}
@@ -57,6 +64,13 @@
             </template>
 
             <template v-else>
+              <button
+                class="navbar__search-btn"
+                @click="searchOpen = true"
+                title="Qidirish"
+              >
+                <Icon name="lucide:search" size="1.1em" mode="css" />
+              </button>
               <NuxtLink to="/login" class="navbar__link">Kirish</NuxtLink>
               <NuxtLink to="/register" class="btn btn--primary">
                 Ro'yxatdan o'tish
@@ -70,6 +84,14 @@
           </template>
         </ClientOnly>
       </div>
+
+      <button
+        class="navbar__search-btn navbar__search-btn--mobile"
+        @click="searchOpen = true"
+        title="Qidirish"
+      >
+        <Icon name="lucide:search" size="1.2em" mode="css" />
+      </button>
 
       <!-- Hamburger button (mobile only) -->
       <button
@@ -159,6 +181,7 @@
         </ClientOnly>
       </div>
     </div>
+    <SearchModal :open="searchOpen" @close="searchOpen = false" />
   </header>
 </template>
 
@@ -166,8 +189,12 @@
 const authStore = useAuthStore();
 const userStore = useUserStore();
 
+const openSearch = () => {
+  searchOpen.value = true;
+};
 const showDropdown = ref(false);
 const isScrolled = ref(false);
+const searchOpen = ref(false);
 const menuOpen = ref(false);
 
 const handleClickOutside = (e: Event) => {
@@ -204,7 +231,12 @@ onMounted(async () => {
   }
 });
 
+onMounted(() => {
+  window.addEventListener("open-search", openSearch);
+});
+
 onUnmounted(() => {
+  window.removeEventListener("open-search", openSearch);
   document.removeEventListener("click", handleClickOutside);
 });
 </script>
@@ -223,11 +255,47 @@ onUnmounted(() => {
     box-shadow: $shadow-md;
   }
 
+  &__search-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &--mobile {
+      display: none;
+      width: 40px;
+      height: 40px;
+      margin-left: auto;
+      margin-right: 0.5rem;
+
+      @media (max-width: $tablet) {
+        display: flex;
+      }
+    }
+  }
+
   &__inner {
     display: flex;
     align-items: center;
     height: 64px;
     gap: 2rem;
+
+    @media (max-width: $tablet) {
+      gap: 0;
+    }
   }
 
   &__logo {
@@ -386,7 +454,6 @@ onUnmounted(() => {
     flex-direction: column;
     gap: 5px;
     padding: 0.5rem;
-    margin-left: auto;
     cursor: pointer;
     background: none;
     border: none;

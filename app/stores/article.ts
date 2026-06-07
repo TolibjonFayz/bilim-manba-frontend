@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 export const useArticleStore = defineStore("articles", () => {
   const allArticles = ref<any[]>([]);
   const oneArticle = ref<any>(null);
+  const searchResults = ref<any[]>([]);
 
   // Token helper
   const getToken = () => {
@@ -53,10 +54,29 @@ export const useArticleStore = defineStore("articles", () => {
     }
   }
 
+  async function searchArticles(query: string) {
+    try {
+      const res = await $fetch<any>("/articles/search", {
+        method: "GET",
+        baseURL: useRuntimeConfig().public.apiBase,
+        params: { q: query },
+      });
+      searchResults.value = res;
+      return { success: true, data: res };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.data?.message || "Xato yuz berdi",
+      };
+    }
+  }
+
   return {
     getAllArticles,
     allArticles,
     oneArticle,
     getArticleBySlug,
+    searchArticles,
+    searchResults,
   };
 });
