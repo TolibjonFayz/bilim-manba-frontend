@@ -66,6 +66,17 @@
                     >
                   </div>
                 </div>
+                <div class="stats-item">
+                  <div class="stats-item__icon stats-item__icon--purple">
+                    🔖
+                  </div>
+                  <div class="stats-item__info">
+                    <span class="stats-item__label">O'QISH RO'YXATI</span>
+                    <span class="stats-item__value"
+                      >{{ stats?.bookmarkCount ?? 0 }} ta</span
+                    >
+                  </div>
+                </div>
               </div>
             </div>
           </aside>
@@ -249,6 +260,69 @@
               </div>
             </div>
 
+            <!-- O'QISH RO'YXATI TAB -->
+            <div v-else-if="activeTab === 'bookmarks'">
+              <div class="content-section">
+                <h2 class="content-section__title">O'qish ro'yxati</h2>
+                <div
+                  v-if="bookmarkStore?.userBookmarks?.length"
+                  class="saved-grid"
+                >
+                  <div
+                    v-for="a in bookmarkStore.userBookmarks"
+                    :key="a.articleId"
+                    class="saved-card-wrapper"
+                  >
+                    <NuxtLink
+                      :to="`/articles/${a.article.slug}`"
+                      class="saved-card"
+                    >
+                      <img :src="a?.article?.coverImage" alt="image" />
+                      <div class="saved-card__body">
+                        <h4 class="saved-card__title">{{ a.article.title }}</h4>
+                        <p class="saved-card__excerpt">
+                          {{ a.article.excerpt }}
+                        </p>
+                        <div class="saved-card__meta">
+                          <span
+                            >📅
+                            {{
+                              a?.createdAt
+                                ? new Date(a.createdAt).toLocaleDateString(
+                                    "uz-UZ",
+                                  )
+                                : ""
+                            }}</span
+                          >
+                        </div>
+                      </div>
+                    </NuxtLink>
+                    <button
+                      class="saved-card__like-btn"
+                      @click.prevent="handleRemoveBookmark(a.articleId)"
+                      title="Ro'yxatdan o'chirish"
+                    >
+                      <Icon
+                        name="lucide:bookmark-check"
+                        size="0.9em"
+                        mode="css"
+                      />
+                    </button>
+                  </div>
+                </div>
+                <div v-else class="empty-state">
+                  <span class="empty-state__emoji">🔖</span>
+                  <h3 class="empty-state__title">O'qish ro'yxati bo'sh</h3>
+                  <p class="empty-state__desc">
+                    Keyinroq o'qish uchun maqolalarni saqlang
+                  </p>
+                  <NuxtLink to="/articles" class="empty-state__link"
+                    >Maqolalarni ko'rish →</NuxtLink
+                  >
+                </div>
+              </div>
+            </div>
+
             <!-- SOZLAMALAR TAB -->
             <div v-else-if="activeTab === 'settings'">
               <div class="settings-card">
@@ -403,12 +477,23 @@ const activeTab = ref("activity");
 const showCurrent = ref(false);
 const showNew = ref(false);
 const showConfirm = ref(false);
+const bookmarkStore = useBookmarkStore();
 
 const tabs = [
   { key: "activity", label: "Faoliyat" },
   { key: "saved", label: "Saqlangan" },
+  { key: "bookmarks", label: "O'qish ro'yxati" },
   { key: "settings", label: "Sozlamalar" },
 ];
+
+const handleRemoveBookmark = async (articleId: number) => {
+  const res = await bookmarkStore.toggle(articleId);
+  if (res.success) {
+    bookmarkStore.userBookmarks = bookmarkStore.userBookmarks.filter(
+      (b: any) => b.articleId !== articleId,
+    );
+  }
+};
 
 const settingsForm = reactive({
   fullName: userStore.oneUserInfo?.fullName ?? "",
@@ -568,6 +653,7 @@ onMounted(async () => {
     userStore.getStats(),
     userStore.getRecentReads(),
     userStore.getWeeklyActivity(),
+    bookmarkStore.getUserBookmarks(),
   ]);
   settingsForm.fullName = userStore.oneUserInfo?.fullName ?? "";
   loading.value = false;
@@ -772,6 +858,9 @@ onMounted(async () => {
     }
     &--pink {
       background: rgba(#ff9a9e, 0.15);
+    }
+    &--purple {
+      background: rgba(139, 92, 246, 0.15);
     }
   }
 

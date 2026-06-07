@@ -61,6 +61,24 @@
                   >
                     {{ isLiked ? "❤️" : "🤍" }} {{ likeCount }}
                   </button>
+                  <button
+                    class="article-header__action-btn"
+                    :class="{
+                      'article-header__action-btn--bookmarked': isBookmarked,
+                    }"
+                    @click="toggleBookmark"
+                  >
+                    <Icon
+                      :name="
+                        isBookmarked
+                          ? 'lucide:bookmark-check'
+                          : 'lucide:bookmark'
+                      "
+                      size="1em"
+                      mode="css"
+                    />
+                    {{ isBookmarked ? "Saqlangan" : "Saqlash" }}
+                  </button>
                 </div>
               </div>
             </div>
@@ -266,6 +284,38 @@ const aiLoading = ref(false);
 const messagesEl = ref<HTMLElement | null>(null);
 const tags = ref<string[]>([]);
 const content = ref<any>(null);
+const bookmarkStore = useBookmarkStore();
+const isBookmarked = ref(false);
+
+const toggleBookmark = async () => {
+  if (!authStore.isLoggedIn) {
+    ElNotification({
+      title: "Diqqat",
+      message: "Saqlash uchun avval kiring",
+      type: "warning",
+    });
+    navigateTo("/login");
+    return;
+  }
+  if (!article.value?.id) return;
+
+  isBookmarked.value = !isBookmarked.value; // optimistic
+  const res = await bookmarkStore.toggle(article.value.id);
+
+  if (!res.success) {
+    isBookmarked.value = !isBookmarked.value; // rollback
+    ElNotification({ title: "Xato", message: res.message, type: "error" });
+  } else {
+    isBookmarked.value = res.data.isBookmarked;
+    ElNotification({
+      title: res.data.isBookmarked ? "Saqlandi" : "O'chirildi",
+      message: res.data.isBookmarked
+        ? "Maqola o'qish ro'yxatiga qo'shildi"
+        : "Maqola ro'yxatdan o'chirildi",
+      type: "success",
+    });
+  }
+};
 
 const gradients = [
   "linear-gradient(135deg, #667eea, #764ba2)",
@@ -470,9 +520,17 @@ onMounted(async () => {
     articleStore.getAllArticles(),
   ]);
 
+  const token = process.client ? localStorage.getItem("access_token") : null;
+  $fetch(`/articles/view/${route.params.slug}`, {
+    method: "POST",
+    baseURL: useRuntimeConfig().public.apiBase,
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  }).catch(() => {});
+
   // Like state
   likeCount.value = articleStore.oneArticle?.likeCount ?? 0;
   isLiked.value = articleStore.oneArticle?.isLiked ?? false;
+  isBookmarked.value = articleStore.oneArticle?.isBookmarked ?? false;
 
   // Content
   if (articleStore.oneArticle?.content) {
@@ -645,6 +703,12 @@ onMounted(async () => {
       border-color: $secondary;
       color: $secondary;
     }
+  }
+
+  &__action-btn--bookmarked {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+    background: rgba(99, 102, 241, 0.08);
   }
 }
 
