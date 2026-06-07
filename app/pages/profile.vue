@@ -1546,4 +1546,226 @@ onMounted(async () => {
     opacity: 0.4;
   }
 }
+
+/* ─────────────────────────────────────
+   KICHIK EKRANLAR — 480px va 350px
+───────────────────────────────────── */
+@media (max-width: 480px) {
+  // HEADER — avatar + nom + tugma tik joylashadi
+  .profile-header {
+    padding: 1.25rem 0;
+
+    &__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 1rem;
+    }
+
+    &__left {
+      gap: 0.75rem;
+    }
+
+    &__avatar {
+      width: 52px;
+      height: 52px;
+      min-width: 52px;
+      font-size: 1.25rem;
+    }
+
+    &__name {
+      font-size: 1.05rem;
+    }
+
+    &__email {
+      font-size: 0.78rem;
+    }
+
+    &__edit-btn {
+      width: 100%;
+      justify-content: center;
+      font-size: 0.82rem;
+      padding: 0.55rem 1rem;
+    }
+  }
+
+  // SIDEBAR stats — vertikal, bitta ustun
+  .sidebar-card {
+    padding: 1rem;
+
+    .stats-list {
+      grid-template-columns: 1fr;
+      gap: 0.85rem;
+    }
+  }
+
+  .stats-item {
+    gap: 0.7rem;
+
+    &__icon {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      font-size: 0.9rem;
+    }
+
+    &__label {
+      font-size: 0.64rem;
+    }
+    &__value {
+      font-size: 1rem;
+    }
+  }
+
+  // TAB BAR — teng bo'linadi, kichik shrift
+  .tab-bar__item {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.78rem;
+  }
+
+  // RECENT + SAVED grid — bitta ustun
+  .recent-grid,
+  .saved-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .recent-card img,
+  .saved-card img {
+    height: 150px;
+  }
+
+  // SECTION sarlavhalari
+  .content-section {
+    margin-bottom: 1.75rem;
+
+    &__title {
+      font-size: 1rem;
+    }
+  }
+
+  // CHART card
+  .chart-card {
+    padding: 0.85rem;
+
+    &__header {
+      gap: 0.5rem;
+    }
+
+    &__subtitle {
+      font-size: 0.875rem;
+    }
+    &__range {
+      font-size: 0.75rem;
+    }
+  }
+
+  // SETTINGS
+  .settings-card {
+    padding: 1rem;
+
+    &__title {
+      font-size: 0.95rem;
+    }
+  }
+
+  .settings-save-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ─── 350px va undan kichik ─── */
+@media (max-width: 360px) {
+  .profile-main {
+    padding: 1rem 0 2rem;
+  }
+
+  .profile-header {
+    &__avatar {
+      width: 46px;
+      height: 46px;
+      min-width: 46px;
+      font-size: 1.1rem;
+    }
+
+    &__name {
+      font-size: 0.95rem;
+    }
+    &__name-row {
+      gap: 0.4rem;
+    }
+  }
+
+  // Tablar — yana zichroq
+  .tab-bar {
+    gap: 0;
+
+    &__item {
+      padding: 0.55rem 0.35rem;
+      font-size: 0.72rem;
+    }
+  }
+
+  // Stats — yana ixchamroq
+  .stats-item {
+    &__icon {
+      width: 30px;
+      height: 30px;
+      min-width: 30px;
+      font-size: 0.8rem;
+    }
+
+    &__label {
+      font-size: 0.6rem;
+      letter-spacing: 0.02em;
+    }
+
+    &__value {
+      font-size: 0.9rem;
+    }
+  }
+
+  // Recent/saved rasm balandligi
+  .recent-card img,
+  .saved-card img {
+    height: 130px;
+  }
+
+  // Chart — bar'lar ingichka, scroll bo'ladi
+  .bar-chart {
+    min-width: 260px;
+  }
+
+  // Forma inputlari
+  .form-input-wrap input {
+    font-size: 16px; // iOS zoom oldini olish
+    padding: 0.65rem 0.85rem;
+  }
+
+  // Alert matni
+  .alert {
+    font-size: 0.8rem;
+    padding: 0.55rem 0.85rem;
+  }
+
+  // Empty state
+  .empty-state {
+    padding: 2rem 1rem;
+
+    &__emoji {
+      font-size: 2.5rem;
+    }
+    &__title {
+      font-size: 0.95rem;
+    }
+    &__desc {
+      font-size: 0.82rem;
+    }
+  }
+
+  // Container padding kamaytirish
+  .container {
+    padding: 0 0.85rem;
+  }
+}
 </style>
