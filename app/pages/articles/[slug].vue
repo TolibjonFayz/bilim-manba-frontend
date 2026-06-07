@@ -125,6 +125,8 @@
               </div>
             </div>
 
+            <CommentsSection v-if="article?.id" :article-id="article.id" />
+
             <!-- RELATED ARTICLES -->
             <div class="related-section">
               <div class="related-section__header">
