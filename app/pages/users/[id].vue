@@ -128,7 +128,7 @@ onMounted(async () => {
     width: 88px;
     height: 88px;
     border-radius: 50%;
-    background: linear-gradient(135deg, $c-primary, $c-secondary);
+    background: linear-gradient(135deg, 99, 102, 241, $c-secondary);
     color: #fff;
     display: flex;
     align-items: center;
