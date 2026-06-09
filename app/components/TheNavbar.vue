@@ -30,6 +30,68 @@
               >
                 <Icon name="lucide:search" size="1.1em" mode="css" />
               </button>
+
+              <div class="navbar__notif" @click.stop="toggleNotifications">
+                <button class="navbar__notif-btn" title="Bildirishnomalar">
+                  <Icon name="lucide:bell" size="1.2em" mode="css" />
+                  <span
+                    v-if="notificationStore.unreadCount > 0"
+                    class="navbar__notif-badge"
+                  >
+                    {{
+                      notificationStore.unreadCount > 9
+                        ? "9+"
+                        : notificationStore.unreadCount
+                    }}
+                  </span>
+                </button>
+
+                <!-- Dropdown -->
+                <div
+                  v-if="showNotifications"
+                  class="notif-dropdown"
+                  @click.stop
+                >
+                  <div class="notif-dropdown__header">
+                    <span>Bildirishnomalar</span>
+                    <button
+                      v-if="notificationStore.unreadCount > 0"
+                      class="notif-dropdown__mark-all"
+                      @click="notificationStore.markAllAsRead()"
+                    >
+                      Hammasini o'qilgan
+                    </button>
+                  </div>
+
+                  <div class="notif-dropdown__list">
+                    <div
+                      v-for="n in notificationStore.notifications"
+                      :key="n.id"
+                      class="notif-item"
+                      :class="{ 'notif-item--unread': !n.isRead }"
+                      @click="handleNotificationClick(n)"
+                    >
+                      <div class="notif-item__dot" v-if="!n.isRead" />
+                      <div class="notif-item__content">
+                        <span class="notif-item__title">{{ n.title }}</span>
+                        <span class="notif-item__msg">{{ n.message }}</span>
+                        <span class="notif-item__time">{{
+                          notifTimeFormat(n.createdAt)
+                        }}</span>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="!notificationStore.notifications.length"
+                      class="notif-empty"
+                    >
+                      <span>🔔</span>
+                      <p>Bildirishnomalar yo'q</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <div class="navbar__user" @click="toggleDropdown">
                 <div class="navbar__avatar">
                   {{ authStore.user?.email?.[0]?.toUpperCase() }}
@@ -196,12 +258,13 @@ const showDropdown = ref(false);
 const isScrolled = ref(false);
 const searchOpen = ref(false);
 const menuOpen = ref(false);
+const notificationStore = useNotificationStore();
+const showNotifications = ref(false);
 
 const handleClickOutside = (e: Event) => {
   const target = e.target as HTMLElement;
-  if (!target.closest(".navbar__user")) {
-    showDropdown.value = false;
-  }
+  if (!target.closest(".navbar__user")) showDropdown.value = false;
+  if (!target.closest(".navbar__notif")) showNotifications.value = false;
 };
 
 const toggleDropdown = () => {
@@ -215,6 +278,27 @@ const handleLogout = () => {
   navigateTo("/");
 };
 
+const toggleNotifications = async () => {
+  showNotifications.value = !showNotifications.value;
+  if (showNotifications.value) {
+    await notificationStore.getNotifications();
+  }
+};
+
+const handleNotificationClick = async (n: any) => {
+  await notificationStore.markAsRead(n.id);
+  showNotifications.value = false;
+  if (n.link) navigateTo(n.link);
+};
+
+const notifTimeFormat = (date: string) => {
+  const diff = Math.floor((Date.now() - new Date(date).getTime()) / 1000);
+  if (diff < 60) return "hozirgina";
+  if (diff < 3600) return `${Math.floor(diff / 60)} daqiqa oldin`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} soat oldin`;
+  return `${Math.floor(diff / 86400)} kun oldin`;
+};
+
 onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
   window.addEventListener("scroll", () => {
@@ -222,6 +306,7 @@ onMounted(async () => {
   });
 
   if (authStore.isLoggedIn) {
+    notificationStore.getUnreadCount();
     const token = localStorage.getItem("access_token");
     if (token) {
       const parts = token.split(".");
@@ -242,6 +327,164 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.navbar__notif {
+  position: relative;
+
+  &-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  &-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 100px;
+    background: var(--color-danger);
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--color-bg);
+  }
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 340px;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: $border-radius;
+  box-shadow: var(--color-shadow-lg);
+  overflow: hidden;
+  z-index: 100;
+
+  @media (max-width: $mobile) {
+    width: calc(100vw - 2rem);
+    right: -1rem;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid var(--color-border);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--color-text-primary);
+  }
+
+  &__mark-all {
+    font-size: 0.72rem;
+    color: var(--color-primary);
+    font-weight: 600;
+    background: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &__list {
+    max-height: 380px;
+    overflow-y: auto;
+  }
+}
+
+.notif-item {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: var(--color-bg-secondary);
+  }
+
+  &--unread {
+    background: rgba(99, 102, 241, 0.04);
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--color-primary);
+    flex-shrink: 0;
+    margin-top: 0.4rem;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__msg {
+    font-size: 0.8rem;
+    color: var(--color-text-secondary);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__time {
+    font-size: 0.7rem;
+    color: var(--color-text-muted);
+    margin-top: 0.1rem;
+  }
+}
+
+.notif-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--color-text-muted);
+
+  span {
+    font-size: 1.75rem;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  p {
+    font-size: 0.85rem;
+  }
+}
+
 .navbar {
   position: sticky;
   top: 0;
