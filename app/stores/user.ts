@@ -5,6 +5,7 @@ export const useUserStore = defineStore("users", () => {
   const recentReads = ref<any[]>([]);
   const weeklyActivity = ref<any>({ days: [], totalThisWeek: 0 });
   const stats = ref<any>({ readCount: 0, totalTime: 0, savedCount: 0 });
+  const publicProfile = ref<any>(null);
 
   const getToken = () => {
     try {
@@ -159,6 +160,19 @@ export const useUserStore = defineStore("users", () => {
     }
   }
 
+  async function getPublicProfile(userId: number) {
+    try {
+      const res = await $fetch<any>(`/users/public/${userId}`, {
+        method: "GET",
+        baseURL: useRuntimeConfig().public.apiBase,
+      });
+      publicProfile.value = res;
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   return {
     login,
     register,
@@ -172,5 +186,7 @@ export const useUserStore = defineStore("users", () => {
     stats,
     recentReads,
     weeklyActivity,
+    getPublicProfile,
+    publicProfile,
   };
 });

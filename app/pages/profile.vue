@@ -359,6 +359,36 @@
                       />
                     </div>
                   </div>
+
+                  <div class="form-group">
+                    <label>Profil ko'rinishi</label>
+                    <div class="privacy-toggle">
+                      <div class="privacy-toggle__info">
+                        <span class="privacy-toggle__status">
+                          {{
+                            settingsForm.isPublic
+                              ? "🌍  Common (Public)"
+                              : "🔒 Maxfiy (Private)"
+                          }}
+                        </span>
+                        <span class="privacy-toggle__desc">
+                          {{
+                            settingsForm.isPublic
+                              ? "Profilingizni hamma ko'ra oladi"
+                              : "Profilingiz faqat sizga ko'rinadi"
+                          }}
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        class="switch"
+                        :class="{ 'switch--on': settingsForm.isPublic }"
+                        @click="settingsForm.isPublic = !settingsForm.isPublic"
+                      >
+                        <span class="switch__knob" />
+                      </button>
+                    </div>
+                  </div>
                   <button
                     class="btn btn--primary settings-save-btn"
                     :disabled="settingsLoading"
@@ -495,10 +525,6 @@ const handleRemoveBookmark = async (articleId: number) => {
   }
 };
 
-const settingsForm = reactive({
-  fullName: userStore.oneUserInfo?.fullName ?? "",
-});
-
 const passwordForm = reactive({
   current: "",
   new: "",
@@ -524,6 +550,7 @@ const handleSaveProfile = async () => {
   try {
     await userStore.UpdateOneUserInfo(Number(localStorage.getItem("userid")), {
       fullName: settingsForm.fullName,
+      isPublic: settingsForm.isPublic,
     });
     settingsSuccess.value = "Ma'lumot muvaffaqiyatli yangilandi!";
   } catch (e: any) {
@@ -587,6 +614,11 @@ const recentArticles = computed(() =>
     date: a.createdAt ? new Date(a.createdAt).toLocaleDateString("uz-UZ") : "",
   })),
 );
+
+const settingsForm = reactive({
+  fullName: userStore.oneUserInfo?.fullName ?? "",
+  isPublic: userStore.oneUserInfo?.isPublic ?? false,
+});
 
 function getLatestByArticleId(data: any[]) {
   const map = new Map();
@@ -656,6 +688,7 @@ onMounted(async () => {
     bookmarkStore.getUserBookmarks(),
   ]);
   settingsForm.fullName = userStore.oneUserInfo?.fullName ?? "";
+  settingsForm.isPublic = userStore.oneUserInfo?.isPublic ?? false;
   loading.value = false;
 });
 </script>
@@ -758,6 +791,74 @@ onMounted(async () => {
       width: 100%;
       justify-content: center;
     }
+  }
+}
+
+.privacy-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  background: var(--color-bg-secondary);
+  border-radius: $border-radius-sm;
+  border: 1px solid var(--color-border);
+
+  &__info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  &__status {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+  }
+
+  &__desc {
+    font-size: 0.78rem;
+    color: var(--color-text-muted);
+  }
+}
+
+.switch {
+  // Browser default reset
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+
+  // Toggle ko'rinishi
+  width: 52px;
+  height: 28px;
+  border-radius: 100px;
+  background: #d1d5db; // 👈 off holat — kulrang
+  position: relative;
+  transition: background 0.25s ease;
+  flex-shrink: 0;
+
+  &--on {
+    background: #6366f1; // 👈 on holat — primary rang
+  }
+
+  &__knob {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    transition: transform 0.25s ease;
+    pointer-events: none; // 👈 knob click'ni blokirovka qilmasin
+  }
+
+  &--on &__knob {
+    transform: translateX(24px); // 👈 o'ngga siljiydi
   }
 }
 
