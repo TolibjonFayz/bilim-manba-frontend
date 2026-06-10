@@ -116,7 +116,7 @@
             bog'laning:
           </p>
           <ul>
-            <li>Email: bilimmanba@outlook.com</li>
+            <li>Email: bilimmanba@gmail.com</li>
             <li>Sayt: bilimmanba.uz</li>
           </ul>
         </section>

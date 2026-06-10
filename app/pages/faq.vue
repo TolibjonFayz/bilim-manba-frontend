@@ -34,7 +34,7 @@
       <div class="faq-cta">
         <h3>Savolingiz javobsiz qoldimi?</h3>
         <p>Biz bilan bog'laning, 24 soat ichida javob beramiz</p>
-        <a href="mailto:bilimmanba@outlook.com" class="btn btn--primary">
+        <a href="mailto:bilimmanba@gmail.com" class="btn btn--primary">
           Biz bilan bog'laning →
         </a>
       </div>
@@ -89,7 +89,7 @@ const faqs = [
   {
     question: "Parolimni unutdim, nima qilaman?",
     answer:
-      "Hozircha parolni tiklash funksiyasi ishlab chiqilmoqda. Muammo yuzaga kelsa, bilimmanba@outlook.com manziliga xat yuboring — 24 soat ichida yordam beramiz.",
+      "Hozircha parolni tiklash funksiyasi ishlab chiqilmoqda. Muammo yuzaga kelsa, bilimmanba@gmail.com manziliga xat yuboring — 24 soat ichida yordam beramiz.",
   },
   {
     question: "Yangi maqolalar qachon qo'shiladi?",
@@ -99,7 +99,7 @@ const faqs = [
   {
     question: "Saytda xato yoki muammo topilsa nima qilaman?",
     answer:
-      "bilimmanba@outlook.com manziliga xabar yuboring. Muammoni tezkor hal qilamiz. Sizning fikr-mulohazalaringiz saytni yaxshilashga yordam beradi!",
+      "bilimmanba@gmail.com manziliga xabar yuboring. Muammoni tezkor hal qilamiz. Sizning fikr-mulohazalaringiz saytni yaxshilashga yordam beradi!",
   },
 ];
 </script>

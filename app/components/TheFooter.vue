@@ -69,7 +69,7 @@
 
     <div class="footer__bottom container">
       <span>© 2026 Bilim Manba. Barcha huquqlar himoyalangan.</span>
-      <span>Toshkent, O'zbekiston · bilimmanba@outlook.com</span>
+      <span>Toshkent, O'zbekiston · bilimmanba@gmail.com</span>
     </div>
   </footer>
 </template>

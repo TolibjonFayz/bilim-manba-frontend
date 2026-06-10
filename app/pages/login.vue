@@ -25,7 +25,9 @@
       <div class="form-group" :class="{ 'form-group--error': errors.password }">
         <div class="form-group__label-row">
           <label>Parol</label>
-          <a href="#" class="form-group__forgot">Parolni unutdingizmi?</a>
+          <NuxtLink to="/forgot-password" class="form-group__forgot">
+            Parolni unutdingizmi?
+          </NuxtLink>
         </div>
         <div class="form-input-wrap">
           <span class="form-input-icon">🔒</span>

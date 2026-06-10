@@ -12,13 +12,13 @@
 
       <!-- Cards -->
       <div class="support-cards">
-        <a href="mailto:bilimmanba@outlook.com" class="support-card">
+        <a href="mailto:bilimmanba@gmail.com" class="support-card">
           <div class="support-card__icon">✉️</div>
           <h3 class="support-card__title">Email</h3>
           <p class="support-card__desc">
             Savollaringizni email orqali yuboring. 24 soat ichida javob beramiz.
           </p>
-          <span class="support-card__link">bilimmanba@outlook.com →</span>
+          <span class="support-card__link">bilimmanba@gmail.com →</span>
         </a>
 
         <a href="https://t.me/bilim_manba" target="_blank" class="support-card">
