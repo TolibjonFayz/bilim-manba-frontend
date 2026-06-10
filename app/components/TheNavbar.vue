@@ -23,6 +23,7 @@
         <ClientOnly>
           <template #default>
             <template v-if="authStore.isLoggedIn">
+              <!-- Search -->
               <button
                 class="navbar__search-btn"
                 @click="searchOpen = true"
@@ -30,10 +31,10 @@
               >
                 <Icon name="lucide:search" size="1.1em" mode="css" />
               </button>
-
+              <!-- 🔔 Notification -->
               <div class="navbar__notif" @click.stop="toggleNotifications">
                 <button class="navbar__notif-btn" title="Bildirishnomalar">
-                  <Icon name="lucide:bell" size="1.2em" mode="css" />
+                  <Icon name="lucide:bell" size="1.15em" mode="css" />
                   <span
                     v-if="notificationStore.unreadCount > 0"
                     class="navbar__notif-badge"
@@ -47,51 +48,81 @@
                 </button>
 
                 <!-- Dropdown -->
-                <div
-                  v-if="showNotifications"
-                  class="notif-dropdown"
-                  @click.stop
-                >
-                  <div class="notif-dropdown__header">
-                    <span>Bildirishnomalar</span>
-                    <button
-                      v-if="notificationStore.unreadCount > 0"
-                      class="notif-dropdown__mark-all"
-                      @click="notificationStore.markAllAsRead()"
-                    >
-                      Hammasini o'qilgan
-                    </button>
-                  </div>
+                <Transition name="notif-drop">
+                  <div
+                    v-if="showNotifications"
+                    class="notif-dropdown"
+                    @click.stop
+                  >
+                    <div class="notif-dropdown__header">
+                      <span class="notif-dropdown__title">
+                        🔔 Bildirishnomalar
+                      </span>
+                      <button
+                        v-if="notificationStore.unreadCount > 0"
+                        class="notif-dropdown__mark-all"
+                        @click="handleMarkAll"
+                      >
+                        Hammasini o'qilgan
+                      </button>
+                    </div>
 
-                  <div class="notif-dropdown__list">
-                    <div
-                      v-for="n in notificationStore.notifications"
-                      :key="n.id"
-                      class="notif-item"
-                      :class="{ 'notif-item--unread': !n.isRead }"
-                      @click="handleNotificationClick(n)"
-                    >
-                      <div class="notif-item__dot" v-if="!n.isRead" />
-                      <div class="notif-item__content">
-                        <span class="notif-item__title">{{ n.title }}</span>
-                        <span class="notif-item__msg">{{ n.message }}</span>
-                        <span class="notif-item__time">{{
-                          notifTimeFormat(n.createdAt)
-                        }}</span>
+                    <div class="notif-dropdown__list">
+                      <!-- Loading -->
+                      <div v-if="notifLoading" class="notif-loading">
+                        <div
+                          class="notif-loading__skeleton"
+                          v-for="i in 3"
+                          :key="i"
+                        >
+                          <div class="notif-loading__dot" />
+                          <div class="notif-loading__lines">
+                            <div
+                              class="notif-loading__line notif-loading__line--title"
+                            />
+                            <div
+                              class="notif-loading__line notif-loading__line--msg"
+                            />
+                            <div
+                              class="notif-loading__line notif-loading__line--time"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Natijalar -->
+                      <template
+                        v-else-if="notificationStore.notifications.length"
+                      >
+                        <div
+                          v-for="n in notificationStore.notifications"
+                          :key="n.id"
+                          class="notif-item"
+                          :class="{ 'notif-item--unread': !n.isRead }"
+                          @click="handleNotificationClick(n)"
+                        >
+                          <div v-if="!n.isRead" class="notif-item__dot" />
+                          <div class="notif-item__body">
+                            <span class="notif-item__title">{{ n.title }}</span>
+                            <span class="notif-item__msg">{{ n.message }}</span>
+                            <span class="notif-item__time">
+                              {{ notifTimeFormat(n.createdAt) }}
+                            </span>
+                          </div>
+                        </div>
+                      </template>
+
+                      <!-- Bo'sh -->
+                      <div v-else class="notif-empty">
+                        <span>🔔</span>
+                        <p>Bildirishnomalar yo'q</p>
                       </div>
                     </div>
-
-                    <div
-                      v-if="!notificationStore.notifications.length"
-                      class="notif-empty"
-                    >
-                      <span>🔔</span>
-                      <p>Bildirishnomalar yo'q</p>
-                    </div>
                   </div>
-                </div>
+                </Transition>
               </div>
 
+              <!-- User dropdown -->
               <div class="navbar__user" @click="toggleDropdown">
                 <div class="navbar__avatar">
                   {{ authStore.user?.email?.[0]?.toUpperCase() }}
@@ -140,13 +171,13 @@
             </template>
           </template>
 
-          <!-- SSR da hech narsa ko'rinmaydi -->
           <template #fallback>
             <div style="width: 130px; height: 36px" />
           </template>
         </ClientOnly>
       </div>
 
+      <!-- Mobile search btn -->
       <button
         class="navbar__search-btn navbar__search-btn--mobile"
         @click="searchOpen = true"
@@ -155,7 +186,7 @@
         <Icon name="lucide:search" size="1.2em" mode="css" />
       </button>
 
-      <!-- Hamburger button (mobile only) -->
+      <!-- Hamburger -->
       <button
         class="navbar__hamburger"
         :class="{ 'navbar__hamburger--open': menuOpen }"
@@ -243,6 +274,7 @@
         </ClientOnly>
       </div>
     </div>
+
     <SearchModal :open="searchOpen" @close="searchOpen = false" />
   </header>
 </template>
@@ -250,17 +282,15 @@
 <script setup lang="ts">
 const authStore = useAuthStore();
 const userStore = useUserStore();
+const notificationStore = useNotificationStore();
 
-const openSearch = () => {
-  searchOpen.value = true;
-};
 const showDropdown = ref(false);
+const showNotifications = ref(false);
 const isScrolled = ref(false);
 const searchOpen = ref(false);
 const menuOpen = ref(false);
-const notificationStore = useNotificationStore();
-const showNotifications = ref(false);
 
+// ── Click outside ──
 const handleClickOutside = (e: Event) => {
   const target = e.target as HTMLElement;
   if (!target.closest(".navbar__user")) showDropdown.value = false;
@@ -278,10 +308,15 @@ const handleLogout = () => {
   navigateTo("/");
 };
 
+const notifLoading = ref(false);
+
+// ── Notifications ──
 const toggleNotifications = async () => {
   showNotifications.value = !showNotifications.value;
   if (showNotifications.value) {
+    notifLoading.value = true;
     await notificationStore.getNotifications();
+    notifLoading.value = false;
   }
 };
 
@@ -289,6 +324,10 @@ const handleNotificationClick = async (n: any) => {
   await notificationStore.markAsRead(n.id);
   showNotifications.value = false;
   if (n.link) navigateTo(n.link);
+};
+
+const handleMarkAll = async () => {
+  await notificationStore.markAllAsRead();
 };
 
 const notifTimeFormat = (date: string) => {
@@ -299,11 +338,24 @@ const notifTimeFormat = (date: string) => {
   return `${Math.floor(diff / 86400)} kun oldin`;
 };
 
+// ── Search shortcut ──
+const openSearch = () => {
+  searchOpen.value = true;
+};
+
+// ── Lifecycle ──
 onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
+  window.addEventListener("keydown", (e: KeyboardEvent) => {
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+      e.preventDefault();
+      searchOpen.value = true;
+    }
+  });
   window.addEventListener("scroll", () => {
     isScrolled.value = window.scrollY > 20;
   });
+  window.addEventListener("open-search", openSearch);
 
   if (authStore.isLoggedIn) {
     notificationStore.getUnreadCount();
@@ -316,175 +368,16 @@ onMounted(async () => {
   }
 });
 
-onMounted(() => {
-  window.addEventListener("open-search", openSearch);
-});
-
 onUnmounted(() => {
-  window.removeEventListener("open-search", openSearch);
   document.removeEventListener("click", handleClickOutside);
+  window.removeEventListener("open-search", openSearch);
 });
 </script>
 
 <style lang="scss" scoped>
-.navbar__notif {
-  position: relative;
-
-  &-btn {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    border: 1.5px solid var(--color-border);
-    background: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    position: relative;
-
-    &:hover {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-    }
-  }
-
-  &-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 4px;
-    border-radius: 100px;
-    background: var(--color-danger);
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 2px solid var(--color-bg);
-  }
-}
-
-.notif-dropdown {
-  position: absolute;
-  top: calc(100% + 12px);
-  right: 0;
-  width: 340px;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: $border-radius;
-  box-shadow: var(--color-shadow-lg);
-  overflow: hidden;
-  z-index: 100;
-
-  @media (max-width: $mobile) {
-    width: calc(100vw - 2rem);
-    right: -1rem;
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0.85rem 1.1rem;
-    border-bottom: 1px solid var(--color-border);
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--color-text-primary);
-  }
-
-  &__mark-all {
-    font-size: 0.72rem;
-    color: var(--color-primary);
-    font-weight: 600;
-    background: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  &__list {
-    max-height: 380px;
-    overflow-y: auto;
-  }
-}
-
-.notif-item {
-  display: flex;
-  gap: 0.6rem;
-  padding: 0.85rem 1.1rem;
-  border-bottom: 1px solid var(--color-border);
-  cursor: pointer;
-  transition: background 0.15s;
-
-  &:hover {
-    background: var(--color-bg-secondary);
-  }
-
-  &--unread {
-    background: rgba(99, 102, 241, 0.04);
-  }
-
-  &__dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--color-primary);
-    flex-shrink: 0;
-    margin-top: 0.4rem;
-  }
-
-  &__content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-    min-width: 0;
-  }
-
-  &__title {
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-  }
-
-  &__msg {
-    font-size: 0.8rem;
-    color: var(--color-text-secondary);
-    line-height: 1.4;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-
-  &__time {
-    font-size: 0.7rem;
-    color: var(--color-text-muted);
-    margin-top: 0.1rem;
-  }
-}
-
-.notif-empty {
-  text-align: center;
-  padding: 2.5rem 1rem;
-  color: var(--color-text-muted);
-
-  span {
-    font-size: 1.75rem;
-    display: block;
-    margin-bottom: 0.4rem;
-  }
-  p {
-    font-size: 0.85rem;
-  }
-}
-
+// ─────────────────────────────────────
+// NAVBAR BASE
+// ─────────────────────────────────────
 .navbar {
   position: sticky;
   top: 0;
@@ -496,38 +389,6 @@ onUnmounted(() => {
 
   &--scrolled {
     box-shadow: $shadow-md;
-  }
-
-  &__search-btn {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1.5px solid var(--color-border);
-    background: var(--color-bg-secondary);
-    color: var(--color-text-secondary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.2s;
-    flex-shrink: 0;
-
-    &:hover {
-      border-color: var(--color-primary);
-      color: var(--color-primary);
-    }
-
-    &--mobile {
-      display: none;
-      width: 40px;
-      height: 40px;
-      margin-left: auto;
-      margin-right: 0.5rem;
-
-      @media (max-width: $tablet) {
-        display: flex;
-      }
-    }
   }
 
   &__inner {
@@ -589,7 +450,7 @@ onUnmounted(() => {
   &__actions {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
     margin-left: auto;
 
     @media (max-width: $tablet) {
@@ -597,6 +458,40 @@ onUnmounted(() => {
     }
   }
 
+  // ── Search btn ──
+  &__search-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &--mobile {
+      display: none;
+      width: 40px;
+      height: 40px;
+      margin-left: auto;
+      margin-right: 0.5rem;
+
+      @media (max-width: $tablet) {
+        display: flex;
+      }
+    }
+  }
+
+  // ── User ──
   &__user {
     position: relative;
     cursor: pointer;
@@ -625,7 +520,7 @@ onUnmounted(() => {
     box-shadow: $shadow-lg;
     min-width: 200px;
     overflow: hidden;
-    z-index: 10;
+    z-index: 200;
   }
 
   &__dropdown-item {
@@ -642,7 +537,6 @@ onUnmounted(() => {
     &:hover {
       background: $bg-secondary;
     }
-
     &--danger {
       color: $danger;
       &:hover {
@@ -692,6 +586,7 @@ onUnmounted(() => {
     background: $border-color;
   }
 
+  // ── Hamburger ──
   &__hamburger {
     display: none;
     flex-direction: column;
@@ -734,6 +629,7 @@ onUnmounted(() => {
     }
   }
 
+  // ── Mobile menu ──
   &__mobile-menu {
     display: none;
     overflow: hidden;
@@ -745,7 +641,6 @@ onUnmounted(() => {
     &--open {
       max-height: 500px;
     }
-
     @media (max-width: $tablet) {
       display: block;
     }
@@ -763,7 +658,7 @@ onUnmounted(() => {
     align-items: center;
     gap: 0.5rem;
     width: 100%;
-    padding: 0.75rem 0.75rem;
+    padding: 0.75rem;
     font-size: 0.975rem;
     font-weight: 500;
     color: $text-primary;
@@ -779,7 +674,6 @@ onUnmounted(() => {
       color: $primary;
       background: $primary-light;
     }
-
     &--danger {
       color: $danger;
       &:hover {
@@ -837,6 +731,360 @@ onUnmounted(() => {
     width: 100%;
     margin-top: 0.5rem;
     justify-content: center;
+  }
+}
+
+// ─────────────────────────────────────
+// NOTIFICATION
+// ─────────────────────────────────────
+.navbar__notif {
+  position: relative;
+
+  &-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--color-border);
+    background: var(--color-bg-secondary);
+    color: var(--color-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    flex-shrink: 0;
+
+    &:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+  }
+
+  &-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 100px;
+    background: #ef4444;
+    color: #fff;
+    font-size: 0.65rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    animation: notif-pulse 2s ease-in-out infinite;
+  }
+}
+
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 12px);
+  right: 0;
+  width: 340px;
+  background: #ffffff;
+  border: 1px solid #eeedf5;
+  border-radius: $border-radius;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  z-index: 200;
+
+  @media (max-width: $mobile) {
+    width: calc(100vw - 2rem);
+    right: -1rem;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9rem 1.1rem;
+    border-bottom: 1px solid #eeedf5;
+    background: #f8f7ff;
+  }
+
+  &__title {
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #1a1a2e;
+  }
+
+  &__mark-all {
+    font-size: 0.75rem;
+    color: #6366f1;
+    font-weight: 600;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: $font-primary;
+    padding: 0.3rem 0.7rem;
+    border-radius: $border-radius-pill;
+    transition: all 0.15s;
+
+    &:hover {
+      background: rgba(99, 102, 241, 0.1);
+      text-decoration: none;
+    }
+  }
+
+  &__list {
+    max-height: 360px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+}
+
+.notif-item {
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid #f0eff8;
+  cursor: pointer;
+  transition: background 0.15s;
+  align-items: flex-start;
+
+  &:last-child {
+    border-bottom: none;
+  }
+  &:hover {
+    background: #f8f7ff;
+  }
+  &--unread {
+    background: rgba(99, 102, 241, 0.04);
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #6366f1;
+    flex-shrink: 0;
+    margin-top: 5px;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+    flex: 1;
+  }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.3;
+  }
+
+  &__msg {
+    font-size: 0.78rem;
+    color: #4a5568;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__time {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin-top: 0.1rem;
+  }
+}
+
+.notif-loading {
+  padding: 0.5rem 0;
+
+  &__skeleton {
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.85rem 1.1rem;
+    border-bottom: 1px solid #f0eff8;
+    align-items: flex-start;
+  }
+
+  &__dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #e5e4ef;
+    flex-shrink: 0;
+    margin-top: 5px;
+    animation: notif-shimmer 1.2s ease-in-out infinite;
+  }
+
+  &__lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    flex: 1;
+  }
+
+  &__line {
+    border-radius: 4px;
+    background: linear-gradient(90deg, #f0eff8 25%, #e5e4ef 50%, #f0eff8 75%);
+    background-size: 200% 100%;
+    animation: notif-shimmer-slide 1.4s ease-in-out infinite;
+
+    &--title {
+      height: 11px;
+      width: 55%;
+    }
+    &--msg {
+      height: 9px;
+      width: 85%;
+    }
+    &--time {
+      height: 8px;
+      width: 35%;
+    }
+  }
+}
+
+@keyframes notif-shimmer {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes notif-shimmer-slide {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.notif-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #9ca3af;
+
+  span {
+    font-size: 1.75rem;
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+  p {
+    font-size: 0.85rem;
+  }
+}
+
+// ─── Animations ───
+.notif-drop-enter-active {
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.notif-drop-leave-active {
+  transition: all 0.15s ease;
+}
+.notif-drop-enter-from {
+  opacity: 0;
+  transform: translateY(-8px) scale(0.97);
+}
+.notif-drop-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
+}
+
+@keyframes notif-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+  50% {
+    transform: scale(1.1);
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0);
+  }
+}
+
+// ─────────────────────────────────────
+// DARK MODE
+// ─────────────────────────────────────
+:global(.dark) {
+  .navbar {
+    background: rgba(15, 15, 26, 0.95);
+    border-color: #2d2d44;
+  }
+
+  .navbar__dropdown {
+    background: #1a1a2e;
+    border-color: #2d2d44;
+  }
+  .navbar__dropdown-item {
+    color: #f1f5f9;
+    &:hover {
+      background: #0f0f1a;
+    }
+  }
+  .navbar__dropdown-name {
+    color: #f1f5f9;
+  }
+  .navbar__dropdown-divider {
+    background: #2d2d44;
+  }
+  .navbar__mobile-menu {
+    background: #1a1a2e;
+    border-color: #2d2d44;
+  }
+  .navbar__mobile-divider {
+    background: #2d2d44;
+  }
+  .navbar__mobile-link {
+    color: #f1f5f9;
+  }
+  .navbar__notif-badge {
+    border-color: #0f0f1a;
+  }
+
+  .notif-dropdown {
+    background: #1a1a2e;
+    border-color: #2d2d44;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+  .notif-dropdown__header {
+    background: #0f0f1a;
+    border-color: #2d2d44;
+  }
+  .notif-dropdown__title {
+    color: #f1f5f9;
+  }
+  .notif-loading__skeleton {
+    border-color: #2d2d44;
+  }
+  .notif-loading__dot {
+    background: #2d2d44;
+  }
+  .notif-loading__line {
+    background: linear-gradient(90deg, #1a1a2e 25%, #2d2d44 50%, #1a1a2e 75%);
+    background-size: 200% 100%;
+  }
+  .notif-item {
+    border-color: #2d2d44;
+  }
+  .notif-item:hover {
+    background: #0f0f1a;
+  }
+  .notif-item--unread {
+    background: rgba(99, 102, 241, 0.08);
+  }
+  .notif-item__title {
+    color: #f1f5f9;
+  }
+  .notif-item__msg {
+    color: #a0aec0;
   }
 }
 </style>
