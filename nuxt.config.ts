@@ -55,6 +55,11 @@ export default defineNuxtConfig({
           content:
             "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
         },
+        { name: "theme-color", content: "#6366f1" },
+        { name: "apple-mobile-web-app-capable", content: "yes" },
+        { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+        { name: "apple-mobile-web-app-title", content: "Bilim Manba" },
+        { name: "mobile-web-app-capable", content: "yes" },
       ],
       script: [
         {
@@ -82,6 +87,8 @@ export default defineNuxtConfig({
           sizes: "180x180",
           href: "/apple-touch-icon.png",
         },
+        { rel: "manifest", href: "/manifest.webmanifest" },
+        { rel: "apple-touch-icon", href: "/icon-192.png" },
       ],
     },
   },
