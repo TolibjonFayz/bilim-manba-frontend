@@ -67,6 +67,8 @@ export default defineNuxtConfig({
           async: true,
           crossorigin: "anonymous",
         },
+        { innerHTML: "window.yaContextCb=window.yaContextCb||[]" },
+        { src: "https://yandex.ru/ads/system/context.js", async: true },
       ],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },

@@ -103,6 +103,8 @@
               <div class="article-content" v-html="content?.message" />
             </div>
 
+            <YandexAd />
+
             <!-- ARTICLE FOOTER -->
             <div class="article-footer">
               <!-- Teglar -->
