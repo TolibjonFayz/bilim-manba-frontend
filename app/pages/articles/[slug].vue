@@ -103,7 +103,9 @@
               <div class="article-content" v-html="content?.message" />
             </div>
 
-            <YandexAd />
+            <ClientOnly>
+              <YandexAd />
+            </ClientOnly>
 
             <!-- ARTICLE FOOTER -->
             <div class="article-footer">
