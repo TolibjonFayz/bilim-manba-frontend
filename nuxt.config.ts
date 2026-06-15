@@ -112,11 +112,11 @@ export default defineNuxtConfig({
   },
 
   runtimeConfig: {
+    apiBase: process.env.NUXT_PUBLIC_API_BASE,
     public: {
-      apiBase: process.env.NUXT_PUBLIC_API_BASE || "http://localhost:3003/api",
+      apiBase: process.env.NUXT_PUBLIC_API_BASE,
     },
   },
-
   vite: {
     css: {
       preprocessorOptions: {

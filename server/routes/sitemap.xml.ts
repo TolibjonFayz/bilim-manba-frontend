@@ -1,10 +1,13 @@
 export default defineEventHandler(async (event) => {
   setHeader(event, "Content-Type", "application/xml");
-  setHeader(event, "Cache-Control", "max-age=3600"); // 1 soat cache
+  setHeader(event, "Cache-Control", "max-age=3600");
 
   try {
     const config = useRuntimeConfig();
-    const data = await $fetch<any>(`${config.public.apiBase}/articles/sitemap`);
+
+    const apiBase = config.apiBase || config.public.apiBase;
+
+    const data = await $fetch<any>(`${apiBase}/articles/sitemap`);
 
     const staticPages = [
       { url: "/", priority: "1.0", changefreq: "daily" },
