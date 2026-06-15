@@ -107,9 +107,11 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
     },
   },
+
   vite: {
     css: {
-      preprocessorOptions: {modules
+      preprocessorOptions: {
+        // 👈 "modules" olib tashlandi
         scss: {
           additionalData: `@use "~/assets/scss/variables" as *;`,
         },
