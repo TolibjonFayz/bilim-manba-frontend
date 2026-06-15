@@ -33,6 +33,7 @@
 
       <div class="footer__col">
         <h4>Yordam</h4>
+        <NuxtLink to="/about">Biz haqimizda</NuxtLink>
         <NuxtLink to="/faq">FAQ</NuxtLink>
         <NuxtLink to="/support">Qo'llab-quvvatlash</NuxtLink>
         <NuxtLink to="/privacy-policy">Maxfiylik siyosati</NuxtLink>

@@ -1,4 +1,64 @@
+# Bilim Manba — robots.txt
+# https://bilimmanba.uz
+
+# Barcha botlarga ruxsat
 User-agent: *
 Allow: /
 
+# Admin va API bloklangan
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /forgot-password
+
+# Profil sahifasi (shaxsiy ma'lumot)
+Disallow: /profile
+
+# Sitemap
 Sitemap: https://bilimmanba.uz/sitemap.xml
+
+# ─────────────────────────────────────
+# Yandex bot
+# ─────────────────────────────────────
+User-agent: Yandex
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /profile
+Crawl-delay: 1
+Sitemap: https://bilimmanba.uz/sitemap.xml
+
+# ─────────────────────────────────────
+# Google bot
+# ─────────────────────────────────────
+User-agent: Googlebot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /reset-password
+Disallow: /forgot-password
+Disallow: /profile
+Sitemap: https://bilimmanba.uz/sitemap.xml
+
+# ─────────────────────────────────────
+# Zararli botlar — to'liq bloklash
+# ─────────────────────────────────────
+User-agent: AhrefsBot
+Disallow: /
+
+User-agent: SemrushBot
+Disallow: /
+
+User-agent: DotBot
+Disallow: /
+
+User-agent: MJ12bot
+Disallow: /
+
+User-agent: BLEXBot
+Disallow: /
