@@ -2,12 +2,13 @@ export default defineEventHandler(async (event) => {
   setHeader(event, "Content-Type", "application/xml");
   setHeader(event, "Cache-Control", "max-age=3600");
 
+  const API_BASE =
+    "https://bilim-manba-backend-production-f298.up.railway.app/api";
+
   try {
-    const config = useRuntimeConfig();
+    const data = await $fetch<any>(`${API_BASE}/articles/sitemap`);
 
-    const apiBase = config.apiBase || config.public.apiBase;
-
-    const data = await $fetch<any>(`${apiBase}/articles/sitemap`);
+    const BASE = "https://bilimmanba.uz";
 
     const staticPages = [
       { url: "/", priority: "1.0", changefreq: "daily" },
@@ -17,8 +18,6 @@ export default defineEventHandler(async (event) => {
       { url: "/privacy-policy", priority: "0.5", changefreq: "monthly" },
       { url: "/contact", priority: "0.5", changefreq: "monthly" },
     ];
-
-    const BASE = "https://bilimmanba.uz";
 
     const staticUrls = staticPages
       .map(
@@ -62,7 +61,7 @@ ${articleUrls}
 ${categoryUrls}
 </urlset>`;
   } catch (err) {
-    // Backend ishlamasa — static fallback
+    // Backend ishlamasa fallback
     return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -72,6 +71,10 @@ ${categoryUrls}
   <url>
     <loc>https://bilimmanba.uz/articles</loc>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://bilimmanba.uz/sitemap</loc>
+    <priority>0.8</priority>
   </url>
 </urlset>`;
   }
