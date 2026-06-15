@@ -7,18 +7,8 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "@element-plus/nuxt",
     "nuxt-gtag",
-    "@nuxtjs/sitemap",
     "@vercel/analytics",
   ],
-
-  sitemap: {
-    siteUrl: "https://bilimmanba.uz",
-  },
-
-  site: {
-    url: "https://bilimmanba.uz",
-    name: "Bilim Manba",
-  },
 
   app: {
     head: {
@@ -119,7 +109,7 @@ export default defineNuxtConfig({
   },
   vite: {
     css: {
-      preprocessorOptions: {
+      preprocessorOptions: {modules
         scss: {
           additionalData: `@use "~/assets/scss/variables" as *;`,
         },
