@@ -100,8 +100,12 @@
               <div class="search-result__cover">
                 <img
                   v-if="item.coverImage"
-                  :src="item.coverImage"
+                  :src="cldImg(item.coverImage, 112)"
                   :alt="item.title"
+                  loading="lazy"
+                  decoding="async"
+                  width="56"
+                  height="56"
                 />
                 <div v-else class="search-result__cover-ph">📄</div>
               </div>

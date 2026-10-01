@@ -53,9 +53,11 @@
                 <!-- Cover -->
                 <div class="article-row__cover">
                   <img
-                    :src="article?.coverImage"
+                    :src="cldImg(article?.coverImage, 480)"
+                    :alt="article?.title"
                     class="article-row__cover-placeholder"
                     loading="lazy"
+                    decoding="async"
                   />
                 </div>
 
@@ -126,9 +128,13 @@
                   <div class="popular-item__cover">
                     <img
                       v-if="item?.coverImage"
-                      :src="item?.coverImage"
+                      :src="cldImg(item?.coverImage, 120)"
                       :alt="item?.title"
                       class="popular-item__cover-img"
+                      loading="lazy"
+                      decoding="async"
+                      width="60"
+                      height="60"
                     />
                     <div
                       v-else
@@ -159,7 +165,7 @@
                 <div class="featured-card__header">
                   <img
                     v-if="featuredArticle?.coverImage"
-                    :src="featuredArticle?.coverImage"
+                    :src="cldImg(featuredArticle?.coverImage, 960)"
                     :alt="featuredArticle?.title"
                     class="featured-card__image"
                   />

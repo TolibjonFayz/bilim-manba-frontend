@@ -4,10 +4,9 @@
       <!-- Logo -->
       <NuxtLink to="/" class="navbar__logo" @click="menuOpen = false">
         <img
-          src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto/c_scale,w_1000/v1776068517/Logo_no_text_transparent_uytuse.png"
+          src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_192/v1776068517/Logo_no_text_transparent_uytuse.png"
           class="navbar__logo-icon"
           alt="Bilim Manba"
-          loading="lazy"
         />
         <span class="navbar__logo-text">Bilim Manba</span>
       </NuxtLink>

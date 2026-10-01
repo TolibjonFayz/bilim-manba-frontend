@@ -4,8 +4,12 @@
     <div class="article-card__cover">
       <img
         v-if="article.coverImage"
-        :src="article.coverImage"
+        :src="cldImg(article.coverImage, 640)"
         :alt="article.title"
+        loading="lazy"
+        decoding="async"
+        width="640"
+        height="400"
       />
       <div
         v-else

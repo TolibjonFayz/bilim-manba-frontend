@@ -112,7 +112,7 @@
                       :to="`/articles/${a?.article?.slug}`"
                       class="recent-card"
                     >
-                      <img :src="a?.article?.coverImage" alt="image" />
+                      <img :src="cldImg(a?.article?.coverImage, 480)" :alt="a?.article?.title" loading="lazy" decoding="async" />
                       <div class="recent-card__body">
                         <h4 class="recent-card__title">
                           {{ a?.article?.title }}
@@ -219,7 +219,7 @@
                       :to="`/articles/${a.article.slug}`"
                       class="saved-card"
                     >
-                      <img :src="a?.article?.coverImage" alt="image" />
+                      <img :src="cldImg(a?.article?.coverImage, 480)" :alt="a?.article?.title" loading="lazy" decoding="async" />
                       <div class="saved-card__body">
                         <h4 class="saved-card__title">{{ a.article.title }}</h4>
                         <p class="saved-card__excerpt">
@@ -277,7 +277,7 @@
                       :to="`/articles/${a.article.slug}`"
                       class="saved-card"
                     >
-                      <img :src="a?.article?.coverImage" alt="image" />
+                      <img :src="cldImg(a?.article?.coverImage, 480)" :alt="a?.article?.title" loading="lazy" decoding="async" />
                       <div class="saved-card__body">
                         <h4 class="saved-card__title">{{ a.article.title }}</h4>
                         <p class="saved-card__excerpt">

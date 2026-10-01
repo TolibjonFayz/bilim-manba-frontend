@@ -85,8 +85,12 @@
                 <div class="article-card-h__cover">
                   <img
                     v-if="article.coverImage"
-                    :src="article.coverImage"
+                    :src="cldImg(article.coverImage, 640)"
+                    :srcset="cldSrcset(article.coverImage, [320, 640])"
+                    sizes="(max-width: 576px) 100vw, 160px"
                     :alt="article.title"
+                    loading="lazy"
+                    decoding="async"
                     style="width: 100%; height: 100%; object-fit: cover"
                   />
                   <div

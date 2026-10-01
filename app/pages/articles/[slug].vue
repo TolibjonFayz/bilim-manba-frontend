@@ -87,9 +87,12 @@
             <div class="article-cover">
               <img
                 v-if="article?.coverImage"
-                :src="article?.coverImage"
+                :src="cldImg(article?.coverImage, 960)"
+                :srcset="cldSrcset(article?.coverImage, [640, 960, 1280])"
+                sizes="(max-width: 768px) 100vw, 860px"
                 :alt="article?.title"
                 class="article-cover__img"
+                fetchpriority="high"
               />
               <div
                 v-else
@@ -151,8 +154,10 @@
                 >
                   <div class="related-card__cover">
                     <img
-                      :src="rel?.coverImage"
+                      :src="cldImg(rel?.coverImage, 480)"
                       :alt="rel?.title"
+                      loading="lazy"
+                      decoding="async"
                       class="related-card__cover-img"
                     />
                   </div>
@@ -202,9 +207,13 @@
                   <div class="popular-item__cover">
                     <img
                       v-if="item?.coverImage"
-                      :src="item?.coverImage"
+                      :src="cldImg(item?.coverImage, 120)"
                       :alt="item?.title"
                       class="popular-item__cover-img"
+                      loading="lazy"
+                      decoding="async"
+                      width="60"
+                      height="60"
                     />
                     <div
                       v-else
