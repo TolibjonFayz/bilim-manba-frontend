@@ -36,7 +36,7 @@
             <td>
               {{
                 article.createdAt
-                  ? new Date(article.createdAt).toLocaleDateString("uz-UZ")
+                  ? formatDate(article.createdAt)
                   : "—"
               }}
             </td>

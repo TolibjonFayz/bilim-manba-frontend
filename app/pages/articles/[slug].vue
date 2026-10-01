@@ -34,9 +34,7 @@
                     ⌛
                     {{
                       article?.createdAt
-                        ? new Date(article?.createdAt).toLocaleDateString(
-                            "uz-UZ",
-                          )
+                        ? formatDate(article?.createdAt)
                         : ""
                     }}
                   </div>
@@ -106,10 +104,6 @@
               <div class="article-content" v-html="content?.message" />
             </div>
 
-            <ClientOnly>
-              <YandexAd />
-            </ClientOnly>
-
             <!-- ARTICLE FOOTER -->
             <div class="article-footer">
               <!-- Teglar -->
@@ -166,7 +160,7 @@
                     <span class="related-card__date">
                       {{
                         rel.createdAt
-                          ? new Date(rel.createdAt).toLocaleDateString("uz-UZ")
+                          ? formatDate(rel.createdAt)
                           : ""
                       }}
                     </span>
@@ -265,7 +259,15 @@
             </div>
           </div>
 
-          <div class="ai-panel__input-wrap">
+          <div v-if="aiLimitReached" class="ai-panel__limit">
+            <NuxtLink to="/register" class="btn btn--primary ai-panel__limit-btn">
+              Ro'yxatdan o'tish
+            </NuxtLink>
+            <NuxtLink to="/login" class="ai-panel__limit-login">
+              Hisobingiz bormi? Kiring
+            </NuxtLink>
+          </div>
+          <div v-else class="ai-panel__input-wrap">
             <input
               v-model="aiQuestion"
               type="text"
@@ -275,6 +277,9 @@
             />
             <button class="ai-panel__send" @click="askAi">→</button>
           </div>
+          <p v-if="guestRemaining !== null && !aiLimitReached" class="ai-panel__hint">
+            Mehmon sifatida bugun yana {{ guestRemaining }} ta savol
+          </p>
         </div>
       </div>
     </div>
@@ -296,6 +301,8 @@ const likeCount = ref(0);
 const showAiPanel = ref(false);
 const aiQuestion = ref("");
 const aiLoading = ref(false);
+const aiLimitReached = ref(false);
+const guestRemaining = ref<number | null>(null);
 const messagesEl = ref<HTMLElement | null>(null);
 const tags = ref<string[]>([]);
 const bookmarkStore = useBookmarkStore();
@@ -547,8 +554,13 @@ const askAi = async () => {
       baseURL: useRuntimeConfig().public.apiBase,
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: {
+        // Backend 6000 belgigacha qabul qiladi — AI butun maqolani ko'rsin
         text:
-          content.value?.message?.replace(/<[^>]*>/g, "").slice(0, 500) ?? "",
+          content.value?.message
+            ?.replace(/<[^>]*>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim()
+            .slice(0, 6000) ?? "",
         question,
         history,
       },
@@ -559,11 +571,20 @@ const askAi = async () => {
       role: "assistant",
       content: res.explanation,
     });
-  } catch {
+    // Mehmon bo'lsa backend qolgan bepul savollar sonini qaytaradi
+    guestRemaining.value = res.guestRemaining ?? null;
+  } catch (err: any) {
+    const data = err?.data;
+    if (err?.status === 429 && data?.code === "GUEST_LIMIT") {
+      aiLimitReached.value = true;
+    }
     aiMessages.value.push({
       id: Date.now() + 1,
       role: "assistant",
-      content: "Xato yuz berdi. Qayta urinib ko'ring.",
+      content:
+        typeof data?.message === "string"
+          ? data.message
+          : "Xato yuz berdi. Qayta urinib ko'ring.",
     });
   } finally {
     aiLoading.value = false;
@@ -1520,6 +1541,38 @@ onMounted(async () => {
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     border-top: 1px solid $border-color;
+  }
+
+  &__limit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.85rem 1rem 1rem;
+    border-top: 1px solid $border-color;
+  }
+
+  &__limit-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  &__limit-login {
+    font-size: 0.8rem;
+    color: $text-secondary;
+    text-decoration: underline;
+
+    &:hover {
+      color: $primary;
+    }
+  }
+
+  &__hint {
+    margin: 0;
+    padding: 0 1rem 0.65rem;
+    font-size: 0.72rem;
+    color: $text-muted;
+    text-align: center;
   }
 
   &__input {

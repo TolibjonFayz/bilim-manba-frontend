@@ -230,9 +230,7 @@
                             >📅
                             {{
                               a?.createdAt
-                                ? new Date(a?.createdAt).toLocaleDateString(
-                                    "uz-UZ",
-                                  )
+                                ? formatDate(a?.createdAt)
                                 : ""
                             }}</span
                           >
@@ -288,9 +286,7 @@
                             >📅
                             {{
                               a?.createdAt
-                                ? new Date(a.createdAt).toLocaleDateString(
-                                    "uz-UZ",
-                                  )
+                                ? formatDate(a.createdAt)
                                 : ""
                             }}</span
                           >
@@ -611,7 +607,7 @@ const stats = computed(() => userStore?.stats);
 const recentArticles = computed(() =>
   (userStore.recentReads ?? []).map((a: any, i: number) => ({
     ...a,
-    date: a.createdAt ? new Date(a.createdAt).toLocaleDateString("uz-UZ") : "",
+    date: a.createdAt ? formatDate(a.createdAt) : "",
   })),
 );
 
@@ -668,8 +664,8 @@ const maxValue = computed(() => {
 const weekRange = computed(() => {
   const days = userStore.weeklyActivity?.days;
   if (!days?.length) return "";
-  const first = new Date(days[0].date).toLocaleDateString("uz-UZ");
-  const last = new Date(days[days.length - 1].date).toLocaleDateString("uz-UZ");
+  const first = formatDate(days[0].date);
+  const last = formatDate(days[days.length - 1].date);
   return `${first} — ${last}`;
 });
 

@@ -51,15 +51,13 @@ export default defineNuxtConfig({
         { name: "apple-mobile-web-app-title", content: "Bilim Manba" },
         { name: "mobile-web-app-capable", content: "yes" },
       ],
-      script: [
-        {
-          src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7020897778969649",
-          async: true,
-          crossorigin: "anonymous",
-        },
-        { innerHTML: "window.yaContextCb=window.yaContextCb||[]" },
-        { src: "https://yandex.ru/ads/system/context.js", async: true },
-      ],
+      // Reklama vaqtincha o'chirilgan (2026-10): trafik kam, daromad ~0,
+      // lekin har sahifani sekinlashtirardi. Trafik ~10K MAU ga yetganda
+      // qaytarish uchun quyidagilarni yoqing va [slug].vue ga <YandexAd /> qo'shing:
+      //   { src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7020897778969649", async: true, crossorigin: "anonymous" },
+      //   { innerHTML: "window.yaContextCb=window.yaContextCb||[]" },
+      //   { src: "https://yandex.ru/ads/system/context.js", async: true },
+      script: [],
       link: [
         { rel: "icon", type: "image/x-icon", href: "/favicon.ico" },
         {

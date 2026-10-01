@@ -70,9 +70,7 @@
                       📅
                       {{
                         article?.createdAt
-                          ? new Date(article?.createdAt).toLocaleDateString(
-                              "uz-UZ",
-                            )
+                          ? formatDate(article?.createdAt)
                           : ""
                       }}
                     </span>
@@ -191,9 +189,7 @@
                       📅
                       {{
                         featuredArticle?.createdAt
-                          ? new Date(
-                              featuredArticle?.createdAt,
-                            ).toLocaleDateString("uz-UZ")
+                          ? formatDate(featuredArticle?.createdAt)
                           : ""
                       }}
                     </span>

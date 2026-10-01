@@ -53,10 +53,7 @@ const profile = computed(() => userStore.publicProfile);
 
 const formatJoined = (date: string) => {
   if (!date) return "";
-  return new Date(date).toLocaleDateString("uz-UZ", {
-    year: "numeric",
-    month: "long",
-  });
+  return formatMonthYear(date);
 };
 
 useHead({

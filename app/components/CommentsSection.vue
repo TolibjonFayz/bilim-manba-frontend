@@ -59,7 +59,7 @@
                 >Admin</span
               >
             </span>
-            <span class="comment__date">{{ formatDate(c.createdAt) }}</span>
+            <span class="comment__date">{{ formatRelative(c.createdAt) }}</span>
           </div>
           <p class="comment__content">{{ c.content }}</p>
           <div class="comment__footer">
@@ -122,7 +122,7 @@
                     >
                   </span>
                   <span class="comment__date">{{
-                    formatDate(r.createdAt)
+                    formatRelative(r.createdAt)
                   }}</span>
                 </div>
                 <p class="comment__content">{{ r.content }}</p>
@@ -189,7 +189,8 @@ const canDelete = (comment: any) => {
   );
 };
 
-const formatDate = (date: string) => {
+// Nisbiy vaqt; bir haftadan eskisi — utils/date.ts dagi formatDate
+const formatRelative = (date: string) => {
   const d = new Date(date);
   const now = new Date();
   const diff = Math.floor((now.getTime() - d.getTime()) / 1000);
@@ -198,7 +199,7 @@ const formatDate = (date: string) => {
   if (diff < 3600) return `${Math.floor(diff / 60)} daqiqa oldin`;
   if (diff < 86400) return `${Math.floor(diff / 3600)} soat oldin`;
   if (diff < 604800) return `${Math.floor(diff / 86400)} kun oldin`;
-  return d.toLocaleDateString("uz-UZ");
+  return formatDate(d);
 };
 
 const toggleReply = (id: number) => {
