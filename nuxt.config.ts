@@ -95,6 +95,19 @@ export default defineNuxtConfig({
     preset: "vercel",
   },
 
+  // Token localStorage'da — server kim kirganini bilmaydi. Login holatiga
+  // bog'liq shaxsiy sahifalarni faqat brauzerda chizamiz, aks holda server
+  // bitta sahifani chizadi, middleware boshqasiga yo'naltiradi va sahifa
+  // "sakraydi" (hydration mismatch). Bu sahifalar robots.txt da yopiq.
+  routeRules: {
+    "/profile": { ssr: false },
+    "/admin": { ssr: false },
+    "/admin/**": { ssr: false },
+    "/login": { ssr: false },
+    "/register": { ssr: false },
+    "/forgot-password": { ssr: false },
+  },
+
   plugins: ["~/plugins/auth.interceptor.ts"],
 
   gtag: {

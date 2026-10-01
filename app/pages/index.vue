@@ -19,13 +19,21 @@
           <NuxtLink to="/articles" class="btn btn--primary">
             Maqolalarni ko'rish →
           </NuxtLink>
-          <NuxtLink
-            v-if="!authStore.isLoggedIn"
-            to="/register"
-            class="btn btn--outline"
-          >
-            Ro'yxatdan o'tish
-          </NuxtLink>
+          <!-- Login holati faqat brauzerda ma'lum (token localStorage'da) -->
+          <ClientOnly>
+            <NuxtLink
+              v-if="!authStore.isLoggedIn"
+              to="/register"
+              class="btn btn--outline"
+            >
+              Ro'yxatdan o'tish
+            </NuxtLink>
+            <template #fallback>
+              <NuxtLink to="/register" class="btn btn--outline">
+                Ro'yxatdan o'tish
+              </NuxtLink>
+            </template>
+          </ClientOnly>
         </div>
       </div>
 

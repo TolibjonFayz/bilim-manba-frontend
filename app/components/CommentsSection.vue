@@ -5,37 +5,45 @@
       <span class="comments__count">{{ totalCount }}</span>
     </h2>
 
-    <!-- Yangi izoh forma -->
-    <div v-if="authStore.isLoggedIn" class="comment-form">
-      <div class="comment-form__avatar">
-        {{ authStore.user?.email?.[0]?.toUpperCase() }}
-      </div>
-      <div class="comment-form__body">
-        <textarea
-          v-model="newComment"
-          class="comment-form__input"
-          placeholder="Fikringizni yozing..."
-          rows="3"
-          maxlength="1000"
-        />
-        <div class="comment-form__actions">
-          <span class="comment-form__counter"
-            >{{ newComment.length }}/1000</span
-          >
-          <button
-            class="btn btn--primary comment-form__submit"
-            :disabled="!newComment.trim() || posting"
-            @click="submitComment()"
-          >
-            {{ posting ? "Yuborilmoqda..." : "Izoh qoldirish" }}
-          </button>
+    <!-- Yangi izoh forma. Login holati faqat brauzerda ma'lum (token localStorage'da) -->
+    <ClientOnly>
+      <div v-if="authStore.isLoggedIn" class="comment-form">
+        <div class="comment-form__avatar">
+          {{ authStore.user?.email?.[0]?.toUpperCase() }}
+        </div>
+        <div class="comment-form__body">
+          <textarea
+            v-model="newComment"
+            class="comment-form__input"
+            placeholder="Fikringizni yozing..."
+            rows="3"
+            maxlength="1000"
+          />
+          <div class="comment-form__actions">
+            <span class="comment-form__counter"
+              >{{ newComment.length }}/1000</span
+            >
+            <button
+              class="btn btn--primary comment-form__submit"
+              :disabled="!newComment.trim() || posting"
+              @click="submitComment()"
+            >
+              {{ posting ? "Yuborilmoqda..." : "Izoh qoldirish" }}
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-    <div v-else class="comment-login-prompt">
-      Izoh qoldirish uchun
-      <NuxtLink to="/login" class="comment-login-prompt__link">kiring</NuxtLink>
-    </div>
+      <div v-else class="comment-login-prompt">
+        Izoh qoldirish uchun
+        <NuxtLink to="/login" class="comment-login-prompt__link">kiring</NuxtLink>
+      </div>
+      <template #fallback>
+        <div class="comment-login-prompt">
+          Izoh qoldirish uchun
+          <NuxtLink to="/login" class="comment-login-prompt__link">kiring</NuxtLink>
+        </div>
+      </template>
+    </ClientOnly>
 
     <!-- Izohlar ro'yxati -->
     <div v-if="commentStore.comments.length" class="comment-list">
