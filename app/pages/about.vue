@@ -54,11 +54,11 @@
       <div class="container">
         <div class="about-stats__grid">
           <div class="about-stats__item">
-            <span class="about-stats__num">50+</span>
+            <span class="about-stats__num">70+</span>
             <span class="about-stats__label">Maqolalar</span>
           </div>
           <div class="about-stats__item">
-            <span class="about-stats__num">10+</span>
+            <span class="about-stats__num">11</span>
             <span class="about-stats__label">Kategoriyalar</span>
           </div>
           <div class="about-stats__item">
@@ -73,14 +73,38 @@
       </div>
     </section>
 
+    <!-- KIM YARATGAN -->
+    <section class="about-section">
+      <div class="container">
+        <div class="about-maker">
+          <span class="about-maker__label">Loyiha egasi</span>
+          <h2 class="about-maker__title">TONG INC</h2>
+          <p class="about-maker__desc">
+            Bilim Manba — Toshkentdagi mustaqil TONG INC studiyasining
+            mahsuloti. TONG INC o'yinlar, dasturlar va veb-platformalar
+            yaratadi: o'zbekcha so'z o'yini So'zbog', brauzerda o'ynaladigan
+            TASHKENT CITY va boshqalar.
+          </p>
+          <a
+            href="https://tong-inc.pages.dev/uz"
+            target="_blank"
+            rel="noopener"
+            class="about-maker__link"
+          >
+            TONG INC sayti →
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- CTA -->
     <section class="about-cta">
       <div class="container">
         <div class="about-cta__inner">
           <h2 class="about-cta__title">Bilim olishni boshlang</h2>
           <p class="about-cta__desc">
-            Minglab maqolalar sizi kutmoqda. Bepul ro'yxatdan o'ting va barcha
-            imkoniyatlardan foydalaning.
+            70 dan ortiq maqola sizni kutmoqda. O'qish bepul va ro'yxatdan
+            o'tishsiz — hisob faqat izoh qoldirish va maqolani saqlash uchun kerak.
           </p>
           <div class="about-cta__actions">
             <NuxtLink to="/articles" class="btn btn--primary">
@@ -103,7 +127,7 @@ useHead({
     {
       name: "description",
       content:
-        "Bilim Manba — O'zbekistondagi zamonaviy bilim platformasi. Texnologiya, fan, psixologiya va shaxsiy rivojlanish bo'yicha saralangan maqolalar.",
+        "Bilim Manba — TONG INC yaratgan o'zbek tilidagi bilim platformasi. Fan, tarix, kino, sport va texnologiya bo'yicha 70 dan ortiq maqola.",
     },
   ],
 });
@@ -213,6 +237,53 @@ useHead({
     font-size: 0.9rem;
     color: $text-secondary;
     line-height: 1.7;
+  }
+}
+
+// KIM YARATGAN
+.about-maker {
+  max-width: 760px;
+  margin: 0 auto;
+  text-align: center;
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-lg;
+  padding: 2.5rem 2rem;
+
+  &__label {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $primary;
+    background: rgba($primary, 0.08);
+    padding: 0.3rem 0.85rem;
+    border-radius: $border-radius-pill;
+    margin-bottom: 1rem;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: $text-primary;
+    margin-bottom: 0.75rem;
+  }
+
+  &__desc {
+    font-size: 0.95rem;
+    color: $text-secondary;
+    line-height: 1.7;
+    margin-bottom: 1.25rem;
+  }
+
+  &__link {
+    font-weight: 700;
+    color: $primary;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 }
 

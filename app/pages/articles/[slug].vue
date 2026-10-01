@@ -478,6 +478,12 @@ const jsonLd = computed(() =>
       name: "Bilim Manba",
       url: "https://bilimmanba.uz",
       logo: { "@type": "ImageObject", url: fallbackImage },
+      // Bilim Manba — TONG INC mahsuloti
+      parentOrganization: {
+        "@type": "Organization",
+        name: "TONG INC",
+        url: "https://tong-inc.pages.dev",
+      },
     },
   }).replace(/</g, "\\u003c"),
 );

@@ -16,7 +16,7 @@
           <span>Bilim Manba</span>
         </div>
         <p class="footer__desc">
-          O'zbekistondagi eng yirik o'quv platformasi. Bilimni sifatli maqolalar
+          O'zbek tilidagi bilim platformasi. Bilimni sifatli maqolalar
           orqali ulashing va qabul qiling.
         </p>
         <div class="footer__socials">
@@ -86,7 +86,17 @@
     </div>
 
     <div class="footer__bottom container">
-      <span>© 2026 Bilim Manba. Barcha huquqlar himoyalangan.</span>
+      <span>
+        © 2026 Bilim Manba —
+        <a
+          href="https://tong-inc.pages.dev/uz"
+          target="_blank"
+          rel="noopener"
+          class="footer__maker"
+          >TONG INC</a
+        >
+        mahsuloti. Barcha huquqlar himoyalangan.
+      </span>
       <span>Toshkent, O'zbekiston · bilimmanba@gmail.com</span>
     </div>
   </footer>
@@ -275,6 +285,17 @@ const handleSubscribe = async () => {
         width: 100%;
         justify-content: center;
       }
+    }
+  }
+
+  &__maker {
+    font-weight: 600;
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+
+    &:hover {
+      color: $primary;
     }
   }
 

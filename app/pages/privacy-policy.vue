@@ -3,121 +3,138 @@
     <div class="container">
       <div class="privacy-content">
         <h1 class="privacy-content__title">Maxfiylik Siyosati</h1>
-        <p class="privacy-content__date">Oxirgi yangilanish: 23 Aprel 2026</p>
+        <p class="privacy-content__date">Oxirgi yangilanish: 1-oktabr 2026</p>
 
         <section class="privacy-section">
-          <h2>1. Umumiy ma'lumot</h2>
+          <h2>1. Biz kimmiz</h2>
           <p>
-            Bilim Manba (bilimmanba.uz) saytiga xush kelibsiz. Ushbu maxfiylik
-            siyosati sizning shaxsiy ma'lumotlaringiz qanday to'planishi,
-            ishlatilishi va himoya qilinishini tushuntiradi.
+            Bilim Manba (bilimmanba.uz) — Toshkentdagi mustaqil
+            <a href="https://tong-inc.pages.dev/uz" target="_blank" rel="noopener"
+              >TONG INC</a
+            >
+            studiyasi yaratgan va boshqaradigan o'zbek tilidagi bilim
+            platformasi. Ushbu siyosat saytda qanday ma'lumot yig'ilishi, nima
+            uchun ishlatilishi va qanday himoya qilinishini tushuntiradi.
           </p>
         </section>
 
         <section class="privacy-section">
-          <h2>2. To'planadigan ma'lumotlar</h2>
-          <p>Biz quyidagi ma'lumotlarni to'playmiz:</p>
+          <h2>2. Hisobsiz foydalanish</h2>
+          <p>
+            Maqolalarni o'qish uchun ro'yxatdan o'tish shart emas. Hisob faqat
+            izoh qoldirish, maqolalarni saqlash va yoqtirish hamda sun'iy
+            intellektdan cheklovsiz foydalanish uchun kerak.
+          </p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>3. Qanday ma'lumot yig'iladi</h2>
           <ul>
-            <li>Ro'yxatdan o'tishda: ism, elektron pochta manzili</li>
-            <li>Sayt faoliyati: o'qilgan maqolalar, like'lar</li>
             <li>
-              Texnik ma'lumotlar: IP manzil, brauzer turi, qurilma ma'lumotlari
+              <strong>Ro'yxatdan o'tsangiz:</strong> ism, email manzil va parol.
+              Parol ochiq holda saqlanmaydi — faqat qaytarib bo'lmaydigan
+              shifrlangan (xesh) ko'rinishda.
             </li>
-            <li>Cookie fayllar: sayt sozlamalari va sessiya ma'lumotlari</li>
+            <li>
+              <strong>Saytdagi faoliyatingiz (hisob bilan):</strong> izohlaringiz,
+              yoqtirgan va saqlagan maqolalaringiz, o'qigan maqolalaringiz soni
+              va bildirishnomalar.
+            </li>
+            <li>
+              <strong>Yangiliklarga obuna bo'lsangiz:</strong> email manzilingiz —
+              faqat yangi maqolalar haqida xat yuborish uchun.
+            </li>
+            <li>
+              <strong>Texnik ma'lumotlar:</strong> IP manzil va brauzer turi
+              server jurnallarida xavfsizlik uchun qayd etilishi mumkin.
+              Mehmonlarning sun'iy intellekt savollari kunlik limiti IP bo'yicha
+              hisoblanadi; bu hisob faqat server xotirasida turadi va har kuni
+              tozalanadi.
+            </li>
           </ul>
         </section>
 
         <section class="privacy-section">
-          <h2>3. Ma'lumotlardan foydalanish</h2>
-          <p>To'plangan ma'lumotlar quyidagi maqsadlarda ishlatiladi:</p>
-          <ul>
-            <li>Sayt xizmatlarini taqdim etish va yaxshilash</li>
-            <li>Foydalanuvchi hisobini boshqarish</li>
-            <li>Sayt statistikasini tahlil qilish</li>
-            <li>Reklama xizmatlarini ko'rsatish (Google AdSense)</li>
-          </ul>
+          <h2>4. Sun'iy intellekt ("AI tushuntirsin")</h2>
+          <p>
+            Bu tugmani ishlatganingizda savolingiz va maqola matni javob olish
+            uchun Groq sun'iy intellekt xizmatiga yuboriladi. Biz savollaringizni
+            o'z serverimizda saqlamaymiz. Savollarga shaxsiy ma'lumot
+            (telefon, manzil va hokazo) yozmang.
+          </p>
         </section>
 
         <section class="privacy-section">
-          <h2>4. Cookie fayllar</h2>
-          <p>
-            Saytimiz cookie fayllardan foydalanadi. Cookie — bu brauzeringizda
-            saqlanadigan kichik ma'lumot fayli. Biz quyidagi cookie turlaridan
-            foydalanamiz:
-          </p>
+          <h2>5. Cookie va brauzer xotirasi</h2>
           <ul>
             <li>
-              <strong>Zaruriy cookie'lar:</strong> Sayt ishlashi uchun kerakli
+              <strong>Kirish ma'lumoti:</strong> tizimga kirganingizda kirish
+              kaliti brauzeringiz xotirasida (localStorage) saqlanadi.
+              "Chiqish" tugmasi uni o'chiradi.
             </li>
             <li>
-              <strong>Tahlil cookie'lari:</strong> Google Analytics orqali
-              statistika
-            </li>
-            <li>
-              <strong>Reklama cookie'lari:</strong> Google AdSense orqali
-              reklama
+              <strong>Statistika:</strong> Google Analytics tashriflarni hisoblash
+              uchun cookie ishlatadi. Vercel Analytics esa cookie'siz ishlaydi.
             </li>
           </ul>
           <p>
-            Brauzer sozlamalarida cookie'larni o'chirib qo'yishingiz mumkin,
-            lekin bu saytning ba'zi funksiyalarini cheklashi mumkin.
+            Hozirda saytda reklama ko'rsatilmaydi. Reklama qo'shilsa, bu
+            siyosat oldindan yangilanadi.
           </p>
         </section>
 
         <section class="privacy-section">
-          <h2>5. Google AdSense va reklama</h2>
-          <p>
-            Saytimizda Google AdSense reklamalari ko'rsatiladi. Google
-            foydalanuvchilarning qiziqishlari asosida reklama ko'rsatish uchun
-            cookie fayllardan foydalanadi. Google'ning maxfiylik siyosati bilan
-            <a href="https://policies.google.com/privacy" target="_blank">
-              bu yerda
-            </a>
-            tanishishingiz mumkin.
-          </p>
+          <h2>6. Ma'lumotlardan foydalanish</h2>
+          <ul>
+            <li>Sayt xizmatlarini ko'rsatish va hisobingizni yuritish</li>
+            <li>Parolni tiklash va siz obuna bo'lgan xatlarni yuborish</li>
+            <li>Qaysi maqolalar o'qilishini bilib, saytni yaxshilash</li>
+          </ul>
+          <p>Biz shaxsiy ma'lumotlaringizni hech kimga sotmaymiz.</p>
         </section>
 
         <section class="privacy-section">
-          <h2>6. Ma'lumotlar xavfsizligi</h2>
+          <h2>7. Ma'lumotlar xavfsizligi</h2>
           <p>
-            Sizning ma'lumotlaringizni himoya qilish uchun zamonaviy xavfsizlik
-            texnologiyalaridan foydalanamiz. Parollar shifrlangan holda
-            saqlanadi. Biroq, internet orqali ma'lumot uzatish mutlaqo xavfsiz
+            Sayt faqat HTTPS orqali ishlaydi, parollar xesh ko'rinishda
+            saqlanadi, baza har kuni shifrlangan holda zaxiralanadi. Shunday
+            bo'lsa-da, internet orqali ma'lumot uzatish hech qachon 100% xavfsiz
             emas.
           </p>
         </section>
 
         <section class="privacy-section">
-          <h2>7. Uchinchi tomon xizmatlar</h2>
-          <p>Saytimiz quyidagi uchinchi tomon xizmatlardan foydalanadi:</p>
+          <h2>8. Uchinchi tomon xizmatlar</h2>
+          <p>Sayt ishlashi uchun quyidagi xizmatlardan foydalanamiz:</p>
           <ul>
-            <li><strong>Google Analytics</strong> — sayt statistikasi</li>
-            <li><strong>Google AdSense</strong> — reklama xizmati</li>
-            <li><strong>Cloudinary</strong> — rasm saqlash</li>
-            <li><strong>Groq AI</strong> — sun'iy intellekt xizmati</li>
+            <li><strong>Vercel</strong> — sayt hostingi va Vercel Analytics</li>
+            <li><strong>Render</strong> — server (API)</li>
+            <li><strong>Neon</strong> — ma'lumotlar bazasi</li>
+            <li>
+              <strong>Cloudflare R2</strong> — maqola matnlari va shifrlangan
+              zaxira nusxalar
+            </li>
+            <li><strong>Cloudinary</strong> — rasmlar</li>
+            <li><strong>Google Analytics</strong> — tashriflar statistikasi</li>
+            <li><strong>Groq</strong> — sun'iy intellekt javoblari</li>
           </ul>
         </section>
 
         <section class="privacy-section">
-          <h2>8. Foydalanuvchi huquqlari</h2>
-          <p>Sizda quyidagi huquqlar mavjud:</p>
-          <ul>
-            <li>Shaxsiy ma'lumotlaringizga kirish huquqi</li>
-            <li>Ma'lumotlarni o'zgartirish huquqi</li>
-            <li>Hisobni o'chirish huquqi</li>
-            <li>Ma'lumotlar ishlanishiga e'tiroz bildirish huquqi</li>
-          </ul>
-        </section>
-
-        <section class="privacy-section">
-          <h2>9. Bog'lanish</h2>
+          <h2>9. Sizning huquqlaringiz</h2>
           <p>
-            Maxfiylik siyosati bo'yicha savollaringiz bo'lsa, biz bilan
-            bog'laning:
+            Ma'lumotlaringizni ko'rish, tuzatish yoki hisobingizni butunlay
+            o'chirishni so'rashingiz mumkin. Ro'yxatdan o'tgan email
+            manzilingizdan bilimmanba@gmail.com ga yozing — so'rovni 30 kun
+            ichida bajaramiz.
           </p>
+        </section>
+
+        <section class="privacy-section">
+          <h2>10. Bog'lanish</h2>
           <ul>
             <li>Email: bilimmanba@gmail.com</li>
-            <li>Sayt: bilimmanba.uz</li>
+            <li>Sayt egasi: TONG INC, Toshkent, O'zbekiston</li>
           </ul>
         </section>
       </div>
@@ -132,7 +149,7 @@ useHead({
     {
       name: "description",
       content:
-        "Bilim Manba saytining maxfiylik siyosati va foydalanuvchi ma'lumotlari himoyasi.",
+        "Bilim Manba (TONG INC) maxfiylik siyosati: qanday ma'lumot yig'iladi, nima uchun ishlatiladi va qanday himoya qilinadi.",
     },
   ],
 });

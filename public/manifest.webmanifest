@@ -1,7 +1,7 @@
 {
   "name": "Bilim Manba",
   "short_name": "BilimManba",
-  "description": "O'zbekistondagi eng yirik bilim platformasi",
+  "description": "O'zbek tilidagi bilim platformasi — TONG INC",
   "start_url": "/",
   "display": "standalone",
   "orientation": "portrait",
