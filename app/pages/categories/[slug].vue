@@ -78,13 +78,9 @@
                       👁 {{ article?.viewCount }}
                     </span>
 
-                    <NuxtLink
-                      :to="`/articles/${article.slug}`"
-                      class="article-row__read-link"
-                      @click.stop
-                    >
-                      O'qish →
-                    </NuxtLink>
+                    <!-- Butun qator havola — ichiga yana <a> qo'yib bo'lmaydi
+                         (HTML parser uni buzadi, SSR'da hydration mismatch) -->
+                    <span class="article-row__read-link">O'qish →</span>
                   </div>
                 </div>
               </NuxtLink>
