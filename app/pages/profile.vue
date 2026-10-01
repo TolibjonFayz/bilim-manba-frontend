@@ -837,7 +837,7 @@ onMounted(async () => {
   flex-shrink: 0;
 
   &--on {
-    background: #6366f1; // 👈 on holat — primary rang
+    background: #5850ec; // 👈 on holat — primary rang
   }
 
   &__knob {

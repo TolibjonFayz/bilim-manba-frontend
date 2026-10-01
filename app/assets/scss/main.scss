@@ -1,6 +1,21 @@
 @use "variables" as *;
 
-@import url("https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+// Shriftlar @nuxt/fonts orqali (nuxt.config.ts) — bu yerda @import qilinmaydi
+
+// Komponentlar var(--color-*) ishlatadi, lekin ular hech qayerda e'lon
+// qilinmagan edi — qidiruv oynasi, izohlar, profil va boshqalarda ranglar
+// umuman qo'llanmasdi. SCSS o'zgaruvchilaridan yaratamiz.
+:root {
+  --color-primary: #{$primary};
+  --color-danger: #{$danger};
+  --color-bg: #{$bg-primary};
+  --color-bg-secondary: #{$bg-secondary};
+  --color-border: #{$border-color};
+  --color-text-primary: #{$text-primary};
+  --color-text-secondary: #{$text-secondary};
+  --color-text-muted: #{$text-muted};
+  --color-shadow-md: #{$shadow-md};
+}
 
 *,
 *::before,

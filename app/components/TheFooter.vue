@@ -4,9 +4,14 @@
       <div class="footer__brand">
         <div class="footer__logo">
           <img
-            src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_192/v1776068517/Logo_no_text_transparent_uytuse.png"
-            alt="Bilim Manba"
+            src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_50/v1776068517/Logo_no_text_transparent_uytuse.png"
+            :srcset="LOGO_SRCSET"
+            alt=""
             class="footer__logo-img"
+            width="50"
+            height="50"
+            loading="lazy"
+            decoding="async"
           />
           <span>Bilim Manba</span>
         </div>
@@ -15,24 +20,36 @@
           orqali ulashing va qabul qiling.
         </p>
         <div class="footer__socials">
-          <a href="https://t.me/bilim_manba" class="footer__social">
+          <a
+            href="https://t.me/bilim_manba"
+            class="footer__social"
+            aria-label="Bilim Manba Telegram kanali"
+            target="_blank"
+            rel="noopener"
+          >
             <Icon name="logos:telegram" size="1em" mode="css" />
           </a>
-          <a href="https://www.instagram.com/bilimmanba" class="footer__social">
+          <a
+            href="https://www.instagram.com/bilimmanba"
+            class="footer__social"
+            aria-label="Bilim Manba Instagram sahifasi"
+            target="_blank"
+            rel="noopener"
+          >
             <Icon name="skill-icons:instagram" size="1em" mode="css" />
           </a>
         </div>
       </div>
 
       <div class="footer__col">
-        <h4>Platforma</h4>
+        <h2>Platforma</h2>
         <NuxtLink to="/">Bosh sahifa</NuxtLink>
         <NuxtLink to="/articles">Maqolalar</NuxtLink>
         <NuxtLink to="/categories">Kategoriyalar</NuxtLink>
       </div>
 
       <div class="footer__col">
-        <h4>Yordam</h4>
+        <h2>Yordam</h2>
         <NuxtLink to="/about">Biz haqimizda</NuxtLink>
         <NuxtLink to="/faq">FAQ</NuxtLink>
         <NuxtLink to="/support">Qo'llab-quvvatlash</NuxtLink>
@@ -41,7 +58,7 @@
       </div>
 
       <div class="footer__col footer__subscribe">
-        <h4>Yangiliklarga obuna bo'ling</h4>
+        <h2>Yangiliklarga obuna bo'ling</h2>
         <p>Eng yangi maqolalar va yangiliklar haqida xabardor bo'ling.</p>
         <div class="footer__subscribe-form">
           <input
@@ -76,6 +93,11 @@
 </template>
 
 <script setup lang="ts">
+// Logo 50px ko'rinadi: oddiy ekranga 50px, retina'ga 100px.
+// :srcset (statik emas) — URL ichidagi vergul (f_auto,q_auto) srcset'ni buzmasin
+const LOGO_SRCSET =
+  "https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_50/v1776068517/Logo_no_text_transparent_uytuse.png 1x, https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_100/v1776068517/Logo_no_text_transparent_uytuse.png 2x";
+
 const email = ref("");
 const loading = ref(false);
 const success = ref(false);
@@ -203,7 +225,7 @@ const handleSubscribe = async () => {
     flex-direction: column;
     gap: 0.75rem;
 
-    h4 {
+    h2 {
       font-weight: 700;
       font-size: 0.95rem;
       margin-bottom: 0.5rem;

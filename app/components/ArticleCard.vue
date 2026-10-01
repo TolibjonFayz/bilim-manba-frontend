@@ -5,6 +5,8 @@
       <img
         v-if="article.coverImage"
         :src="cldImg(article.coverImage, 640)"
+        :srcset="cldSrcset(article.coverImage, [360, 480, 640, 960])"
+        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 380px"
         :alt="article.title"
         loading="lazy"
         decoding="async"

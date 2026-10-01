@@ -1,12 +1,10 @@
 <template>
   <div class="error-page">
     <div class="error-page__inner">
-      <div class="error-page__code">404</div>
-      <div class="error-page__emoji">🔍</div>
-      <h1 class="error-page__title">Sahifa topilmadi</h1>
-      <p class="error-page__desc">
-        Siz qidirgan sahifa mavjud emas yoki ko'chirilgan bo'lishi mumkin.
-      </p>
+      <div class="error-page__code">{{ code }}</div>
+      <div class="error-page__emoji">{{ notFound ? "🔍" : "🛠️" }}</div>
+      <h1 class="error-page__title">{{ title }}</h1>
+      <p class="error-page__desc">{{ desc }}</p>
       <div class="error-page__actions">
         <NuxtLink to="/" class="btn btn--primary"> 🏠 Bosh sahifaga </NuxtLink>
         <NuxtLink to="/articles" class="btn btn--secondary">
@@ -20,8 +18,25 @@
 <script setup lang="ts">
 const props = defineProps<{ error: any }>();
 
+const code = computed(() => props.error?.statusCode ?? 500);
+const notFound = computed(() => code.value === 404);
+const title = computed(() =>
+  notFound.value ? "Sahifa topilmadi" : "Sahifa vaqtincha ishlamayapti",
+);
+const desc = computed(() =>
+  notFound.value
+    ? "Siz qidirgan sahifa mavjud emas yoki ko'chirilgan bo'lishi mumkin."
+    : "Server bilan bog'lanishda muammo bo'ldi. Birozdan so'ng qayta urinib ko'ring.",
+);
+
+// Xato sahifasi CDN keshiga tushmasin: backend bir lahza ishlamay qolsa,
+// 503 sahifa keyingi tashrif buyuruvchilarga ham berilib qolardi
+if (import.meta.server) {
+  useResponseHeader("cache-control").value = "no-store";
+}
+
 useHead({
-  title: "404 — Sahifa topilmadi | Bilim Manba",
+  title: () => `${code.value} — ${title.value} | Bilim Manba`,
 });
 </script>
 
@@ -44,7 +59,7 @@ useHead({
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.05em;
-    background: linear-gradient(135deg, #6366f1, #f59e0b);
+    background: linear-gradient(135deg, #5850ec, #f59e0b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

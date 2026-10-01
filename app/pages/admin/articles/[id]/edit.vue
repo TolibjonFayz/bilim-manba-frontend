@@ -83,7 +83,7 @@
         <div class="form-group">
           <label>Kategoriya *</label>
           <div class="form-input-wrap">
-            <select v-model="form.categoryId">
+            <select v-model="form.categoryId" aria-label="Kategoriya">
               <option value="">Kategoriya tanlang</option>
               <option
                 v-for="cat in adminStore.categories"

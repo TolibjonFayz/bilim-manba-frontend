@@ -8,10 +8,30 @@ export default defineNuxtConfig({
     "@element-plus/nuxt",
     "nuxt-gtag",
     "@vercel/analytics",
+    "@nuxt/fonts",
   ],
+
+  // Shriftlar saytning o'zidan beriladi (build paytida yuklab olinadi).
+  // Avval main.scss da Google Fonts @import qilinardi — u sahifa chizilishini
+  // ~0.5s to'sib turardi (CSS → fonts CSS → shrift fayllari zanjiri)
+  fonts: {
+    families: [
+      // preload: shrift birinchi chizishdan oldin kelsin — aks holda Arial'dan
+      // Space Grotesk'ga almashganda matn kengayib, sahifa siljirdi (CLS 0.19)
+      {
+        name: "Space Grotesk",
+        provider: "google",
+        weights: [400, 500, 600, 700],
+        preload: true,
+      },
+      { name: "JetBrains Mono", provider: "google", weights: [400, 500] },
+    ],
+    defaults: { subsets: ["latin", "latin-ext"] },
+  },
 
   app: {
     head: {
+      htmlAttrs: { lang: "uz" },
       title: "Bilim Manba — O'zbek tilidagi bilim ulashish platformasi",
       meta: [
         {
@@ -45,7 +65,7 @@ export default defineNuxtConfig({
           content:
             "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776068601/Main_logo_with_text_transparent_wzcdl8.png",
         },
-        { name: "theme-color", content: "#6366f1" },
+        { name: "theme-color", content: "#5850ec" },
         { name: "apple-mobile-web-app-capable", content: "yes" },
         { name: "apple-mobile-web-app-status-bar-style", content: "default" },
         { name: "apple-mobile-web-app-title", content: "Bilim Manba" },
@@ -98,6 +118,21 @@ export default defineNuxtConfig({
   // bitta sahifani chizadi, middleware boshqasiga yo'naltiradi va sahifa
   // "sakraydi" (hydration mismatch). Bu sahifalar robots.txt da yopiq.
   routeRules: {
+    // Ommaviy sahifalar Vercel CDN'da keshlanadi: har tashrifda AQShdagi
+    // funksiya + Render backend chaqirilmaydi (TTFB 1.2-2.2s edi). Login
+    // holati faqat brauzerda — server HTML hamma uchun bir xil, keshlash xavfsiz.
+    // Muddat tugagach eski nusxa darhol beriladi va fonda yangilanadi.
+    // Ma'lumot olinmagan yoki xato sahifalar keshlanmaydi (useNoStoreUnless, error.vue).
+    "/": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/articles": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/articles/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/categories": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/categories/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/about": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
+    "/faq": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
+    "/terms": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
+    "/privacy-policy": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
+
     "/profile": { ssr: false },
     "/admin": { ssr: false },
     "/admin/**": { ssr: false },

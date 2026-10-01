@@ -4,9 +4,12 @@
       <!-- Logo -->
       <NuxtLink to="/" class="navbar__logo" @click="menuOpen = false">
         <img
-          src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_192/v1776068517/Logo_no_text_transparent_uytuse.png"
+          src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_50/v1776068517/Logo_no_text_transparent_uytuse.png"
+          :srcset="LOGO_SRCSET"
           class="navbar__logo-icon"
-          alt="Bilim Manba"
+          alt=""
+          width="50"
+          height="50"
         />
         <span class="navbar__logo-text">Bilim Manba</span>
       </NuxtLink>
@@ -96,8 +99,15 @@
               >
             </template>
           </template>
+          <!-- Server mehmon ko'rinishini chizadi: yuklangach joy siljimaydi (CLS) -->
           <template #fallback>
-            <div style="width: 130px; height: 36px" />
+            <button class="navbar__icon-btn" title="Qidirish" type="button">
+              <Icon name="lucide:search" size="1.1em" mode="css" />
+            </button>
+            <NuxtLink to="/login" class="navbar__link">Kirish</NuxtLink>
+            <NuxtLink to="/register" class="btn btn--primary"
+              >Ro'yxatdan o'tish</NuxtLink
+            >
           </template>
         </ClientOnly>
       </div>
@@ -274,6 +284,11 @@
 </template>
 
 <script setup lang="ts">
+// Logo 50px ko'rinadi: oddiy ekranga 50px, retina'ga 100px.
+// :srcset (statik emas) — URL ichidagi vergul (f_auto,q_auto) srcset'ni buzmasin
+const LOGO_SRCSET =
+  "https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_50/v1776068517/Logo_no_text_transparent_uytuse.png 1x, https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_100/v1776068517/Logo_no_text_transparent_uytuse.png 2x";
+
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const notificationStore = useNotificationStore();
@@ -899,7 +914,7 @@ onUnmounted(() => {
 
 .notif-dropdown__mark-all {
   font-size: 0.75rem;
-  color: #6366f1;
+  color: #5850ec;
   font-weight: 600;
   background: none;
   border: none;
@@ -910,7 +925,7 @@ onUnmounted(() => {
 }
 
 .notif-dropdown__mark-all:hover {
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(88, 80, 236, 0.1);
 }
 
 .notif-dropdown__list {
@@ -985,14 +1000,14 @@ onUnmounted(() => {
   background: #f8f7ff;
 }
 .notif-item--unread {
-  background: rgba(99, 102, 241, 0.04);
+  background: rgba(88, 80, 236, 0.04);
 }
 
 .notif-item__dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #5850ec;
   flex-shrink: 0;
   margin-top: 5px;
 }
@@ -1022,14 +1037,14 @@ onUnmounted(() => {
 }
 .notif-item__time {
   font-size: 0.7rem;
-  color: #9ca3af;
+  color: #6b7280;
   margin-top: 0.1rem;
 }
 
 .notif-empty {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #9ca3af;
+  color: #6b7280;
 }
 .notif-empty span {
   font-size: 1.75rem;
@@ -1070,7 +1085,7 @@ onUnmounted(() => {
   background: #0f0f1a;
 }
 .dark .notif-item--unread {
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(88, 80, 236, 0.08);
 }
 .dark .notif-item__title {
   color: #f1f5f9;

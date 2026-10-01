@@ -8,9 +8,10 @@
       <div class="admin-sidebar__logo">
         <NuxtLink to="/" class="admin-sidebar__logo-link">
           <img
-            src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_192/v1776068517/Logo_no_text_transparent_uytuse.png"
+            src="https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_72/v1776068517/Logo_no_text_transparent_uytuse.png"
             alt="Bilim Manba"
             width="36"
+            height="36"
           />
           <span>Bilim Manba</span>
         </NuxtLink>

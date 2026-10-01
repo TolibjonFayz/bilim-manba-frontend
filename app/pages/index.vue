@@ -143,12 +143,13 @@ useHead({
 
 // SSR — maqola va kategoriya havolalari server HTML'ida bo'lsin (Google
 // ichki havolalarni shu orqali topadi)
-await useAsyncData("home", () =>
+const { data: loaded } = await useAsyncData("home", () =>
   Promise.all([
     categoryStore.getCategories(),
     articleStore.getAllArticles(),
-  ]).then(() => true),
+  ]).then((res) => res.every((r) => r.success)),
 );
+useNoStoreUnless(loaded.value === true);
 </script>
 
 <style lang="scss" scoped>

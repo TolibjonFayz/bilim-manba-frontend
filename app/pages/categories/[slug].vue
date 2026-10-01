@@ -34,7 +34,11 @@
               </div>
               <div class="articles-header__sort">
                 <span class="articles-header__sort-label">Saralash:</span>
-                <select v-model="sortBy" class="articles-header__select">
+                <select
+                  v-model="sortBy"
+                  class="articles-header__select"
+                  aria-label="Saralash"
+                >
                   <option value="newest">Eng yangi</option>
                   <option value="popular">Mashhur</option>
                   <option value="oldest">Eng eski</option>
@@ -311,6 +315,8 @@ const { data: found } = await useAsyncData(
   },
 );
 if (found.value !== 200) {
+  // 404/503 sahifa CDN keshiga tushmasin
+  useNoStoreUnless(false);
   throw createError({
     statusCode: found.value === 404 ? 404 : 503,
     statusMessage:

@@ -671,7 +671,7 @@ onUnmounted(() => {
 
 // ── Highlight (global — v-html ichidagi mark uchun) ──
 :deep(.search-hl) {
-  background: rgba(99, 102, 241, 0.18);
+  background: rgba(88, 80, 236, 0.18);
   color: var(--color-primary);
   font-weight: 700;
   border-radius: 3px;

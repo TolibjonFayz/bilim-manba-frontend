@@ -32,7 +32,7 @@
 
       <!-- Bottom CTA -->
       <div class="faq-cta">
-        <h3>Savolingiz javobsiz qoldimi?</h3>
+        <h2>Savolingiz javobsiz qoldimi?</h2>
         <p>Biz bilan bog'laning, 24 soat ichida javob beramiz</p>
         <a href="mailto:bilimmanba@gmail.com" class="btn btn--primary">
           Biz bilan bog'laning →
@@ -188,7 +188,7 @@ const faqs = [
   max-width: 720px;
   margin: 0 auto;
 
-  h3 {
+  h2 {
     font-size: 1.25rem;
     font-weight: 700;
     margin-bottom: 0.5rem;

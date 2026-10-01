@@ -1,5 +1,6 @@
-$primary: #6c63ff;
-$primary-dark: #5a52d5;
+// WCAG AA: oq fonda va och binafsha fonlarda kontrast >= 4.5 (eski #6c63ff — 4.3)
+$primary: #5850ec;
+$primary-dark: #463ec9;
 $primary-light: #f0efff;
 $secondary: #ff6584;
 $success: #43d98b;
@@ -7,8 +8,9 @@ $warning: #ffb347;
 $danger: #ff5757;
 
 $text-primary: #1a1a2e;
-$text-secondary: #6b7280;
-$text-muted: #9ca3af;
+$text-secondary: #565e6c;
+// eski #9ca3af oq fonda 2.5 kontrast edi — o'qish qiyin
+$text-muted: #6b7280;
 
 $bg-primary: #ffffff;
 $bg-secondary: #f8f7ff;
@@ -20,9 +22,9 @@ $border-radius-sm: 8px;
 $border-radius-lg: 24px;
 $border-radius-pill: 100px;
 
-$shadow-sm: 0 1px 4px rgba(108, 99, 255, 0.06);
-$shadow-md: 0 4px 20px rgba(108, 99, 255, 0.1);
-$shadow-lg: 0 8px 40px rgba(108, 99, 255, 0.14);
+$shadow-sm: 0 1px 4px rgba(88, 80, 236, 0.06);
+$shadow-md: 0 4px 20px rgba(88, 80, 236, 0.1);
+$shadow-lg: 0 8px 40px rgba(88, 80, 236, 0.14);
 
 $font-primary: "Space Grotesk", sans-serif;
 $font-mono: "JetBrains Mono", monospace;

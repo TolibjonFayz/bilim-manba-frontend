@@ -73,7 +73,7 @@
           <div class="form-group">
             <label>Mavzu</label>
             <div class="form-input-wrap">
-              <select v-model="form.subject">
+              <select v-model="form.subject" aria-label="Mavzu">
                 <option value="">Mavzuni tanlang</option>
                 <option value="bug">Xato yoki muammo</option>
                 <option value="content">Maqola bo'yicha</option>

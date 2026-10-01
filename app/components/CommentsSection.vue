@@ -312,7 +312,7 @@ onMounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #f59e0b);
+    background: linear-gradient(135deg, #5850ec, #f59e0b);
     color: #fff;
     display: flex;
     align-items: center;
@@ -340,10 +340,10 @@ onMounted(() => {
     transition: border-color 0.2s;
 
     &:focus {
-      border-color: #6366f1;
+      border-color: #5850ec;
     }
     &::placeholder {
-      color: #9ca3af;
+      color: #6b7280;
     }
   }
 
@@ -357,7 +357,7 @@ onMounted(() => {
 
   &__counter {
     font-size: 0.75rem;
-    color: #9ca3af;
+    color: #6b7280;
     margin-right: auto;
   }
 
@@ -378,7 +378,7 @@ onMounted(() => {
   margin-bottom: 2rem;
 
   &__link {
-    color: #6366f1;
+    color: #5850ec;
     font-weight: 700;
   }
 }
@@ -410,7 +410,7 @@ onMounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #6366f1;
+    background: #5850ec;
     color: #fff;
     display: flex;
     align-items: center;
@@ -449,7 +449,7 @@ onMounted(() => {
 
   &__badge {
     font-size: 0.65rem;
-    background: #6366f1;
+    background: #5850ec;
     color: #fff;
     padding: 0.1rem 0.45rem;
     border-radius: $border-radius-pill;
@@ -459,7 +459,7 @@ onMounted(() => {
 
   &__date {
     font-size: 0.65rem;
-    color: #9ca3af;
+    color: #6b7280;
   }
 
   &__content {
@@ -508,8 +508,8 @@ onMounted(() => {
 
     &:hover {
       background: #eef2ff;
-      border-color: #6366f1;
-      color: #6366f1;
+      border-color: #5850ec;
+      color: #5850ec;
     }
 
     &--danger {

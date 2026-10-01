@@ -21,7 +21,7 @@
         <div class="about-grid">
           <div class="about-card">
             <div class="about-card__icon">🎯</div>
-            <h3 class="about-card__title">Maqsadimiz</h3>
+            <h2 class="about-card__title">Maqsadimiz</h2>
             <p class="about-card__desc">
               O'zbek tilidagi sifatli bilim kontentini hamma uchun ochiq va
               qulay qilish. Har bir maqola chuqur tadqiq qilingan va amaliy
@@ -30,7 +30,7 @@
           </div>
           <div class="about-card">
             <div class="about-card__icon">💡</div>
-            <h3 class="about-card__title">Nima taklif qilamiz</h3>
+            <h2 class="about-card__title">Nima taklif qilamiz</h2>
             <p class="about-card__desc">
               Texnologiya, fan, psixologiya, biznes va shaxsiy rivojlanish
               mavzularida muntazam yangilanib turadigan maqolalar to'plami.
@@ -38,7 +38,7 @@
           </div>
           <div class="about-card">
             <div class="about-card__icon">🌍</div>
-            <h3 class="about-card__title">Kimlar uchun</h3>
+            <h2 class="about-card__title">Kimlar uchun</h2>
             <p class="about-card__desc">
               Bilimga chanqoq, o'z sohasida o'sishni xohlovchi, dunyo
               yangiliklari bilan qiziquvchi barcha o'zbek tillidagi
@@ -118,7 +118,7 @@ useHead({
 .about-hero {
   background: linear-gradient(
     135deg,
-    rgba(99, 102, 241, 0.06),
+    rgba(88, 80, 236, 0.06),
     rgba(245, 158, 11, 0.04)
   );
   border-bottom: 1px solid $border-color;
@@ -133,7 +133,7 @@ useHead({
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(99, 102, 241, 0.1);
+    background: rgba(88, 80, 236, 0.1);
     color: $primary;
     font-size: 0.82rem;
     font-weight: 700;
@@ -267,7 +267,7 @@ useHead({
   }
 
   &__inner {
-    background: linear-gradient(135deg, #6366f1, #f59e0b);
+    background: linear-gradient(135deg, #5850ec, #f59e0b);
     border-radius: $border-radius-lg;
     padding: 3.5rem 2rem;
     text-align: center;

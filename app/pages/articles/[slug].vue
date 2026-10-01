@@ -92,6 +92,8 @@
                 sizes="(max-width: 768px) 100vw, 860px"
                 :alt="article?.title"
                 class="article-cover__img"
+                width="1200"
+                height="630"
                 fetchpriority="high"
               />
               <div
@@ -166,7 +168,7 @@
                           : ""
                       }}
                     </span>
-                    <h4 class="related-card__title">{{ rel?.title }}</h4>
+                    <h3 class="related-card__title">{{ rel?.title }}</h3>
                   </div>
                 </NuxtLink>
               </div>
@@ -370,6 +372,8 @@ const { data: content, error: articleError } = await useAsyncData(
   },
 );
 if (articleError.value) {
+  // 404/503 sahifa CDN keshiga tushmasin
+  useNoStoreUnless(false);
   throw createError({ ...articleError.value, fatal: true });
 }
 
@@ -388,7 +392,8 @@ const { data: links } = await useAsyncData(
   async () => {
     const all = await $fetch<any[]>("/articles/all", {
       baseURL: useRuntimeConfig().public.apiBase,
-    }).catch(() => [] as any[]);
+    }).catch(() => null);
+    if (!all) return null;
     const current = articleStore.oneArticle;
     const slim = (a: any) => ({
       id: a.id,
@@ -410,6 +415,10 @@ const { data: links } = await useAsyncData(
         .map(slim),
     };
   },
+);
+
+useNoStoreUnless(
+  !!links.value && (!articleStore.oneArticle?.content || !!content.value),
 );
 
 const withGradient = (list: any[] = []) =>
@@ -821,7 +830,7 @@ onMounted(async () => {
   &__action-btn--bookmarked {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    background: rgba(99, 102, 241, 0.08);
+    background: rgba(88, 80, 236, 0.08);
   }
 }
 
@@ -844,6 +853,16 @@ onMounted(async () => {
   border-radius: $border-radius;
   overflow: hidden;
   margin-bottom: 1.5rem;
+
+  // Joy rasm yuklanishidan oldin ajratiladi — matn pastga "sakramaydi" (CLS).
+  // Muqovalarning 58/71 tasi aynan 1200x630
+  &__img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1200 / 630;
+    object-fit: cover;
+  }
 
   &__placeholder {
     height: 380px;

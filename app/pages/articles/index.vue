@@ -65,7 +65,11 @@
               </span>
               <div class="results-bar__sort">
                 <span>Saralash:</span>
-                <select v-model="sortBy" class="results-bar__select">
+                <select
+                  v-model="sortBy"
+                  class="results-bar__select"
+                  aria-label="Saralash"
+                >
                   <option value="newest">Eng yangi</option>
                   <option value="popular">Mashhur</option>
                   <option value="oldest">Eng eski</option>
@@ -87,11 +91,11 @@
                     v-if="article.coverImage"
                     :src="cldImg(article.coverImage, 640)"
                     :srcset="cldSrcset(article.coverImage, [320, 640])"
-                    sizes="(max-width: 576px) 100vw, 160px"
+                    sizes="(max-width: 576px) 100vw, 200px"
                     :alt="article.title"
                     loading="lazy"
                     decoding="async"
-                    style="width: 100%; height: 100%; object-fit: cover"
+                    class="article-card-h__cover-img"
                   />
                   <div
                     v-else
@@ -109,7 +113,7 @@
                   <span class="article-card-h__cat-label">{{
                     article.category?.name
                   }}</span>
-                  <h3 class="article-card-h__title">{{ article.title }}</h3>
+                  <h2 class="article-card-h__title">{{ article.title }}</h2>
                   <p class="article-card-h__excerpt">{{ article.excerpt }}</p>
                   <div class="article-card-h__meta">
                     <div class="article-card-h__author">
@@ -176,20 +180,20 @@
                 <h3 class="popular-card__title">MASHHUR MAQOLALAR</h3>
               </div>
               <ol class="popular-list">
-                <NuxtLink
-                  v-for="(item, idx) in popularArticles"
-                  :key="item.id"
-                  :to="`/articles/${item.slug}`"
-                  class="popular-item"
-                >
-                  <span class="popular-item__num">0{{ idx + 1 }}</span>
-                  <div class="popular-item__content">
-                    <p class="popular-item__title">{{ item.title }}</p>
-                    <span class="popular-item__views">
-                      👁 {{ item.viewCount }}
-                    </span>
-                  </div>
-                </NuxtLink>
+                <li v-for="(item, idx) in popularArticles" :key="item.id">
+                  <NuxtLink
+                    :to="`/articles/${item.slug}`"
+                    class="popular-item"
+                  >
+                    <span class="popular-item__num">0{{ idx + 1 }}</span>
+                    <div class="popular-item__content">
+                      <p class="popular-item__title">{{ item.title }}</p>
+                      <span class="popular-item__views">
+                        👁 {{ item.viewCount }}
+                      </span>
+                    </div>
+                  </NuxtLink>
+                </li>
               </ol>
             </div>
 
@@ -353,12 +357,13 @@ useHead({
 });
 
 // SSR — ro'yxat server HTML'ida bo'lsin
-await useAsyncData("articles-list", () =>
+const { data: loaded } = await useAsyncData("articles-list", () =>
   Promise.all([
     articleStore.getAllArticles(),
     categoryStore.getCategories(),
-  ]).then(() => true),
+  ]).then((res) => res.every((r) => r.success)),
 );
+useNoStoreUnless(loaded.value === true);
 </script>
 
 <style lang="scss" scoped>
@@ -527,7 +532,13 @@ await useAsyncData("articles-list", () =>
 }
 
 .filter-pill {
-  padding: 0.45rem 1.1rem;
+  padding: 0 1.1rem;
+  // Qat'iy balandlik: shrift almashganda tugma balandligi o'zgarmasin (CLS)
+  height: 34px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
   border-radius: $border-radius-pill;
   font-size: 0.875rem;
   font-weight: 500;
@@ -635,14 +646,25 @@ await useAsyncData("articles-list", () =>
     grid-template-columns: 1fr;
   }
 
-  // Cover
+  // Cover — rasm absolyut joylashadi: qator balandligini matn belgilaydi,
+  // rasm yuklanganda karta o'lchami o'zgarmaydi (CLS 0.197 edi)
   &__cover {
     position: relative;
     overflow: hidden;
+    min-height: 180px;
 
     @media (max-width: $mobile) {
       height: 160px;
+      min-height: 0;
     }
+  }
+
+  &__cover-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
 
   &__cover-bg {

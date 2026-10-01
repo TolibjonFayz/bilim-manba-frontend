@@ -58,7 +58,7 @@
 
             <!-- Body -->
             <div class="cat-card__body">
-              <h3 class="cat-card__name">{{ cat?.name }}</h3>
+              <h2 class="cat-card__name">{{ cat?.name }}</h2>
               <p class="cat-card__desc">{{ cat?.slug }}</p>
 
               <div class="cat-card__footer">
@@ -74,7 +74,7 @@
         <!-- Empty state -->
         <div v-else class="empty-state">
           <span class="empty-state__emoji">😔</span>
-          <h3 class="empty-state__title">Kategoriya topilmadi</h3>
+          <h2 class="empty-state__title">Kategoriya topilmadi</h2>
           <p class="empty-state__desc">Boshqa so'z bilan qidiring</p>
           <button class="btn btn--primary" @click="searchQuery = ''">
             Hammasini ko'rish
@@ -90,7 +90,7 @@
           <div class="feature-item">
             <div class="feature-item__icon feature-item__icon--blue">ℹ️</div>
             <div>
-              <h4 class="feature-item__title">Doimiy yangilanish</h4>
+              <h3 class="feature-item__title">Doimiy yangilanish</h3>
               <p class="feature-item__desc">
                 Kategoriyalar ro'yxati har hafta yangi maqolalar bilan to'ldirib
                 boriladi.
@@ -101,7 +101,7 @@
           <div class="feature-item">
             <div class="feature-item__icon feature-item__icon--coral">⭐</div>
             <div>
-              <h4 class="feature-item__title">Ekspertlar maslahati</h4>
+              <h3 class="feature-item__title">Ekspertlar maslahati</h3>
               <p class="feature-item__desc">
                 Har bir yo'nalish bo'yicha malakali mutaxassislar tomonidan
                 yozilgan kontent.
@@ -112,7 +112,7 @@
           <div class="feature-item">
             <div class="feature-item__icon feature-item__icon--purple">∞</div>
             <div>
-              <h4 class="feature-item__title">To'siqsiz o'rgan</h4>
+              <h3 class="feature-item__title">To'siqsiz o'rgan</h3>
               <p class="feature-item__desc">
                 Vaqt yo'q dema — materiallar 24/7 ochiq. Istalgan qurilmada,
                 istalgan joyda, mutlaqo bepul.
@@ -166,9 +166,10 @@ useHead({
 });
 
 // SSR — kategoriya havolalari server HTML'ida bo'lsin
-await useAsyncData("categories-list", () =>
-  categoryStore.getCategories().then(() => true),
+const { data: loaded } = await useAsyncData("categories-list", () =>
+  categoryStore.getCategories().then((r) => r.success),
 );
+useNoStoreUnless(loaded.value === true);
 </script>
 
 <style lang="scss" scoped>
