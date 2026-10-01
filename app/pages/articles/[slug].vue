@@ -289,7 +289,6 @@ const aiQuestion = ref("");
 const aiLoading = ref(false);
 const messagesEl = ref<HTMLElement | null>(null);
 const tags = ref<string[]>([]);
-const content = ref<any>(null);
 const bookmarkStore = useBookmarkStore();
 const isBookmarked = ref(false);
 
@@ -331,9 +330,18 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-// SSR — SEO uchun
-await useAsyncData(`article-${route.params.slug}`, () =>
-  articleStore.getArticleBySlug(route.params.slug as string),
+// SSR — SEO uchun. Maqola matni (R2 dagi JSON) ham serverda yuklanadi,
+// aks holda Google sahifani bo'sh ko'radi
+const { data: content } = await useAsyncData(
+  `article-${route.params.slug}`,
+  async () => {
+    const res = await articleStore.getArticleBySlug(
+      route.params.slug as string,
+    );
+    return res.success && res.data?.content
+      ? await fetchContent(res.data.content)
+      : null;
+  },
 );
 
 const article = computed(() => articleStore.oneArticle);
@@ -374,27 +382,68 @@ const popularArticles = computed(() =>
 const fallbackImage =
   "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png";
 
+const articleUrl = computed(
+  () => `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
+);
+
+// excerpt maydonida manba nomi turadi ("Claude AI"), shuning uchun
+// meta description maqola matnining boshidan olinadi
+const description = computed(() => {
+  const text = (content.value?.message ?? "")
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;|&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (!text) return article.value?.title ?? "";
+  if (text.length <= 160) return text;
+  return text.slice(0, 157).replace(/\s+\S*$/, "") + "…";
+});
+
+const jsonLd = computed(() =>
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.value?.title,
+    description: description.value,
+    image: [article.value?.coverImage ?? fallbackImage],
+    datePublished: article.value?.createdAt,
+    dateModified: article.value?.updatedAt ?? article.value?.createdAt,
+    mainEntityOfPage: articleUrl.value,
+    articleSection: article.value?.category?.name,
+    keywords: article.value?.tags,
+    inLanguage: "uz",
+    author: { "@type": "Organization", name: "Bilim Manba", url: "https://bilimmanba.uz" },
+    publisher: {
+      "@type": "Organization",
+      name: "Bilim Manba",
+      url: "https://bilimmanba.uz",
+      logo: { "@type": "ImageObject", url: fallbackImage },
+    },
+  }).replace(/</g, "\\u003c"),
+);
+
 useHead({
   title: () => `${article.value?.title ?? "Maqola"} — Bilim Manba`,
+  link: [{ rel: "canonical", href: () => articleUrl.value }],
+  script: [{ type: "application/ld+json", innerHTML: () => jsonLd.value }],
   meta: [
-    { name: "description", content: () => article.value?.excerpt ?? "" },
+    { name: "description", content: () => description.value },
     {
       property: "og:title",
       content: () => article.value?.title ?? "Bilim Manba",
     },
     {
       property: "og:description",
-      content: () => article.value?.excerpt ?? "",
+      content: () => description.value,
     },
     {
       property: "og:image",
       content: () => article.value?.coverImage ?? fallbackImage,
     },
-    {
-      property: "og:url",
-      content: () =>
-        `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
-    },
+    { property: "og:url", content: () => articleUrl.value },
     { property: "og:type", content: "article" },
     { name: "twitter:card", content: "summary_large_image" },
     {
@@ -538,8 +587,8 @@ onMounted(async () => {
   isLiked.value = articleStore.oneArticle?.isLiked ?? false;
   isBookmarked.value = articleStore.oneArticle?.isBookmarked ?? false;
 
-  // Content
-  if (articleStore.oneArticle?.content) {
+  // Content — odatda SSR dan keladi, faqat bo'sh qolsa qayta yuklaymiz
+  if (!content.value && articleStore.oneArticle?.content) {
     content.value = await fetchContent(articleStore.oneArticle.content);
   }
 
