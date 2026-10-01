@@ -80,7 +80,7 @@
             <!-- Article cards -->
             <div class="article-list">
               <NuxtLink
-                v-for="article in paginatedArticles"
+                v-for="(article, i) in paginatedArticles"
                 :key="article.id"
                 :to="`/articles/${article.slug}`"
                 class="article-card-h"
@@ -93,7 +93,8 @@
                     :srcset="cldSrcset(article.coverImage, [320, 640])"
                     sizes="(max-width: 576px) 100vw, 200px"
                     :alt="article.title"
-                    loading="lazy"
+                    :loading="i === 0 ? 'eager' : 'lazy'"
+                    :fetchpriority="i === 0 ? 'high' : undefined"
                     decoding="async"
                     class="article-card-h__cover-img"
                   />

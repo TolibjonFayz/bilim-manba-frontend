@@ -49,7 +49,7 @@
             <!-- Article list -->
             <div class="article-list" v-if="filteredArticles.length">
               <NuxtLink
-                v-for="article in visibleArticles"
+                v-for="(article, i) in visibleArticles"
                 :key="article.id"
                 :to="`/articles/${article.slug}`"
                 class="article-row"
@@ -60,7 +60,8 @@
                     :src="cldImg(article?.coverImage, 480)"
                     :alt="article?.title"
                     class="article-row__cover-placeholder"
-                    loading="lazy"
+                    :loading="i === 0 ? 'eager' : 'lazy'"
+                    :fetchpriority="i === 0 ? 'high' : undefined"
                     decoding="async"
                   />
                 </div>
