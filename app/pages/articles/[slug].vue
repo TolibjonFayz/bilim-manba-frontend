@@ -26,7 +26,9 @@
               </div>
 
               <h1 class="article-header__title">{{ article?.title }}</h1>
-              <p class="article-header__excerpt">{{ article?.excerpt }}</p>
+              <p v-if="article?.excerpt" class="article-header__excerpt">
+                {{ article.excerpt }}
+              </p>
 
               <div class="article-header__meta">
                 <div class="article-header__author">
@@ -173,17 +175,18 @@
 
           <!-- O'NG: Sidebar -->
           <aside class="article-sidebar">
-            <!-- Author card -->
-            <div class="sidebar-card">
+            <!-- Manba -->
+            <div v-if="source.name" class="sidebar-card">
               <div class="author-card">
                 <div class="author-card__source">Manba</div>
                 <div class="author-card__avatar">
-                  {{ article?.excerpt?.[0] }}
+                  {{ source.name[0] }}
                 </div>
                 <div class="author-card__info">
-                  <h4 class="author-card__name">
-                    {{ article?.excerpt }}
-                  </h4>
+                  <h4 class="author-card__name">{{ source.name }}</h4>
+                  <p v-if="source.author" class="author-card__bio">
+                    {{ source.author }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -402,9 +405,12 @@ const articleUrl = computed(
   () => `https://bilimmanba.uz/articles/${article.value?.slug ?? ""}`,
 );
 
-// excerpt maydonida manba nomi turadi ("Claude AI"), shuning uchun
-// meta description maqola matnining boshidan olinadi
+const source = computed(() => splitSource(article.value?.source));
+
+// Meta description: admin yozgan qisqa tavsif, bo'lmasa maqola matnining boshi
 const description = computed(() => {
+  const excerpt = article.value?.excerpt?.trim();
+  if (excerpt) return excerpt;
   const text = (content.value?.message ?? "")
     .replace(/<[^>]*>/g, " ")
     .replace(/&nbsp;/g, " ")

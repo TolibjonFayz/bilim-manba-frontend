@@ -263,7 +263,8 @@ const filteredArticles = computed(() => {
     list = list.filter(
       (a: any) =>
         a.title.toLowerCase().includes(q) ||
-        a.excerpt?.toLowerCase().includes(q),
+        a.excerpt?.toLowerCase().includes(q) ||
+        a.source?.toLowerCase().includes(q),
     );
   }
 

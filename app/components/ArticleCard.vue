@@ -25,16 +25,16 @@
 
       <h3 class="article-card__title">{{ article.title }}</h3>
 
-      <!-- <p v-if="article.excerpt" class="article-card__excerpt">
+      <p v-if="article.excerpt" class="article-card__excerpt">
         {{ article.excerpt }}
-      </p> -->
+      </p>
 
       <div class="article-card__meta">
-        <div class="article-card__author">
+        <div v-if="sourceName" class="article-card__author">
           <div class="article-card__author-avatar">
-            {{ article.excerpt?.[0] }}
+            {{ sourceName[0] }}
           </div>
-          <span>{{ article.excerpt }}</span>
+          <span>{{ sourceName }}</span>
         </div>
         <div class="article-card__stats">
           <span>👁 {{ article.viewCount }}</span>
@@ -51,6 +51,7 @@ const props = defineProps<{
     title: string;
     slug: string;
     excerpt?: string;
+    source?: string;
     coverImage?: string;
     type: "free";
     viewCount: number;
@@ -58,6 +59,9 @@ const props = defineProps<{
     author?: { fullName: string };
   };
 }>();
+
+// Kartochkada faqat nashr nomi: "Quanta Magazine (Ben Brubaker)" → "Quanta Magazine"
+const sourceName = computed(() => splitSource(props.article.source).name);
 
 // Placeholder uchun har bir kartaga boshqa gradient
 const gradients = [

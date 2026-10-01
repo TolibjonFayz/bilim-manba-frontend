@@ -33,12 +33,49 @@
         </div>
 
         <div class="form-group">
-          <label>Qisqacha tavsif *</label>
+          <label
+            >Qisqacha tavsif *
+            <span class="form-group__note"
+              >(kartochkada va Google natijasida ko'rinadi)</span
+            ></label
+          >
           <div class="form-input-wrap form-input-wrap--textarea">
             <textarea
               v-model="form.excerpt"
               rows="3"
-              placeholder="Maqola haqida qisqacha..."
+              maxlength="300"
+              placeholder="Maqola nima haqida — 1-2 gap"
+            />
+          </div>
+          <div class="excerpt-tools">
+            <button
+              type="button"
+              class="btn btn--outline upload-btn"
+              :disabled="excerptLoading"
+              @click="handleGenerateExcerpt"
+            >
+              {{ excerptLoading ? "⏳ Yozilmoqda..." : "✨ AI bilan yozish" }}
+            </button>
+            <span
+              class="excerpt-tools__count"
+              :class="{ 'excerpt-tools__count--warn': form.excerpt.length > 170 }"
+              >{{ form.excerpt.length }}/170</span
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label
+            >Manba
+            <span class="form-group__note"
+              >(masalan: Quanta Magazine (Ben Brubaker))</span
+            ></label
+          >
+          <div class="form-input-wrap">
+            <input
+              v-model="form.source"
+              type="text"
+              placeholder="Nashr (Muallif)"
             />
           </div>
         </div>
@@ -168,6 +205,7 @@ const form = reactive({
   title: "",
   slug: "",
   excerpt: "",
+  source: "",
   categoryId: "" as any,
   content: "",
   coverImage: "",
@@ -176,6 +214,32 @@ const form = reactive({
 });
 
 const contentText = ref("");
+
+// Qisqa tavsifni AI yozadi: matn textarea'dan yoki yuklangan R2 fayldan olinadi
+const excerptLoading = ref(false);
+const handleGenerateExcerpt = async () => {
+  error.value = "";
+  let text = contentText.value.trim();
+  if (!text && form.content) {
+    try {
+      const c = await $fetch<any>(form.content);
+      text = c?.message ?? "";
+    } catch {}
+  }
+  text = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  if (text.length < 50) {
+    error.value = "Avval maqola matnini kiriting";
+    return;
+  }
+  excerptLoading.value = true;
+  const res = await adminStore.generateExcerpt(form.title, text);
+  excerptLoading.value = false;
+  if (res.success) {
+    form.excerpt = res.data.excerpt;
+  } else {
+    error.value = res.message;
+  }
+};
 const contentUploading = ref(false);
 const imageUploading = ref(false);
 const imageInput = ref<HTMLInputElement | null>(null);
@@ -192,6 +256,7 @@ onMounted(async () => {
     form.title = article.title ?? "";
     form.slug = article.slug ?? "";
     form.excerpt = article.excerpt ?? "";
+    form.source = article.source ?? "";
     form.categoryId = article.category?.id ?? article.categoryId ?? "";
     form.content = article.content ?? "";
     form.coverImage = article.coverImage ?? "";
@@ -378,6 +443,22 @@ const handleSubmit = async () => {
 
   select {
     cursor: pointer;
+  }
+}
+
+.excerpt-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &__count {
+    font-size: 0.75rem;
+    color: $text-muted;
+
+    &--warn {
+      color: #d97706;
+      font-weight: 600;
+    }
   }
 }
 

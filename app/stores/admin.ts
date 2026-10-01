@@ -213,6 +213,21 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Maqola matnidan AI bilan qisqa tavsif (faqat admin)
+  async function generateExcerpt(title: string, text: string) {
+    try {
+      const res = await $fetch<any>("/ai/excerpt", {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body: { title, text },
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   async function getArticle(id: number) {
     try {
       const res = await $fetch<any>(`/admin/articles/${id}`, {
@@ -244,5 +259,6 @@ export const useAdminStore = defineStore("admin", () => {
     uploadImage,
     uploadContent,
     getArticle,
+    generateExcerpt,
   };
 });
