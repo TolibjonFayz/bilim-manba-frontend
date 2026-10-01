@@ -351,17 +351,27 @@ const gradients = [
 
 // SSR — SEO uchun. Maqola matni (R2 dagi JSON) ham serverda yuklanadi,
 // aks holda Google sahifani bo'sh ko'radi
-const { data: content } = await useAsyncData(
+const { data: content, error: articleError } = await useAsyncData(
   `article-${route.params.slug}`,
   async () => {
     const res = await articleStore.getArticleBySlug(
       route.params.slug as string,
     );
-    return res.success && res.data?.content
-      ? await fetchContent(res.data.content)
-      : null;
+    if (!res.success) {
+      // Maqola yo'q — haqiqiy 404 (bo'sh sahifa + 200 = "soft 404").
+      // Backend ishlamasa — 503, Google sahifani o'chirmay keyinroq qaytadi
+      throw createError({
+        statusCode: res.status === 404 ? 404 : 503,
+        statusMessage:
+          res.status === 404 ? "Maqola topilmadi" : "Vaqtincha mavjud emas",
+      });
+    }
+    return res.data?.content ? await fetchContent(res.data.content) : null;
   },
 );
+if (articleError.value) {
+  throw createError({ ...articleError.value, fatal: true });
+}
 
 const article = computed(() => articleStore.oneArticle);
 

@@ -352,14 +352,13 @@ useHead({
   ],
 });
 
-onMounted(async () => {
-  loading.value = true;
-  await Promise.all([
+// SSR — ro'yxat server HTML'ida bo'lsin
+await useAsyncData("articles-list", () =>
+  Promise.all([
     articleStore.getAllArticles(),
     categoryStore.getCategories(),
-  ]);
-  loading.value = false;
-});
+  ]).then(() => true),
+);
 </script>
 
 <style lang="scss" scoped>

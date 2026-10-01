@@ -240,7 +240,10 @@ const popularArticles = computed(() =>
 );
 
 const filteredArticles = computed(() => {
-  let list = [...(categoryStore.categoryBySlug?.articles ?? [])].map(
+  // Backend kategoriya bilan birga qoralamalarni ham qaytaradi — ularni ko'rsatmaymiz
+  let list = [...(categoryStore.categoryBySlug?.articles ?? [])]
+    .filter((a: any) => a.status === "published")
+    .map(
     (a, i) => ({
       ...a,
       gradient: gradients[i % gradients.length],
@@ -264,29 +267,62 @@ const filteredArticles = computed(() => {
   return list;
 });
 
+// Boshqa kategoriyadagi eng ko'p o'qilgan maqola. Math.random() SSR'da
+// serverda bitta, brauzerda boshqa maqolani tanlab, hydration mismatch berardi
 const featuredArticle = computed(() => {
-  const articles = articleStore.allArticles ?? [];
-  if (articles.length === 0) return null;
-  const randomIndex = Math.floor(Math.random() * articles.length);
-  return articles[randomIndex];
-});
-
-watchEffect(() => {
-  if (category.value) {
-    useHead({
-      title: `${category.value.name} — Bilim Manba`,
-      meta: [{ name: "description", content: category.value.slug ?? "" }],
-    });
-  }
-});
-
-onMounted(async () => {
-  loading.value = true;
-  const res = await categoryStore.getCategoryBySlug(
-    route.params.slug as string,
+  const others = (articleStore.allArticles ?? []).filter(
+    (a: any) => a.category?.id !== category.value?.id,
   );
-  await articleStore.getAllArticles();
-  loading.value = false;
+  if (others.length === 0) return null;
+  return [...others].sort((a: any, b: any) => b.viewCount - a.viewCount)[0];
+});
+
+// SSR — maqolalar ro'yxati server HTML'ida bo'lsin. Kategoriya yo'q bo'lsa —
+// haqiqiy 404 (bo'sh sahifa + 200 Google uchun "soft 404" bo'lardi),
+// backend ishlamasa — 503 (Google sahifani indeksdan o'chirmaydi)
+const { data: found } = await useAsyncData(
+  `category-${route.params.slug}`,
+  async () => {
+    const [res] = await Promise.all([
+      categoryStore.getCategoryBySlug(route.params.slug as string),
+      articleStore.getAllArticles(),
+    ]);
+    return res.success ? 200 : res.status === 404 ? 404 : 503;
+  },
+);
+if (found.value !== 200) {
+  throw createError({
+    statusCode: found.value === 404 ? 404 : 503,
+    statusMessage:
+      found.value === 404 ? "Kategoriya topilmadi" : "Vaqtincha mavjud emas",
+    fatal: true,
+  });
+}
+
+// category.slug maydonida kategoriya tavsifi saqlanadi
+const categoryDescription = computed(() => {
+  const c = category.value;
+  if (!c) return "";
+  const count = filteredArticles.value.length;
+  return `${c.name}: ${c.slug ?? ""}. Bilim Manba'da o'zbek tilida ${count} ta maqola.`;
+});
+const categoryUrl = computed(
+  () =>
+    `https://bilimmanba.uz/categories/${encodeURIComponent(category.value?.name ?? "")}`,
+);
+
+useHead({
+  title: () => `${category.value?.name ?? "Kategoriya"} — Bilim Manba`,
+  link: [{ rel: "canonical", href: () => categoryUrl.value }],
+  meta: [
+    { name: "description", content: () => categoryDescription.value },
+    {
+      property: "og:title",
+      content: () => `${category.value?.name ?? ""} — Bilim Manba`,
+    },
+    { property: "og:description", content: () => categoryDescription.value },
+    { property: "og:url", content: () => categoryUrl.value },
+  ],
 });
 </script>
 

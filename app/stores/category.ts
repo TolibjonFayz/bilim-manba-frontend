@@ -34,6 +34,8 @@ export const useCategoryStore = defineStore("categories", () => {
       return {
         success: false,
         message: error?.data?.message || "Xato yuz berdi",
+        // 404 = haqiqatan yo'q; boshqa xato = backend ishlamayapti
+        status: error?.statusCode ?? error?.status ?? 500,
       };
     }
   }

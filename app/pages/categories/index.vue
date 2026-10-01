@@ -165,11 +165,10 @@ useHead({
   ],
 });
 
-onMounted(async () => {
-  loading.value = true;
-  await categoryStore.getCategories();
-  loading.value = false;
-});
+// SSR — kategoriya havolalari server HTML'ida bo'lsin
+await useAsyncData("categories-list", () =>
+  categoryStore.getCategories().then(() => true),
+);
 </script>
 
 <style lang="scss" scoped>
