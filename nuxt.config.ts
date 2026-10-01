@@ -52,6 +52,7 @@ export default defineNuxtConfig({
           name: "google-site-verification",
           content: "cp5qkEakZ-AwmJ5KrJ2Y5jWyO2UODfk09v8iUFwTP-4",
         },
+        { name: "yandex-verification", content: "1b7f13c649d5629e" },
         {
           property: "og:image",
           content:
