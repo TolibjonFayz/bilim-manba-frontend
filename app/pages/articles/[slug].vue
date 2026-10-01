@@ -379,34 +379,50 @@ const articleGradient = computed(
   () => gradients[(article.value?.id ?? 0) % gradients.length],
 );
 
-// Related — categoryStore dan emas, allArticles dan olamiz
-const relatedArticles = computed(() => {
-  const categoryId = article.value?.category?.id;
-  if (!categoryId) return [];
+// O'xshash va mashhur maqolalar SSR'da tanlanadi — maqolalar bir-biriga
+// havola bersin (Google ichki havolalar orqali sahifalarni bog'laydi).
+// Payload yengil bo'lishi uchun 71 ta maqolani emas, faqat 3+5 tasining
+// kerakli maydonlarini qaytaramiz
+const { data: links } = await useAsyncData(
+  `article-links-${route.params.slug}`,
+  async () => {
+    const all = await $fetch<any[]>("/articles/all", {
+      baseURL: useRuntimeConfig().public.apiBase,
+    }).catch(() => [] as any[]);
+    const current = articleStore.oneArticle;
+    const slim = (a: any) => ({
+      id: a.id,
+      slug: a.slug,
+      title: a.title,
+      coverImage: a.coverImage,
+      createdAt: a.createdAt,
+      viewCount: a.viewCount,
+    });
+    const others = (all ?? []).filter((a: any) => a.id !== current?.id);
+    return {
+      related: others
+        .filter((a: any) => a.category?.id === current?.category?.id)
+        .slice(0, 3)
+        .map(slim),
+      popular: [...others]
+        .sort((a: any, b: any) => b.viewCount - a.viewCount)
+        .slice(0, 5)
+        .map(slim),
+    };
+  },
+);
 
-  return (articleStore.allArticles ?? [])
-    .filter(
-      (a: any) => a.category?.id === categoryId && a.id !== article.value?.id,
-    )
-    .slice(0, 3)
-    .map((a: any, i: number) => ({
-      ...a,
-      gradient: gradients[i % gradients.length],
-    }));
-});
+const withGradient = (list: any[] = []) =>
+  list.map((a: any, i: number) => ({
+    ...a,
+    gradient: gradients[i % gradients.length],
+  }));
+
+const relatedArticles = computed(() => withGradient(links.value?.related));
 
 const readTime = computed(() => calcReadTime(content.value?.message ?? ""));
 
-const popularArticles = computed(() =>
-  (articleStore.allArticles ?? [])
-    .filter((a: any) => a.id !== article.value?.id)
-    .sort((a: any, b: any) => b.viewCount - a.viewCount)
-    .slice(0, 5)
-    .map((a: any, i: number) => ({
-      ...a,
-      gradient: gradients[i % gradients.length],
-    })),
-);
+const popularArticles = computed(() => withGradient(links.value?.popular));
 
 const fallbackImage =
   "https://res.cloudinary.com/dne7ddv2a/image/upload/q_auto/f_auto/v1776925677/Untitled_design_kn3uhe.png";
@@ -613,13 +629,9 @@ const askAi = async () => {
 onMounted(async () => {
   loading.value = true;
 
-  // Parallel — tez ishlash uchun
-  await Promise.all([
-    // Client da token bilan qayta so'rov — isLiked to'g'ri keladi
-    articleStore.getArticleBySlug(route.params.slug as string),
-    // Barcha maqolalar — related va popular uchun
-    articleStore.getAllArticles(),
-  ]);
+  // Client da token bilan qayta so'rov — isLiked to'g'ri keladi
+  // (o'xshash/mashhur maqolalar endi SSR'da keladi)
+  await articleStore.getArticleBySlug(route.params.slug as string);
 
   const token = process.client ? localStorage.getItem("access_token") : null;
   $fetch(`/articles/view/${route.params.slug}`, {

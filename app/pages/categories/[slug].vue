@@ -45,7 +45,7 @@
             <!-- Article list -->
             <div class="article-list" v-if="filteredArticles.length">
               <NuxtLink
-                v-for="article in filteredArticles"
+                v-for="article in visibleArticles"
                 :key="article.id"
                 :to="`/articles/${article.slug}`"
                 class="article-row"
@@ -86,7 +86,14 @@
               </NuxtLink>
 
               <!-- Load more -->
-              <button class="load-more-btn">Ko'proq yuklash →</button>
+              <button
+                v-if="remainingCount > 0"
+                type="button"
+                class="load-more-btn"
+                @click="loadMore"
+              >
+                Ko'proq yuklash ({{ remainingCount }} ta qoldi) →
+              </button>
             </div>
 
             <el-empty v-else description="Maqolalar topilmadi" />
@@ -265,6 +272,23 @@ const filteredArticles = computed(() => {
 
 // Boshqa kategoriyadagi eng ko'p o'qilgan maqola. Math.random() SSR'da
 // serverda bitta, brauzerda boshqa maqolani tanlab, hydration mismatch berardi
+// "Ko'proq yuklash": avval PAGE_SIZE ta, har bosishda yana PAGE_SIZE ta
+const PAGE_SIZE = 8;
+const visibleCount = ref(PAGE_SIZE);
+const visibleArticles = computed(() =>
+  filteredArticles.value.slice(0, visibleCount.value),
+);
+const remainingCount = computed(() =>
+  Math.max(0, filteredArticles.value.length - visibleCount.value),
+);
+const loadMore = () => {
+  visibleCount.value += PAGE_SIZE;
+};
+// Saralash yoki kategoriya o'zgarsa — ro'yxat yana boshidan
+watch([sortBy, () => route.params.slug], () => {
+  visibleCount.value = PAGE_SIZE;
+});
+
 const featuredArticle = computed(() => {
   const others = (articleStore.allArticles ?? []).filter(
     (a: any) => a.category?.id !== category.value?.id,
