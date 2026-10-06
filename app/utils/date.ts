@@ -33,3 +33,31 @@ export function formatMonthYear(date: string | number | Date | null | undefined)
   if (!d) return "";
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
+
+/** 06.10.2026 09:00 — Toshkent vaqtida */
+export function formatDateTime(date: string | number | Date | null | undefined): string {
+  const d = tashkent(date);
+  if (!d) return "";
+  const hh = String(d.getUTCHours()).padStart(2, "0");
+  const mi = String(d.getUTCMinutes()).padStart(2, "0");
+  return `${formatDate(date)} ${hh}:${mi}`;
+}
+
+/**
+ * <input type="datetime-local"> qiymati ("2026-10-06T09:00") Toshkent vaqti
+ * deb olinadi va ISO (UTC) ga aylantiriladi — admin qaysi mintaqada
+ * o'tirmasin, vaqt Toshkent bo'yicha bo'ladi.
+ */
+export function tashkentLocalToIso(local: string): string | null {
+  if (!local) return null;
+  const t = Date.parse(`${local}:00Z`);
+  if (Number.isNaN(t)) return null;
+  return new Date(t - TASHKENT_OFFSET_MS).toISOString();
+}
+
+/** ISO → datetime-local input qiymati (Toshkent vaqtida) */
+export function isoToTashkentLocal(iso: string | null | undefined): string {
+  const d = tashkent(iso);
+  if (!d) return "";
+  return d.toISOString().slice(0, 16);
+}

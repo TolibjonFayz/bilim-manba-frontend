@@ -178,6 +178,33 @@
           </div>
         </div>
 
+        <div class="form-group">
+          <label>Status</label>
+          <div class="form-input-wrap">
+            <select v-model="form.status" aria-label="Status">
+              <option value="published">✅ Chop etilgan</option>
+              <option value="draft">📝 Qoralama</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rejalashtirish: qoralama shu vaqtda o'zi chop etiladi -->
+        <div v-if="form.status === 'draft'" class="form-group">
+          <label
+            >Chop etish vaqti
+            <span class="form-group__note"
+              >(Toshkent vaqti. Bo'sh qoldirsangiz — qoralama bo'lib qoladi)</span
+            ></label
+          >
+          <div class="form-input-wrap">
+            <input
+              v-model="scheduleLocal"
+              type="datetime-local"
+              aria-label="Chop etish vaqti"
+            />
+          </div>
+        </div>
+
         <button
           class="btn btn--primary admin-form__submit"
           :disabled="loading"
@@ -214,6 +241,7 @@ const form = reactive({
 });
 
 const contentText = ref("");
+const scheduleLocal = ref("");
 
 // Qisqa tavsifni AI yozadi: matn textarea'dan yoki yuklangan R2 fayldan olinadi
 const excerptLoading = ref(false);
@@ -263,6 +291,7 @@ onMounted(async () => {
     form.tags = article.tags ?? "";
     form.readTime = article.readTime ?? 5;
     form.status = article.status ?? "published";
+    scheduleLocal.value = isoToTashkentLocal(article.scheduledAt);
   } else {
     error.value = "Maqola topilmadi";
   }
@@ -344,6 +373,8 @@ const handleSubmit = async () => {
     ...form,
     categoryId: +form.categoryId,
     readTime: +form.readTime,
+    scheduledAt:
+      form.status === "draft" ? tashkentLocalToIso(scheduleLocal.value) : null,
   });
 
   loading.value = false;

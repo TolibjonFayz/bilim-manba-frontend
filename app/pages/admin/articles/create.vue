@@ -188,6 +188,23 @@
           </div>
         </div>
 
+        <!-- Rejalashtirish: qoralama shu vaqtda o'zi chop etiladi -->
+        <div v-if="form.status === 'draft'" class="form-group">
+          <label
+            >Chop etish vaqti
+            <span class="form-group__note"
+              >(Toshkent vaqti. Bo'sh qoldirsangiz — qoralama bo'lib qoladi)</span
+            ></label
+          >
+          <div class="form-input-wrap">
+            <input
+              v-model="scheduleLocal"
+              type="datetime-local"
+              aria-label="Chop etish vaqti"
+            />
+          </div>
+        </div>
+
         <button
           class="btn btn--primary admin-form__submit"
           :disabled="loading"
@@ -222,6 +239,7 @@ const form = reactive({
 });
 
 const contentText = ref("");
+const scheduleLocal = ref("");
 
 // Qisqa tavsifni AI yozadi: matn textarea'dan yoki yuklangan R2 fayldan olinadi
 const excerptLoading = ref(false);
@@ -352,7 +370,10 @@ const handleSubmit = async () => {
     categoryId: +form.categoryId,
     authorId: payload?.sub,
     readTime: +form.readTime,
-    status: "published",
+    // Formadagi tanlov (avval doim "published" yuborilardi — qoralama yaratib bo'lmasdi)
+    status: form.status,
+    scheduledAt:
+      form.status === "draft" ? tashkentLocalToIso(scheduleLocal.value) : null,
   });
 
   loading.value = false;
@@ -371,6 +392,7 @@ const handleSubmit = async () => {
       readTime: 5,
     });
     contentText.value = "";
+    scheduleLocal.value = "";
     window.scrollTo(0, 0);
   } else {
     error.value = res.message;

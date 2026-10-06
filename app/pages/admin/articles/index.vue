@@ -7,6 +7,28 @@
       </NuxtLink>
     </div>
 
+    <!-- Avtomatik nashr holati -->
+    <div v-if="pubStatus" class="pub-status">
+      <span
+        class="pub-status__item"
+        :class="pubStatus.telegramConfigured ? 'is-ok' : 'is-warn'"
+      >
+        {{
+          pubStatus.telegramConfigured
+            ? "✈️ Telegram kanal ulangan"
+            : "⚠️ Telegram ulanmagan — postlar kanalga ketmaydi"
+        }}
+      </span>
+      <span class="pub-status__item">
+        ⏰
+        {{
+          pubStatus.nextScheduledAt
+            ? `Keyingi rejali maqola: ${formatDateTime(pubStatus.nextScheduledAt)}`
+            : "Rejalashtirilgan maqola yo'q"
+        }}
+      </span>
+    </div>
+
     <div class="admin-table-wrap" v-loading="loading">
       <table class="admin-table">
         <thead>
@@ -18,6 +40,7 @@
             <th>Sana</th>
             <th>Amal</th>
             <th>Status</th>
+            <th>Telegram</th>
           </tr>
         </thead>
         <tbody>
@@ -62,16 +85,42 @@
                 :class="
                   article.status === 'published'
                     ? 'status-badge--published'
-                    : 'status-badge--draft'
+                    : article.scheduledAt
+                      ? 'status-badge--scheduled'
+                      : 'status-badge--draft'
+                "
+                :title="
+                  article.status === 'published'
+                    ? 'Qoralamaga qaytarish'
+                    : 'Hozir chop etish'
                 "
                 @click="handleToggleStatus(article)"
               >
                 {{
                   article.status === "published"
                     ? "✅ Chop etilgan"
-                    : "📝 Qoralama"
+                    : article.scheduledAt
+                      ? `⏰ ${formatDateTime(article.scheduledAt)}`
+                      : "📝 Qoralama"
                 }}
               </button>
+            </td>
+            <td>
+              <span
+                v-if="article.telegramPostedAt"
+                class="tg-sent"
+                :title="formatDateTime(article.telegramPostedAt)"
+                >✈️ Yuborilgan</span
+              >
+              <button
+                v-else-if="article.status === 'published'"
+                class="admin-table__btn tg-btn"
+                :disabled="tgSending === article.id"
+                @click="handleTelegram(article)"
+              >
+                {{ tgSending === article.id ? "⏳" : "✈️ Yuborish" }}
+              </button>
+              <span v-else class="tg-none">—</span>
             </td>
           </tr>
         </tbody>
@@ -95,24 +144,60 @@ definePageMeta({ middleware: "admin", layout: "admin" });
 
 const adminStore = useAdminStore();
 const loading = ref(false);
+const pubStatus = ref<any>(null);
+const tgSending = ref<number | null>(null);
+
+const loadPublishingStatus = async () => {
+  const res = await adminStore.getPublishingStatus();
+  if (res.success) pubStatus.value = res.data;
+};
 
 onMounted(async () => {
   loading.value = true;
-  await adminStore.getArticles();
+  await Promise.all([adminStore.getArticles(), loadPublishingStatus()]);
   loading.value = false;
 });
 
 const handleToggleStatus = async (article: any) => {
   const newStatus = article.status === "published" ? "draft" : "published";
+  if (newStatus === "published") {
+    try {
+      await ElMessageBox.confirm(
+        `"${article.title}" hozir chop etilsinmi? Telegram kanalga ham post ketadi.`,
+        "Chop etish",
+        { confirmButtonText: "Ha, chop et", cancelButtonText: "Bekor", type: "info" },
+      );
+    } catch {
+      return;
+    }
+  }
   const res = await adminStore.updateArticle(article.id, { status: newStatus });
   if (res.success) {
-    article.status = newStatus;
+    // Sana, Telegram holati va jadval o'zgaradi — ro'yxatni yangilaymiz
+    await Promise.all([adminStore.getArticles(), loadPublishingStatus()]);
     ElMessage({
       type: "success",
       message:
         newStatus === "published"
           ? "✅ Chop etildi!"
           : "📝 Qoralamaga o'tkazildi!",
+    });
+  }
+};
+
+const handleTelegram = async (article: any) => {
+  tgSending.value = article.id;
+  const res = await adminStore.postToTelegram(article.id);
+  tgSending.value = null;
+  if (res.success && res.data?.sent) {
+    article.telegramPostedAt = new Date().toISOString();
+    ElMessage({ type: "success", message: "✈️ Telegram kanalga yuborildi" });
+  } else {
+    ElMessage({
+      type: "error",
+      message: res.success
+        ? "Telegram ulanmagan (Render sozlamalarini tekshiring)"
+        : res.message,
     });
   }
 };
@@ -156,6 +241,51 @@ const handleDelete = async (id: number, title: string) => {
   overflow: hidden;
 }
 
+.pub-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  &__item {
+    font-size: 0.85rem;
+    padding: 0.5rem 0.9rem;
+    border-radius: $border-radius-sm;
+    background: $bg-secondary;
+    border: 1px solid $border-color;
+    color: $text-secondary;
+
+    &.is-ok {
+      color: #15803d;
+      border-color: rgba(21, 128, 61, 0.3);
+      background: rgba(21, 128, 61, 0.06);
+    }
+
+    &.is-warn {
+      color: #b45309;
+      border-color: rgba(180, 83, 9, 0.3);
+      background: rgba(180, 83, 9, 0.06);
+    }
+  }
+}
+
+.tg-sent {
+  font-size: 0.8rem;
+  color: #15803d;
+  white-space: nowrap;
+}
+
+.tg-none {
+  color: $text-muted;
+}
+
+.tg-btn {
+  width: auto;
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
 .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: $border-radius-pill;
@@ -172,6 +302,15 @@ const handleDelete = async (id: number, title: string) => {
     color: #1a9e5e;
     &:hover {
       background: rgba(#43d98b, 0.2);
+    }
+  }
+
+  &--scheduled {
+    background: rgba($primary, 0.1);
+    color: $primary;
+    white-space: nowrap;
+    &:hover {
+      background: rgba($primary, 0.18);
     }
   }
 

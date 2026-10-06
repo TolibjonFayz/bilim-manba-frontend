@@ -213,6 +213,33 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Maqolani Telegram kanalga (qayta) yuborish
+  async function postToTelegram(id: number) {
+    try {
+      const res = await $fetch<any>(`/admin/articles/${id}/telegram`, {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  // Avtomatik nashr holati: Telegram sozlanganmi, keyingi rejali maqola vaqti
+  async function getPublishingStatus() {
+    try {
+      const res = await $fetch<any>("/admin/publishing/status", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Maqola matnidan AI bilan qisqa tavsif (faqat admin)
   async function generateExcerpt(title: string, text: string) {
     try {
@@ -260,5 +287,7 @@ export const useAdminStore = defineStore("admin", () => {
     uploadContent,
     getArticle,
     generateExcerpt,
+    postToTelegram,
+    getPublishingStatus,
   };
 });
