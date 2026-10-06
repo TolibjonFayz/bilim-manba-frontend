@@ -227,6 +227,35 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Maqolani Instagram'ga (qayta) yuborish: post + story
+  async function postToInstagram(id: number) {
+    try {
+      const res = await $fetch<any>(`/admin/articles/${id}/instagram`, {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  // Instagram kartochkasi (JPEG) — oldindan ko'rish uchun blob URL
+  async function getSocialPreview(id: number, format: "feed" | "story") {
+    try {
+      const blob = await $fetch<Blob>(`/admin/articles/${id}/social-preview`, {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        query: { format },
+        responseType: "blob",
+      });
+      return { success: true, data: URL.createObjectURL(blob) };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Avtomatik nashr holati: Telegram sozlanganmi, keyingi rejali maqola vaqti
   async function getPublishingStatus() {
     try {
@@ -288,6 +317,8 @@ export const useAdminStore = defineStore("admin", () => {
     getArticle,
     generateExcerpt,
     postToTelegram,
+    postToInstagram,
+    getSocialPreview,
     getPublishingStatus,
   };
 });

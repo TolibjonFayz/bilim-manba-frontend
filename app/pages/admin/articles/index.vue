@@ -19,6 +19,16 @@
             : "⚠️ Telegram ulanmagan — postlar kanalga ketmaydi"
         }}
       </span>
+      <span
+        class="pub-status__item"
+        :class="pubStatus.instagramConfigured ? 'is-ok' : 'is-warn'"
+      >
+        {{
+          pubStatus.instagramConfigured
+            ? "📸 Instagram ulangan"
+            : "⚠️ Instagram ulanmagan"
+        }}
+      </span>
       <span class="pub-status__item">
         ⏰
         {{
@@ -41,6 +51,7 @@
             <th>Amal</th>
             <th>Status</th>
             <th>Telegram</th>
+            <th>Instagram</th>
           </tr>
         </thead>
         <tbody>
@@ -122,9 +133,65 @@
               </button>
               <span v-else class="tg-none">—</span>
             </td>
+            <td>
+              <div class="ig-cell">
+                <span
+                  v-if="article.instagramPostedAt && article.instagramStoryPostedAt"
+                  class="tg-sent"
+                  :title="formatDateTime(article.instagramPostedAt)"
+                  >📸 Yuborilgan</span
+                >
+                <button
+                  v-else-if="article.status === 'published'"
+                  class="admin-table__btn tg-btn"
+                  :disabled="igSending === article.id"
+                  :title="
+                    article.instagramPostedAt || article.instagramStoryPostedAt
+                      ? 'Yetishmaganini yuborish (post yoki story)'
+                      : 'Post + story'
+                  "
+                  @click="handleInstagram(article)"
+                >
+                  {{ igSending === article.id ? "⏳" : "📸 Yuborish" }}
+                </button>
+                <button
+                  class="admin-table__btn tg-btn"
+                  title="Instagram rasmini oldindan ko'rish"
+                  @click="openPreview(article)"
+                >
+                  👁
+                </button>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
+
+      <!-- Instagram rasmini oldindan ko'rish -->
+      <div v-if="preview.open" class="ig-preview" @click.self="closePreview">
+        <div class="ig-preview__box">
+          <div class="ig-preview__head">
+            <strong>{{ preview.title }}</strong>
+            <button class="admin-table__btn" @click="closePreview">✕</button>
+          </div>
+          <div v-if="preview.loading" class="ig-preview__loading">
+            ⏳ Rasm tayyorlanmoqda…
+          </div>
+          <div v-else-if="preview.error" class="ig-preview__loading">
+            ⚠️ {{ preview.error }}
+          </div>
+          <div v-else class="ig-preview__imgs">
+            <figure>
+              <img :src="preview.feed" alt="Instagram post" />
+              <figcaption>Post (1080×1350)</figcaption>
+            </figure>
+            <figure>
+              <img :src="preview.story" alt="Instagram story" />
+              <figcaption>Story (1080×1920)</figcaption>
+            </figure>
+          </div>
+        </div>
+      </div>
 
       <div v-if="!adminStore.articles.length && !loading" class="admin-empty">
         <span>📝</span>
@@ -146,6 +213,15 @@ const adminStore = useAdminStore();
 const loading = ref(false);
 const pubStatus = ref<any>(null);
 const tgSending = ref<number | null>(null);
+const igSending = ref<number | null>(null);
+const preview = reactive({
+  open: false,
+  loading: false,
+  error: "",
+  title: "",
+  feed: "",
+  story: "",
+});
 
 const loadPublishingStatus = async () => {
   const res = await adminStore.getPublishingStatus();
@@ -200,6 +276,38 @@ const handleTelegram = async (article: any) => {
         : res.message,
     });
   }
+};
+
+const handleInstagram = async (article: any) => {
+  igSending.value = article.id;
+  const res = await adminStore.postToInstagram(article.id);
+  igSending.value = null;
+  if (res.success) {
+    if (res.data?.post) article.instagramPostedAt = new Date().toISOString();
+    if (res.data?.story) article.instagramStoryPostedAt = new Date().toISOString();
+    ElMessage({ type: "success", message: "📸 Instagram'ga yuborildi (post + story)" });
+  } else {
+    ElMessage({ type: "error", message: res.message, duration: 6000 });
+  }
+};
+
+const openPreview = async (article: any) => {
+  Object.assign(preview, { open: true, loading: true, error: "", title: article.title });
+  const [feed, story] = await Promise.all([
+    adminStore.getSocialPreview(article.id, "feed"),
+    adminStore.getSocialPreview(article.id, "story"),
+  ]);
+  if (feed.success && story.success) {
+    Object.assign(preview, { feed: feed.data, story: story.data, loading: false });
+  } else {
+    Object.assign(preview, { loading: false, error: feed.message || story.message });
+  }
+};
+
+const closePreview = () => {
+  if (preview.feed) URL.revokeObjectURL(preview.feed);
+  if (preview.story) URL.revokeObjectURL(preview.story);
+  Object.assign(preview, { open: false, feed: "", story: "" });
 };
 
 const handleDelete = async (id: number, title: string) => {
@@ -265,6 +373,72 @@ const handleDelete = async (id: number, title: string) => {
       color: #b45309;
       border-color: rgba(180, 83, 9, 0.3);
       background: rgba(180, 83, 9, 0.06);
+    }
+  }
+}
+
+.ig-cell {
+  display: flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.ig-preview {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(15, 15, 30, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+
+  &__box {
+    background: #fff;
+    border-radius: $border-radius;
+    padding: 1.25rem;
+    max-width: 760px;
+    width: 100%;
+    max-height: 92vh;
+    overflow: auto;
+  }
+
+  &__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  &__loading {
+    padding: 3rem 0;
+    text-align: center;
+    color: $text-secondary;
+  }
+
+  &__imgs {
+    display: grid;
+    grid-template-columns: 1fr 0.75fr;
+    gap: 1rem;
+    align-items: start;
+
+    figure {
+      margin: 0;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+      border-radius: $border-radius-sm;
+      border: 1px solid $border-color;
+    }
+
+    figcaption {
+      font-size: 0.75rem;
+      color: $text-muted;
+      margin-top: 0.35rem;
+      text-align: center;
     }
   }
 }
