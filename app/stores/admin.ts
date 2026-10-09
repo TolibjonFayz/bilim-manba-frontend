@@ -269,6 +269,54 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // AI qoralama: mavzu yoki Wikipedia havolasi (bo'sh — kunlik tanlangan maqola)
+  async function generateDraft(topic: string, categoryId?: number | "") {
+    try {
+      const res = await $fetch<any>("/admin/drafts/generate", {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body: { topic, categoryId: categoryId || undefined },
+        timeout: 180000,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return {
+        success: false,
+        message: error?.data?.message || "AI qoralama yozilmadi",
+      };
+    }
+  }
+
+  async function getDraftSettings() {
+    try {
+      const res = await $fetch<any>("/admin/drafts/settings", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  async function updateDraftSettings(body: {
+    daily?: boolean;
+    topics?: string[];
+  }) {
+    try {
+      const res = await $fetch<any>("/admin/drafts/settings", {
+        method: "PUT",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Maqola matnidan AI bilan qisqa tavsif (faqat admin)
   async function generateExcerpt(title: string, text: string) {
     try {
@@ -318,6 +366,9 @@ export const useAdminStore = defineStore("admin", () => {
     generateExcerpt,
     postToTelegram,
     postToInstagram,
+    generateDraft,
+    getDraftSettings,
+    updateDraftSettings,
     getSocialPreview,
     getPublishingStatus,
   };

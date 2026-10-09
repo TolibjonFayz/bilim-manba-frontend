@@ -12,6 +12,14 @@
         ✅ Maqola muvaffaqiyatli yangilandi!
       </div>
       <div v-if="error" class="alert alert--danger">⚠️ {{ error }}</div>
+      <div
+        v-if="form.source === AI_SOURCE && form.status === 'draft'"
+        class="alert alert--info"
+      >
+        🤖 <strong>AI qoralama.</strong> Matnni o'qib chiqing va faktlarni
+        tekshiring (pastdagi "👁 Ko'rinishi"), muqova rasm qo'ying, so'ng chop
+        eting yoki chop etish vaqtini belgilang.
+      </div>
 
       <div class="admin-form">
         <div class="form-group">
@@ -58,7 +66,9 @@
             </button>
             <span
               class="excerpt-tools__count"
-              :class="{ 'excerpt-tools__count--warn': form.excerpt.length > 170 }"
+              :class="{
+                'excerpt-tools__count--warn': form.excerpt.length > 170,
+              }"
               >{{ form.excerpt.length }}/170</span
             >
           </div>
@@ -113,6 +123,19 @@
           >
             {{ contentUploading ? "⏳ Yuklanmoqda..." : "☁️ R2 ga yuklash" }}
           </button>
+          <button
+            type="button"
+            class="btn btn--outline upload-btn"
+            :disabled="!contentText.trim()"
+            @click="showPreview = !showPreview"
+          >
+            {{ showPreview ? "✕ Ko'rinishni yopish" : "👁 Ko'rinishi" }}
+          </button>
+          <div
+            v-if="showPreview"
+            class="content-preview article-content"
+            v-html="contentText"
+          />
           <div v-if="form.content" class="upload-success">
             ✅ Yuklandi:
             <a :href="form.content" target="_blank">{{ form.content }}</a>
@@ -193,7 +216,8 @@
           <label
             >Chop etish vaqti
             <span class="form-group__note"
-              >(Toshkent vaqti. Bo'sh qoldirsangiz — qoralama bo'lib qoladi)</span
+              >(Toshkent vaqti. Bo'sh qoldirsangiz — qoralama bo'lib
+              qoladi)</span
             ></label
           >
           <div class="form-input-wrap">
@@ -241,7 +265,12 @@ const form = reactive({
 });
 
 const contentText = ref("");
+// R2'dagi matn — o'zgarmagan bo'lsa saqlashda qayta yuklanmaydi
+const loadedText = ref("");
+const showPreview = ref(false);
 const scheduleLocal = ref("");
+// Backend'dagi AI qoralama belgisi (DraftsService AI_SOURCE)
+const AI_SOURCE = "Wikipedia (Bilim Manba AI)";
 
 // Qisqa tavsifni AI yozadi: matn textarea'dan yoki yuklangan R2 fayldan olinadi
 const excerptLoading = ref(false);
@@ -254,7 +283,10 @@ const handleGenerateExcerpt = async () => {
       text = c?.message ?? "";
     } catch {}
   }
-  text = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+  text = text
+    .replace(/<[^>]*>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
   if (text.length < 50) {
     error.value = "Avval maqola matnini kiriting";
     return;
@@ -292,6 +324,16 @@ onMounted(async () => {
     form.readTime = article.readTime ?? 5;
     form.status = article.status ?? "published";
     scheduleLocal.value = isoToTashkentLocal(article.scheduledAt);
+    // Matnni tahrirlash/tekshirish uchun R2'dan yuklaymiz
+    if (form.content) {
+      try {
+        const c = await $fetch<any>(form.content);
+        contentText.value = loadedText.value = c?.message ?? "";
+      } catch {}
+    }
+    if (form.source === AI_SOURCE && form.status === "draft") {
+      showPreview.value = true;
+    }
   } else {
     error.value = "Maqola topilmadi";
   }
@@ -368,6 +410,16 @@ const handleSubmit = async () => {
   }
 
   loading.value = true;
+
+  // Matn o'zgargan bo'lsa — avval R2'ga yuklanadi (aks holda tahrir yo'qolardi)
+  if (contentText.value.trim() && contentText.value !== loadedText.value) {
+    await handleContentUpload();
+    if (error.value) {
+      loading.value = false;
+      return;
+    }
+    loadedText.value = contentText.value;
+  }
 
   const res = await adminStore.updateArticle(+route.params.id, {
     ...form,
@@ -569,6 +621,59 @@ const handleSubmit = async () => {
     background: rgba($danger, 0.08);
     border: 1px solid rgba($danger, 0.2);
     color: $danger;
+  }
+
+  &--info {
+    background: rgba($primary, 0.06);
+    border: 1px solid rgba($primary, 0.25);
+    color: $text-primary;
+    line-height: 1.5;
+  }
+}
+
+// Saqlanadigan HTML qanday ko'rinishini oldindan ko'rish
+.content-preview {
+  margin-top: 1rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid $border-color;
+  border-radius: $border-radius-sm;
+  background: #fff;
+  max-height: 70vh;
+  overflow: auto;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: $text-primary;
+
+  :deep(h2) {
+    font-size: 1.35rem;
+    font-weight: 800;
+    margin: 1.5rem 0 0.6rem;
+  }
+
+  :deep(h3) {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 1.2rem 0 0.5rem;
+  }
+
+  :deep(p) {
+    margin: 0 0 0.9rem;
+  }
+
+  :deep(ul),
+  :deep(ol) {
+    margin: 0 0 0.9rem 1.4rem;
+  }
+
+  :deep(blockquote) {
+    border-left: 3px solid $primary;
+    padding-left: 1rem;
+    color: $text-secondary;
+    margin: 1rem 0;
+  }
+
+  :deep(a) {
+    color: $primary;
   }
 }
 </style>
