@@ -13,7 +13,7 @@
       </div>
       <div v-if="error" class="alert alert--danger">⚠️ {{ error }}</div>
       <div
-        v-if="form.source === AI_SOURCE && form.status === 'draft'"
+        v-if="isAiSource(form.source) && form.status === 'draft'"
         class="alert alert--info"
       >
         🤖 <strong>AI qoralama.</strong> Matnni o'qib chiqing va faktlarni
@@ -269,8 +269,8 @@ const contentText = ref("");
 const loadedText = ref("");
 const showPreview = ref(false);
 const scheduleLocal = ref("");
-// Backend'dagi AI qoralama belgisi (DraftsService AI_SOURCE)
-const AI_SOURCE = "Wikipedia (Bilim Manba AI)";
+// Backend'dagi AI qoralama belgisi (DraftsService AI_SOURCE; eski: "Wikipedia (Bilim Manba AI)")
+const isAiSource = (src: string) => /Bilim Manba AI/.test(src ?? "");
 
 // Qisqa tavsifni AI yozadi: matn textarea'dan yoki yuklangan R2 fayldan olinadi
 const excerptLoading = ref(false);
@@ -331,7 +331,7 @@ onMounted(async () => {
         contentText.value = loadedText.value = c?.message ?? "";
       } catch {}
     }
-    if (form.source === AI_SOURCE && form.status === "draft") {
+    if (isAiSource(form.source) && form.status === "draft") {
       showPreview.value = true;
     }
   } else {

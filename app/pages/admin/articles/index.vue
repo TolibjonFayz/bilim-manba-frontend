@@ -218,7 +218,8 @@
           </div>
 
           <p class="ai-box__hint">
-            AI Wikipedia'dagi faktlar asosida o'zbekcha maqola yozadi va
+            AI bir nechta erkin manbadan — Wikipedia maqolalari va arXiv'dagi
+            yangi ilmiy ishlardan — faktlarni yig'ib, o'zbekcha maqola yozadi va
             <strong>qoralama</strong> qilib saqlaydi. Siz o'qib chiqasiz, muqova
             qo'yasiz, keyin chop etasiz yoki vaqtini belgilaysiz.
           </p>
@@ -291,6 +292,7 @@
             <div class="ai-box__meta">
               <span>Oxirgi: {{ aiSettings.lastRun || "—" }}</span>
               <span>Ko'rib chiqilmagan: {{ aiSettings.pending }}</span>
+              <span v-if="aiSettings.model">Model: {{ aiSettings.model }}</span>
             </div>
             <div v-if="aiSettings.lastError" class="ai-box__error">
               ⚠️ {{ aiSettings.lastError }}
