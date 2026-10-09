@@ -45,50 +45,36 @@
           <tr>
             <th>Sarlavha</th>
             <th>Kategoriya</th>
-            <th>Ko'rishlar</th>
-            <th>Like</th>
+            <th>Statistika</th>
             <th>Sana</th>
-            <th>Amal</th>
             <th>Status</th>
-            <th>Telegram</th>
-            <th>Instagram</th>
+            <th>Tarmoqlar</th>
+            <th>Amal</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="article in adminStore.articles" :key="article.id">
-            <td>
-              <div class="admin-table__title">{{ article.title }}</div>
-              <div class="admin-table__slug">{{ article.slug }}</div>
+            <td class="col-title">
+              <div class="admin-table__title" :title="article.title">
+                {{ article.title }}
+              </div>
+              <div class="admin-table__slug" :title="article.slug">
+                {{ article.slug }}
+              </div>
             </td>
             <td>
               <span class="admin-table__badge">
                 {{ article.category?.name ?? "—" }}
               </span>
             </td>
-            <td>👁 {{ article.viewCount }}</td>
-            <td>❤️ {{ article.likeCount }}</td>
-            <td>
-              {{
-                article.createdAt
-                  ? formatDate(article.createdAt)
-                  : "—"
-              }}
-            </td>
-            <td>
-              <div class="admin-table__actions">
-                <NuxtLink
-                  :to="`/admin/articles/${article.id}/edit`"
-                  class="admin-table__btn admin-table__btn--edit"
-                >
-                  ✏️
-                </NuxtLink>
-                <button
-                  class="admin-table__btn admin-table__btn--delete"
-                  @click="handleDelete(article.id, article.title)"
-                >
-                  🗑️
-                </button>
+            <td class="nowrap">
+              <div class="stats">
+                <span title="Ko'rishlar">👁 {{ article.viewCount }}</span>
+                <span title="Like">❤️ {{ article.likeCount }}</span>
               </div>
+            </td>
+            <td class="nowrap">
+              {{ article.createdAt ? formatDate(article.createdAt) : "—" }}
             </td>
             <td>
               <button
@@ -117,49 +103,77 @@
               </button>
             </td>
             <td>
-              <span
-                v-if="article.telegramPostedAt"
-                class="tg-sent"
-                :title="formatDateTime(article.telegramPostedAt)"
-                >✈️ Yuborilgan</span
-              >
-              <button
-                v-else-if="article.status === 'published'"
-                class="admin-table__btn tg-btn"
-                :disabled="tgSending === article.id"
-                @click="handleTelegram(article)"
-              >
-                {{ tgSending === article.id ? "⏳" : "✈️ Yuborish" }}
-              </button>
-              <span v-else class="tg-none">—</span>
+              <div class="social">
+                <!-- Telegram -->
+                <div class="social__row">
+                  <span
+                    v-if="article.telegramPostedAt"
+                    class="social__done"
+                    :title="`Telegram: ${formatDateTime(article.telegramPostedAt)}`"
+                    >✈️ Telegram ✓</span
+                  >
+                  <button
+                    v-else-if="article.status === 'published'"
+                    class="social__btn"
+                    :disabled="tgSending === article.id"
+                    title="Telegram kanalga yuborish"
+                    @click="handleTelegram(article)"
+                  >
+                    {{ tgSending === article.id ? "⏳" : "✈️ Telegram'ga" }}
+                  </button>
+                  <span v-else class="social__none">✈️ —</span>
+                </div>
+                <!-- Instagram -->
+                <div class="social__row">
+                  <span
+                    v-if="
+                      article.instagramPostedAt &&
+                      article.instagramStoryPostedAt
+                    "
+                    class="social__done"
+                    :title="`Instagram: ${formatDateTime(article.instagramPostedAt)}`"
+                    >📸 Instagram ✓</span
+                  >
+                  <button
+                    v-else-if="article.status === 'published'"
+                    class="social__btn"
+                    :disabled="igSending === article.id"
+                    :title="
+                      article.instagramPostedAt ||
+                      article.instagramStoryPostedAt
+                        ? 'Yetishmaganini yuborish (post yoki story)'
+                        : 'Post + story'
+                    "
+                    @click="handleInstagram(article)"
+                  >
+                    {{ igSending === article.id ? "⏳" : "📸 Instagram'ga" }}
+                  </button>
+                  <span v-else class="social__none">📸 —</span>
+                  <button
+                    class="social__eye"
+                    title="Instagram rasmini oldindan ko'rish"
+                    @click="openPreview(article)"
+                  >
+                    👁
+                  </button>
+                </div>
+              </div>
             </td>
             <td>
-              <div class="ig-cell">
-                <span
-                  v-if="article.instagramPostedAt && article.instagramStoryPostedAt"
-                  class="tg-sent"
-                  :title="formatDateTime(article.instagramPostedAt)"
-                  >📸 Yuborilgan</span
+              <div class="admin-table__actions">
+                <NuxtLink
+                  :to="`/admin/articles/${article.id}/edit`"
+                  class="admin-table__btn admin-table__btn--edit"
+                  title="Tahrirlash"
                 >
+                  ✏️
+                </NuxtLink>
                 <button
-                  v-else-if="article.status === 'published'"
-                  class="admin-table__btn tg-btn"
-                  :disabled="igSending === article.id"
-                  :title="
-                    article.instagramPostedAt || article.instagramStoryPostedAt
-                      ? 'Yetishmaganini yuborish (post yoki story)'
-                      : 'Post + story'
-                  "
-                  @click="handleInstagram(article)"
+                  class="admin-table__btn admin-table__btn--delete"
+                  title="O'chirish"
+                  @click="handleDelete(article.id, article.title)"
                 >
-                  {{ igSending === article.id ? "⏳" : "📸 Yuborish" }}
-                </button>
-                <button
-                  class="admin-table__btn tg-btn"
-                  title="Instagram rasmini oldindan ko'rish"
-                  @click="openPreview(article)"
-                >
-                  👁
+                  🗑️
                 </button>
               </div>
             </td>
@@ -241,7 +255,11 @@ const handleToggleStatus = async (article: any) => {
       await ElMessageBox.confirm(
         `"${article.title}" hozir chop etilsinmi? Telegram kanalga ham post ketadi.`,
         "Chop etish",
-        { confirmButtonText: "Ha, chop et", cancelButtonText: "Bekor", type: "info" },
+        {
+          confirmButtonText: "Ha, chop et",
+          cancelButtonText: "Bekor",
+          type: "info",
+        },
       );
     } catch {
       return;
@@ -284,23 +302,39 @@ const handleInstagram = async (article: any) => {
   igSending.value = null;
   if (res.success) {
     if (res.data?.post) article.instagramPostedAt = new Date().toISOString();
-    if (res.data?.story) article.instagramStoryPostedAt = new Date().toISOString();
-    ElMessage({ type: "success", message: "📸 Instagram'ga yuborildi (post + story)" });
+    if (res.data?.story)
+      article.instagramStoryPostedAt = new Date().toISOString();
+    ElMessage({
+      type: "success",
+      message: "📸 Instagram'ga yuborildi (post + story)",
+    });
   } else {
     ElMessage({ type: "error", message: res.message, duration: 6000 });
   }
 };
 
 const openPreview = async (article: any) => {
-  Object.assign(preview, { open: true, loading: true, error: "", title: article.title });
+  Object.assign(preview, {
+    open: true,
+    loading: true,
+    error: "",
+    title: article.title,
+  });
   const [feed, story] = await Promise.all([
     adminStore.getSocialPreview(article.id, "feed"),
     adminStore.getSocialPreview(article.id, "story"),
   ]);
   if (feed.success && story.success) {
-    Object.assign(preview, { feed: feed.data, story: story.data, loading: false });
+    Object.assign(preview, {
+      feed: feed.data,
+      story: story.data,
+      loading: false,
+    });
   } else {
-    Object.assign(preview, { loading: false, error: feed.message || story.message });
+    Object.assign(preview, {
+      loading: false,
+      error: feed.message || story.message,
+    });
   }
 };
 
@@ -346,7 +380,7 @@ const handleDelete = async (id: number, title: string) => {
   background: #fff;
   border: 1px solid $border-color;
   border-radius: $border-radius;
-  overflow: hidden;
+  overflow-x: auto;
 }
 
 .pub-status {
@@ -377,10 +411,72 @@ const handleDelete = async (id: number, title: string) => {
   }
 }
 
-.ig-cell {
+.nowrap {
+  white-space: nowrap;
+}
+
+.stats {
   display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  font-size: 0.8rem;
+  color: $text-secondary;
+}
+
+.social {
+  display: flex;
+  flex-direction: column;
   gap: 0.35rem;
-  align-items: center;
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    white-space: nowrap;
+  }
+
+  &__done {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #15803d;
+  }
+
+  &__none {
+    font-size: 0.78rem;
+    color: $text-muted;
+  }
+
+  &__btn,
+  &__eye {
+    height: 26px;
+    border: 1px solid rgba($primary, 0.25);
+    background: rgba($primary, 0.06);
+    color: $primary;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    font-family: $font-primary;
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover:not(:disabled) {
+      background: rgba($primary, 0.14);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: wait;
+    }
+  }
+
+  &__btn {
+    padding: 0 0.55rem;
+  }
+
+  &__eye {
+    width: 26px;
+    padding: 0;
+  }
 }
 
 .ig-preview {
@@ -443,23 +539,6 @@ const handleDelete = async (id: number, title: string) => {
   }
 }
 
-.tg-sent {
-  font-size: 0.8rem;
-  color: #15803d;
-  white-space: nowrap;
-}
-
-.tg-none {
-  color: $text-muted;
-}
-
-.tg-btn {
-  width: auto;
-  padding: 0 0.6rem;
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
 .status-badge {
   padding: 0.25rem 0.75rem;
   border-radius: $border-radius-pill;
@@ -503,8 +582,9 @@ const handleDelete = async (id: number, title: string) => {
 
   th {
     background: $bg-secondary;
-    padding: 0.875rem 1rem;
+    padding: 0.875rem 0.7rem;
     text-align: left;
+    white-space: nowrap;
     font-size: 0.8rem;
     font-weight: 700;
     color: $text-muted;
@@ -514,7 +594,7 @@ const handleDelete = async (id: number, title: string) => {
   }
 
   td {
-    padding: 1rem;
+    padding: 0.85rem 0.7rem;
     border-bottom: 1px solid $border-color;
     font-size: 0.875rem;
     color: $text-primary;
@@ -532,13 +612,22 @@ const handleDelete = async (id: number, title: string) => {
     background: $bg-secondary;
   }
 
-  &__title {
-    font-weight: 600;
-    margin-bottom: 0.2rem;
-    max-width: 300px;
+  // Sarlavha ekran eniga qarab qisqaradi, qolgan ustunlar sig'ishi uchun
+  .col-title {
+    min-width: 180px;
+    max-width: clamp(180px, 18vw, 380px);
+  }
+
+  &__title,
+  &__slug {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  &__title {
+    font-weight: 600;
+    margin-bottom: 0.2rem;
   }
 
   &__slug {
@@ -553,6 +642,7 @@ const handleDelete = async (id: number, title: string) => {
     border-radius: $border-radius-pill;
     font-size: 0.75rem;
     font-weight: 600;
+    white-space: nowrap;
   }
 
   &__actions {
