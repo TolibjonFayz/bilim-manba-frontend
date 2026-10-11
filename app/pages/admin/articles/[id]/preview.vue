@@ -1,0 +1,483 @@
+<template>
+  <div class="admin-preview">
+    <!-- Amallar paneli -->
+    <div class="preview-bar">
+      <NuxtLink to="/admin/articles" class="btn btn--outline"
+        >← Ro'yxat</NuxtLink
+      >
+
+      <div v-if="article" class="preview-bar__actions">
+        <span class="preview-bar__status" :class="`is-${statusKind}`">
+          {{ statusLabel }}
+        </span>
+        <NuxtLink
+          :to="`/admin/articles/${article.id}/edit`"
+          class="btn btn--outline"
+          >✏️ Tahrirlash</NuxtLink
+        >
+        <template v-if="article.status === 'draft'">
+          <button
+            class="btn btn--outline"
+            :disabled="busy"
+            @click="scheduleOpen = !scheduleOpen"
+          >
+            ⏰ Rejalashtirish
+          </button>
+          <button
+            class="btn btn--primary"
+            :disabled="busy"
+            @click="handlePublish"
+          >
+            ✅ Hozir chop etish
+          </button>
+          <button
+            class="btn btn--danger-outline"
+            :disabled="busy"
+            @click="handleDelete"
+          >
+            🗑
+          </button>
+        </template>
+        <a
+          v-else
+          :href="`/articles/${article.slug}`"
+          target="_blank"
+          class="btn btn--primary"
+          >🌐 Saytda ochish</a
+        >
+      </div>
+    </div>
+
+    <div v-if="scheduleOpen && article" class="schedule-box">
+      <label for="schedule-at">Chop etish vaqti (Toshkent)</label>
+      <input id="schedule-at" v-model="scheduleLocal" type="datetime-local" />
+      <button
+        class="btn btn--primary"
+        :disabled="busy || !scheduleLocal"
+        @click="handleSchedule"
+      >
+        💾 Saqlash
+      </button>
+      <button
+        v-if="article.scheduledAt"
+        class="btn btn--outline"
+        :disabled="busy"
+        @click="handleUnschedule"
+      >
+        Vaqtni olib tashlash
+      </button>
+    </div>
+
+    <div v-if="loading" class="preview-loading">⏳ Yuklanmoqda…</div>
+    <div v-else-if="error" class="alert alert--danger">⚠️ {{ error }}</div>
+
+    <template v-else-if="article">
+      <div v-if="isAi && article.status === 'draft'" class="alert alert--info">
+        🤖 <strong>AI qoralama.</strong> O'qib chiqing: raqamlar, sanalar va
+        ismlarni tekshiring. Kerak bo'lsa "Tahrirlash"da tuzating, so'ng chop
+        eting yoki vaqtini belgilang.
+      </div>
+      <div v-if="!article.coverImage" class="alert alert--warn">
+        🖼 Muqova rasmi yo'q — "Tahrirlash"da qo'shing (Telegram va Instagram
+        postlari muqova bilan chiroyliroq chiqadi).
+      </div>
+
+      <!-- Saytdagidek ko'rinish -->
+      <article class="preview-article">
+        <img
+          v-if="article.coverImage"
+          :src="cldImg(article.coverImage, 1200)"
+          :alt="article.title"
+          class="preview-article__cover"
+        />
+        <div class="preview-article__meta">
+          <span v-if="article.category?.name" class="preview-article__badge">{{
+            article.category.name
+          }}</span>
+          <span>📖 {{ readTime }} daqiqa</span>
+          <span v-if="article.source">✍️ {{ article.source }}</span>
+        </div>
+        <h1 class="preview-article__title">{{ article.title }}</h1>
+        <p v-if="article.excerpt" class="preview-article__excerpt">
+          {{ article.excerpt }}
+        </p>
+        <div class="article-content" v-html="content" />
+        <div v-if="tags.length" class="preview-article__tags">
+          <span v-for="t in tags" :key="t">#{{ t }}</span>
+        </div>
+      </article>
+    </template>
+  </div>
+</template>
+
+<script setup lang="ts">
+import { ElMessage, ElMessageBox } from "element-plus";
+
+definePageMeta({ middleware: "admin", layout: "admin" });
+
+const route = useRoute();
+const adminStore = useAdminStore();
+
+const article = ref<any>(null);
+const content = ref("");
+const loading = ref(true);
+const error = ref("");
+const busy = ref(false);
+const scheduleOpen = ref(false);
+const scheduleLocal = ref("");
+
+const isAi = computed(() => /Bilim Manba AI/.test(article.value?.source ?? ""));
+const readTime = computed(() => calcReadTime(content.value));
+const tags = computed(() =>
+  String(article.value?.tags ?? "")
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean),
+);
+const statusKind = computed(() =>
+  article.value?.status === "published"
+    ? "published"
+    : article.value?.scheduledAt
+      ? "scheduled"
+      : "draft",
+);
+const statusLabel = computed(() =>
+  statusKind.value === "published"
+    ? "✅ Chop etilgan"
+    : statusKind.value === "scheduled"
+      ? `⏰ ${formatDateTime(article.value.scheduledAt)}`
+      : "📝 Qoralama",
+);
+
+const load = async () => {
+  loading.value = true;
+  error.value = "";
+  const res = await adminStore.getArticle(+route.params.id);
+  if (!res.success || !res.data) {
+    error.value = "Maqola topilmadi";
+    loading.value = false;
+    return;
+  }
+  article.value = res.data;
+  scheduleLocal.value = isoToTashkentLocal(res.data.scheduledAt);
+  if (res.data.content) {
+    try {
+      const c = await $fetch<any>(res.data.content);
+      content.value = c?.message ?? "";
+    } catch {
+      error.value = "Maqola matnini yuklab bo'lmadi";
+    }
+  }
+  loading.value = false;
+};
+
+onMounted(load);
+
+const handlePublish = async () => {
+  const a = article.value;
+  try {
+    await ElMessageBox.confirm(
+      `"${a.title}" hozir chop etilsinmi? Telegram va Instagram'ga ham post ketadi.` +
+        (a.coverImage ? "" : "\n\n⚠️ Muqova rasmi yo'q."),
+      "Chop etish",
+      {
+        confirmButtonText: "Ha, chop et",
+        cancelButtonText: "Bekor",
+        type: "info",
+      },
+    );
+  } catch {
+    return;
+  }
+  busy.value = true;
+  const res = await adminStore.updateArticle(a.id, { status: "published" });
+  busy.value = false;
+  if (res.success) {
+    ElMessage({ type: "success", message: "✅ Chop etildi!" });
+    await load();
+  } else {
+    ElMessage({ type: "error", message: res.message });
+  }
+};
+
+const handleSchedule = async () => {
+  busy.value = true;
+  const res = await adminStore.updateArticle(article.value.id, {
+    scheduledAt: tashkentLocalToIso(scheduleLocal.value),
+  });
+  busy.value = false;
+  if (res.success) {
+    scheduleOpen.value = false;
+    ElMessage({
+      type: "success",
+      message: `⏰ ${formatDateTime(res.data?.scheduledAt)} da chop etiladi`,
+    });
+    await load();
+  } else {
+    ElMessage({ type: "error", message: res.message });
+  }
+};
+
+const handleUnschedule = async () => {
+  busy.value = true;
+  const res = await adminStore.updateArticle(article.value.id, {
+    scheduledAt: null,
+  });
+  busy.value = false;
+  if (res.success) {
+    scheduleLocal.value = "";
+    ElMessage({
+      type: "success",
+      message: "Vaqt olib tashlandi — qoralama bo'lib qoldi",
+    });
+    await load();
+  }
+};
+
+const handleDelete = async () => {
+  try {
+    await ElMessageBox.confirm(
+      `"${article.value.title}" qoralamasi o'chirilsinmi?`,
+      "O'chirish",
+      {
+        confirmButtonText: "Ha, o'chir",
+        cancelButtonText: "Bekor",
+        type: "warning",
+      },
+    );
+  } catch {
+    return;
+  }
+  busy.value = true;
+  const res = await adminStore.deleteArticle(article.value.id);
+  busy.value = false;
+  if (res.success) {
+    ElMessage({ type: "success", message: "Qoralama o'chirildi" });
+    await navigateTo("/admin/articles");
+  }
+};
+</script>
+
+<style lang="scss" scoped>
+.preview-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: $bg-secondary;
+  padding: 0.5rem 0;
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  &__status {
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.3rem 0.75rem;
+    border-radius: $border-radius-pill;
+
+    &.is-published {
+      background: rgba(#43d98b, 0.12);
+      color: #1a9e5e;
+    }
+    &.is-scheduled {
+      background: rgba($primary, 0.1);
+      color: $primary;
+    }
+    &.is-draft {
+      background: rgba($text-muted, 0.12);
+      color: $text-muted;
+    }
+  }
+}
+
+.btn--danger-outline {
+  border: 1px solid rgba($danger, 0.35);
+  color: $danger;
+  background: #fff;
+
+  &:hover:not(:disabled) {
+    background: rgba($danger, 0.08);
+  }
+}
+
+.schedule-box {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.85rem;
+
+  input {
+    padding: 0.45rem 0.6rem;
+    border: 1px solid $border-color;
+    border-radius: $border-radius-sm;
+    font-family: $font-primary;
+  }
+}
+
+.preview-loading {
+  padding: 4rem;
+  text-align: center;
+  color: $text-secondary;
+}
+
+.alert {
+  padding: 0.75rem 1rem;
+  border-radius: $border-radius-sm;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+
+  &--danger {
+    background: rgba($danger, 0.08);
+    border: 1px solid rgba($danger, 0.2);
+    color: $danger;
+  }
+
+  &--info {
+    background: rgba($primary, 0.06);
+    border: 1px solid rgba($primary, 0.25);
+    color: $text-primary;
+  }
+
+  &--warn {
+    background: rgba(180, 83, 9, 0.06);
+    border: 1px solid rgba(180, 83, 9, 0.3);
+    color: #b45309;
+  }
+}
+
+.preview-article {
+  max-width: 780px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid $border-color;
+  border-radius: $border-radius;
+  padding: 2rem;
+
+  @media (max-width: 640px) {
+    padding: 1.1rem;
+  }
+
+  &__cover {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: $border-radius-sm;
+    margin-bottom: 1.25rem;
+    display: block;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    font-size: 0.8rem;
+    color: $text-muted;
+    margin-bottom: 0.75rem;
+  }
+
+  &__badge {
+    background: rgba($primary, 0.1);
+    color: $primary;
+    padding: 0.2rem 0.6rem;
+    border-radius: $border-radius-pill;
+    font-weight: 600;
+  }
+
+  &__title {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: 0.75rem;
+  }
+
+  &__excerpt {
+    font-size: 1.05rem;
+    color: $text-secondary;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.25rem;
+    border-bottom: 1px solid $border-color;
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    font-size: 0.8rem;
+    color: $primary;
+  }
+}
+
+// Saytdagi maqola sahifasi bilan bir xil matn uslubi
+.article-content {
+  font-size: 1rem;
+  line-height: 1.85;
+  color: $text-primary;
+
+  :deep(p) {
+    margin-bottom: 1.25rem;
+  }
+
+  :deep(h2) {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 2rem 0 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid $primary;
+  }
+
+  :deep(h3) {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 1.75rem 0 0.75rem;
+  }
+
+  :deep(blockquote) {
+    border-left: 4px solid $primary;
+    background: $primary-light;
+    padding: 1rem 1.25rem;
+    border-radius: 0 $border-radius-sm $border-radius-sm 0;
+    margin: 1.5rem 0;
+    font-style: italic;
+    color: $text-secondary;
+  }
+
+  :deep(ol),
+  :deep(ul) {
+    padding-left: 1.5rem;
+    margin-bottom: 1.25rem;
+
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.7;
+    }
+  }
+
+  :deep(li::marker) {
+    color: $primary;
+  }
+
+  :deep(a) {
+    color: $primary;
+  }
+}
+</style>

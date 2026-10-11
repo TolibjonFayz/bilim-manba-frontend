@@ -277,7 +277,6 @@ export const useAdminStore = defineStore("admin", () => {
         baseURL: useRuntimeConfig().public.apiBase,
         headers: getAuthHeaders(),
         body: { topic, categoryId: categoryId || undefined },
-        timeout: 180000,
       });
       return { success: true, data: res };
     } catch (error: any) {
@@ -285,6 +284,19 @@ export const useAdminStore = defineStore("admin", () => {
         success: false,
         message: error?.data?.message || "AI qoralama yozilmadi",
       };
+    }
+  }
+
+  // Fonda yozilayotgan AI qoralama holati
+  async function getDraftJob() {
+    try {
+      const res = await $fetch<any>("/admin/drafts/job", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res?.job ?? null };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
     }
   }
 
@@ -367,6 +379,7 @@ export const useAdminStore = defineStore("admin", () => {
     postToTelegram,
     postToInstagram,
     generateDraft,
+    getDraftJob,
     getDraftSettings,
     updateDraftSettings,
     getSocialPreview,

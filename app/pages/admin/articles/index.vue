@@ -42,14 +42,19 @@
         @click="openAi"
       >
         🤖
-        {{
-          aiSettings.daily
-            ? `Kunlik AI qoralama: ${String(aiSettings.dailyHour).padStart(2, "0")}:00`
-            : "Kunlik AI qoralama o'chiq"
-        }}
-        <template v-if="aiSettings.pending">
-          · {{ aiSettings.pending }} ta ko'rib chiqilmagan</template
+        <template v-if="ai.generating"
+          >Qoralama yozilmoqda… {{ ai.elapsed }} s</template
         >
+        <template v-else>
+          {{
+            aiSettings.daily
+              ? `Kunlik AI qoralama: ${String(aiSettings.dailyHour).padStart(2, "0")}:00`
+              : "Kunlik AI qoralama o'chiq"
+          }}
+          <template v-if="aiSettings.pending">
+            · {{ aiSettings.pending }} ta ko'rib chiqilmagan</template
+          >
+        </template>
       </span>
       <span class="pub-status__item">
         ⏰
@@ -77,9 +82,13 @@
         <tbody>
           <tr v-for="article in adminStore.articles" :key="article.id">
             <td class="col-title">
-              <div class="admin-table__title" :title="article.title">
+              <NuxtLink
+                :to="`/admin/articles/${article.id}/preview`"
+                class="admin-table__title"
+                :title="`Ko'rish: ${article.title}`"
+              >
                 {{ article.title }}
-              </div>
+              </NuxtLink>
               <div class="admin-table__slug" :title="article.slug">
                 {{ article.slug }}
               </div>
@@ -262,10 +271,14 @@
           >
             {{
               ai.generating
-                ? "⏳ AI yozmoqda… (odatda 20–60 soniya)"
+                ? `⏳ AI yozmoqda… ${ai.elapsed} s (odatda 1–2 daqiqa)`
                 : "✍️ Qoralama yozish"
             }}
           </button>
+          <small v-if="ai.generating" class="ai-box__small">
+            Manbalar yig'ilyapti, muallif yozadi, muharrir tekshiradi, muqova
+            qidiriladi. Oynani yopsangiz ham yozish davom etadi.
+          </small>
 
           <div v-if="aiSettings" class="ai-box__daily">
             <strong>Kunlik qoralama</strong>
@@ -379,6 +392,7 @@ const ai = reactive({
   daily: true,
   topicsText: "",
   saving: false,
+  elapsed: 0,
 });
 
 const loadAiSettings = async () => {
@@ -397,26 +411,67 @@ const openAi = async () => {
 };
 
 const closeAi = () => {
-  if (!ai.generating) ai.open = false;
+  ai.open = false;
+};
+
+// Qoralama serverda fonda yoziladi (1–2 daqiqa) — holatini kuzatib turamiz
+let pollTimer: ReturnType<typeof setTimeout> | null = null;
+const stopPolling = () => {
+  if (pollTimer) clearTimeout(pollTimer);
+  pollTimer = null;
+};
+
+const pollJob = async (startedAt: number) => {
+  ai.elapsed = Math.round((Date.now() - startedAt) / 1000);
+  const res = await adminStore.getDraftJob();
+  const job = res.success ? res.data : null;
+  if (job?.state === "running" || !res.success) {
+    // Server vaqtincha javob bermasa ham kutishda davom etamiz (10 daqiqagacha)
+    if (ai.elapsed < 600) {
+      pollTimer = setTimeout(() => pollJob(startedAt), 3000);
+      return;
+    }
+  }
+  ai.generating = false;
+  stopPolling();
+  if (job?.state === "done") {
+    ai.topic = "";
+    ElMessage({ type: "success", message: `✍️ Qoralama tayyor: ${job.title}` });
+    if (ai.open) {
+      ai.open = false;
+      await navigateTo(`/admin/articles/${job.articleId}/preview`);
+    } else {
+      await Promise.all([adminStore.getArticles(), loadAiSettings()]);
+    }
+  } else {
+    ElMessage({
+      type: "error",
+      message: job?.error || "AI qoralama yozilmadi",
+      duration: 10000,
+    });
+  }
+};
+
+const watchJob = (startedAt: number) => {
+  ai.generating = true;
+  stopPolling();
+  pollTimer = setTimeout(() => pollJob(startedAt), 3000);
 };
 
 const handleGenerate = async () => {
   if (ai.generating) return;
   ai.generating = true;
+  ai.elapsed = 0;
   const res = await adminStore.generateDraft(ai.topic.trim(), ai.categoryId);
-  ai.generating = false;
   if (res.success) {
-    ElMessage({
-      type: "success",
-      message: `✍️ Qoralama tayyor: ${res.data.title}`,
-    });
-    ai.open = false;
-    ai.topic = "";
-    await navigateTo(`/admin/articles/${res.data.id}/edit`);
+    watchJob(Date.now());
   } else {
+    ai.generating = false;
     ElMessage({ type: "error", message: res.message, duration: 8000 });
   }
 };
+
+onBeforeUnmount(stopPolling);
 
 const handleSaveAi = async () => {
   ai.saving = true;
@@ -442,6 +497,11 @@ onMounted(async () => {
     loadAiSettings(),
   ]);
   loading.value = false;
+  // Sahifa yangilangan paytda qoralama yozilayotgan bo'lsa — kuzatishni davom ettiramiz
+  const job = await adminStore.getDraftJob();
+  if (job.success && job.data?.state === "running") {
+    watchJob(new Date(job.data.startedAt).getTime());
+  }
 });
 
 const handleToggleStatus = async (article: any) => {
@@ -922,8 +982,16 @@ const handleDelete = async (id: number, title: string) => {
   }
 
   &__title {
+    display: block;
     font-weight: 600;
     margin-bottom: 0.2rem;
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: $primary;
+      text-decoration: underline;
+    }
   }
 
   &__slug {
