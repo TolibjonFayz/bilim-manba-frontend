@@ -3,7 +3,13 @@
     <!-- HERO -->
     <section class="hero">
       <div class="hero__inner container">
-        <div class="hero__badge">⚡ O'qish — eng foydali investitsiya!</div>
+        <div class="hero__badge">
+          {{
+            isAutumn
+              ? "🍂 Kuz — mutolaa fasli"
+              : "⚡ O'qish — eng foydali investitsiya!"
+          }}
+        </div>
 
         <h1 class="hero__title">
           Bilim oling,<br />
@@ -40,6 +46,8 @@
       <!-- Background shapes -->
       <div class="hero__shape hero__shape--1" />
       <div class="hero__shape hero__shape--2" />
+      <!-- Kuzgi barglar (1-sentabr – 30-noyabr) -->
+      <SeasonLeaves v-if="isAutumn" />
     </section>
 
     <!-- KATEGORIYALAR -->
@@ -86,7 +94,7 @@
       <div class="container">
         <div class="section-header">
           <div class="section-header__left">
-            <h2>✨ So'nggi maqolalar</h2>
+            <h2>{{ isAutumn ? "🍁" : "✨" }} So'nggi maqolalar</h2>
             <p>Ekspertlarimiz tomonidan yozilgan eng yangi materiallar</p>
           </div>
         </div>
@@ -112,6 +120,7 @@ const authStore = useAuthStore();
 const articleStore = useArticleStore();
 const categoryStore = useCategoryStore();
 const loading = ref(false);
+const { isAutumn } = useSeason();
 
 useHead({
   title: "Bilim Manba — O'zbek tilidagi bilim ulashish platformasi",

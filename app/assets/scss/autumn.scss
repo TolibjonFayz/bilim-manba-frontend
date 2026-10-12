@@ -1,0 +1,142 @@
+@use "variables" as *;
+
+// ============================================================
+// KUZ — mavsumiy bezak (1-sentabr – 30-noyabr, app/utils/season.ts)
+// Faqat <html class="season-autumn"> bo'lganda ishlaydi. Brendning
+// binafsha rangi (tugmalar, havolalar) o'zgarmaydi — kuzgi iliq ranglar
+// fon, urg'u va bezakda. Binafsha va zarg'aldoq — bir-birini to'ldiruvchi
+// ranglar, shuning uchun birga uyg'un turadi.
+//
+// Specificity: komponentlarning scoped uslublari (.hero[data-v]) dan
+// ustun turishi uchun selektorlar "html.season-autumn" bilan boshlanadi.
+// ============================================================
+
+$autumn-cream: #fbf4ea;
+$autumn-sand: #f4e7d4;
+$autumn-amber: #d97706;
+$autumn-gold: #f2a93b;
+$autumn-maple: #c2410c;
+$autumn-rust: #9a3412; // oq/krem fonda matn uchun (kontrast AA)
+$autumn-wine: #9f1239;
+$autumn-ribbon: linear-gradient(
+  90deg,
+  $autumn-gold,
+  $autumn-amber 30%,
+  $autumn-maple 65%,
+  $autumn-wine
+);
+
+html.season-autumn {
+  --autumn-amber: #{$autumn-amber};
+  --autumn-maple: #{$autumn-maple};
+  --autumn-rust: #{$autumn-rust};
+  --autumn-cream: #{$autumn-cream};
+
+  ::selection {
+    background: rgba($autumn-amber, 0.22);
+  }
+
+  // ---------- Navbar: tepada ingichka kuzgi lenta ----------
+  .navbar::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 3px;
+    background: $autumn-ribbon;
+  }
+
+  // ---------- Hero ----------
+  .hero {
+    background:
+      radial-gradient(
+        1100px 420px at 50% -10%,
+        rgba($autumn-gold, 0.16),
+        transparent 70%
+      ),
+      linear-gradient(180deg, $autumn-cream 0%, #fdf9f3 70%, #fff 100%);
+    border-bottom: 1px solid rgba($autumn-amber, 0.12);
+  }
+
+  .hero__badge {
+    background: rgba(#fff, 0.75);
+    color: $autumn-rust;
+    border-color: rgba($autumn-amber, 0.35);
+    box-shadow: 0 2px 12px rgba($autumn-maple, 0.08);
+    backdrop-filter: blur(6px);
+  }
+
+  .hero__title-gradient {
+    background: linear-gradient(
+      120deg,
+      $autumn-maple 0%,
+      $autumn-amber 45%,
+      $autumn-wine 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .hero__shape--1 {
+    background: radial-gradient(
+      circle,
+      rgba($autumn-gold, 0.28),
+      transparent 70%
+    );
+    opacity: 0.7;
+  }
+
+  .hero__shape--2 {
+    background: radial-gradient(
+      circle,
+      rgba($autumn-maple, 0.16),
+      transparent 70%
+    );
+    opacity: 0.7;
+  }
+
+  // ---------- Kategoriyalar ----------
+  .category-chip:hover {
+    border-color: rgba($autumn-amber, 0.55);
+    color: $autumn-rust;
+    background: $autumn-cream;
+    box-shadow: 0 4px 14px rgba($autumn-maple, 0.1);
+  }
+
+  // ---------- Maqola kartalari ----------
+  .article-card:hover {
+    border-color: rgba($autumn-amber, 0.4);
+    box-shadow: 0 10px 34px rgba($autumn-maple, 0.12);
+  }
+
+  // ---------- Bo'lim sarlavhalari: kichik barg urg'usi ----------
+  .section-header__left h2 {
+    position: relative;
+  }
+
+  // ---------- O'qish progressi ----------
+  .progress-bar {
+    background: $autumn-ribbon;
+  }
+
+  // ---------- Footer ----------
+  .footer {
+    position: relative;
+    background:
+      radial-gradient(
+        900px 300px at 85% 0%,
+        rgba($autumn-gold, 0.1),
+        transparent 70%
+      ),
+      $autumn-cream;
+    border-top: none;
+
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: $autumn-ribbon;
+      opacity: 0.85;
+    }
+  }
+}

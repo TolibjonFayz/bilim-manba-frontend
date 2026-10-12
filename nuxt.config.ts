@@ -152,6 +152,8 @@ export default defineNuxtConfig({
     apiBase: process.env.NUXT_PUBLIC_API_BASE,
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
+      // Mavsumiy bezak: "auto" (kuz — 1-sentabr–30-noyabr) | "autumn" | "off"
+      season: process.env.NUXT_PUBLIC_SEASON || "auto",
     },
   },
 
