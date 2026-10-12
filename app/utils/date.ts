@@ -7,8 +7,18 @@
 const TASHKENT_OFFSET_MS = 5 * 60 * 60 * 1000;
 
 const MONTHS = [
-  "yanvar", "fevral", "mart", "aprel", "may", "iyun",
-  "iyul", "avgust", "sentabr", "oktabr", "noyabr", "dekabr",
+  "yanvar",
+  "fevral",
+  "mart",
+  "aprel",
+  "may",
+  "iyun",
+  "iyul",
+  "avgust",
+  "sentabr",
+  "oktabr",
+  "noyabr",
+  "dekabr",
 ];
 
 function tashkent(date: string | number | Date | null | undefined) {
@@ -19,7 +29,9 @@ function tashkent(date: string | number | Date | null | undefined) {
 }
 
 /** 29.06.2026 */
-export function formatDate(date: string | number | Date | null | undefined): string {
+export function formatDate(
+  date: string | number | Date | null | undefined,
+): string {
   const d = tashkent(date);
   if (!d) return "";
   const dd = String(d.getUTCDate()).padStart(2, "0");
@@ -28,14 +40,18 @@ export function formatDate(date: string | number | Date | null | undefined): str
 }
 
 /** iyun 2026 */
-export function formatMonthYear(date: string | number | Date | null | undefined): string {
+export function formatMonthYear(
+  date: string | number | Date | null | undefined,
+): string {
   const d = tashkent(date);
   if (!d) return "";
   return `${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}`;
 }
 
 /** 06.10.2026 09:00 — Toshkent vaqtida */
-export function formatDateTime(date: string | number | Date | null | undefined): string {
+export function formatDateTime(
+  date: string | number | Date | null | undefined,
+): string {
   const d = tashkent(date);
   if (!d) return "";
   const hh = String(d.getUTCHours()).padStart(2, "0");
@@ -60,4 +76,47 @@ export function isoToTashkentLocal(iso: string | null | undefined): string {
   const d = tashkent(iso);
   if (!d) return "";
   return d.toISOString().slice(0, 16);
+}
+
+/** "bugun", "kecha", "5 kun oldin", "3 oy oldin" — nisbiy vaqt (Toshkent kuni bo'yicha) */
+export function timeAgo(
+  date: string | number | Date | null | undefined,
+): string {
+  if (!date) return "—";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "—";
+  const day = (x: Date) =>
+    Math.floor((x.getTime() + 5 * 3600 * 1000) / 86400000);
+  const diff = day(new Date()) - day(d);
+  if (diff <= 0) return "bugun";
+  if (diff === 1) return "kecha";
+  if (diff < 7) return `${diff} kun oldin`;
+  if (diff < 30) return `${Math.floor(diff / 7)} hafta oldin`;
+  if (diff < 365) return `${Math.floor(diff / 30)} oy oldin`;
+  return `${Math.floor(diff / 365)} yil oldin`;
+}
+
+const MONTHS_SHORT = [
+  "Yan",
+  "Fev",
+  "Mar",
+  "Apr",
+  "May",
+  "Iyun",
+  "Iyul",
+  "Avg",
+  "Sen",
+  "Okt",
+  "Noy",
+  "Dek",
+];
+
+/** Grafik bo'lagi yorlig'i: kun → "12.10", oy → "Okt 26" */
+export function bucketLabel(
+  ymd: string,
+  unit: "day" | "week" | "month",
+): string {
+  const [y, m, d] = ymd.split("-");
+  if (unit === "month") return `${MONTHS_SHORT[Number(m) - 1]} ${y!.slice(2)}`;
+  return `${d}.${m}`;
 }

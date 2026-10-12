@@ -287,6 +287,47 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Statistika hisoboti: day | week | month | year
+  async function getStatsReport(period: string) {
+    try {
+      const res = await $fetch<any>("/admin/stats/report", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        query: { period },
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  // Google Search Console
+  async function getSearchConsole(days: number) {
+    try {
+      const res = await $fetch<any>("/admin/search-console", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        query: { days },
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  async function getSearchConsoleIndexing(refresh = false) {
+    try {
+      const res = await $fetch<any>("/admin/search-console/indexing", {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        query: refresh ? { refresh: 1 } : {},
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Fonda yozilayotgan AI qoralama holati
   async function getDraftJob() {
     try {
@@ -380,6 +421,9 @@ export const useAdminStore = defineStore("admin", () => {
     postToInstagram,
     generateDraft,
     getDraftJob,
+    getStatsReport,
+    getSearchConsole,
+    getSearchConsoleIndexing,
     getDraftSettings,
     updateDraftSettings,
     getSocialPreview,

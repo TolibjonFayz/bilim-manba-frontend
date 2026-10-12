@@ -30,6 +30,12 @@
         <NuxtLink to="/admin/users" class="admin-sidebar__link">
           👥 Foydalanuvchilar
         </NuxtLink>
+        <NuxtLink to="/admin/stats" class="admin-sidebar__link">
+          📈 Statistika
+        </NuxtLink>
+        <NuxtLink to="/admin/search" class="admin-sidebar__link">
+          🔎 Google qidiruv
+        </NuxtLink>
       </nav>
 
       <div class="admin-sidebar__footer">
