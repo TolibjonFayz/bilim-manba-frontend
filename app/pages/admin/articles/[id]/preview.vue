@@ -15,6 +15,14 @@
           class="btn btn--outline"
           >✏️ Tahrirlash</NuxtLink
         >
+        <button
+          class="btn btn--outline"
+          :disabled="busy || coverBusy"
+          title="AI erkin rasm bazalaridan yangi muqova tanlaydi (18+ tekshiruvi bilan)"
+          @click="handleRegenerateCover"
+        >
+          {{ coverBusy ? "⏳ Rasm qidirilmoqda…" : "🔄 Muqovani almashtirish" }}
+        </button>
         <template v-if="article.status === 'draft'">
           <button
             class="btn btn--outline"
@@ -123,6 +131,7 @@ const content = ref("");
 const loading = ref(true);
 const error = ref("");
 const busy = ref(false);
+const coverBusy = ref(false);
 const scheduleOpen = ref(false);
 const scheduleLocal = ref("");
 
@@ -231,6 +240,24 @@ const handleUnschedule = async () => {
       message: "Vaqt olib tashlandi — qoralama bo'lib qoldi",
     });
     await load();
+  }
+};
+
+const handleRegenerateCover = async () => {
+  coverBusy.value = true;
+  const res = await adminStore.regenerateCover(article.value.id);
+  coverBusy.value = false;
+  if (res.success) {
+    ElMessage({
+      type: res.data?.coverImage ? "success" : "warning",
+      message: res.data?.coverImage
+        ? `🖼 Yangi muqova: ${res.data.cover?.title ?? ""} (${res.data.cover?.provider ?? ""})`
+        : "Mos va xavfsiz rasm topilmadi — muqovani \"Tahrirlash\"da o'zingiz qo'ying",
+      duration: 6000,
+    });
+    await load();
+  } else {
+    ElMessage({ type: "error", message: res.message, duration: 8000 });
   }
 };
 

@@ -328,6 +328,20 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Muqovani AI bilan qayta tanlash (xavfsizlik tekshiruvi bilan)
+  async function regenerateCover(id: number) {
+    try {
+      const res = await $fetch<any>(`/admin/articles/${id}/cover/regenerate`, {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Fonda yozilayotgan AI qoralama holati
   async function getDraftJob() {
     try {
@@ -421,6 +435,7 @@ export const useAdminStore = defineStore("admin", () => {
     postToInstagram,
     generateDraft,
     getDraftJob,
+    regenerateCover,
     getStatsReport,
     getSearchConsole,
     getSearchConsoleIndexing,
