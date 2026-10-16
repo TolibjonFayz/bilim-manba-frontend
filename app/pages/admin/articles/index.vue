@@ -271,7 +271,7 @@
           >
             {{
               ai.generating
-                ? `⏳ AI yozmoqda… ${ai.elapsed} s (odatda 1–2 daqiqa)`
+                ? `⏳ AI yozmoqda… ${ai.elapsed} s (odatda 3–10 daqiqa)`
                 : "✍️ Qoralama yozish"
             }}
           </button>
@@ -426,15 +426,24 @@ const pollJob = async (startedAt: number) => {
   const res = await adminStore.getDraftJob();
   const job = res.success ? res.data : null;
   if (job?.state === "running" || !res.success) {
-    // Server vaqtincha javob bermasa ham kutishda davom etamiz (10 daqiqagacha)
-    if (ai.elapsed < 600) {
+    // Server vaqtincha javob bermasa ham kutishda davom etamiz (Gemini band
+    // bo'lsa qayta urinishlar bilan 10 daqiqadan oshishi mumkin — 25 daqiqagacha)
+    if (ai.elapsed < 1500) {
       pollTimer = setTimeout(() => pollJob(startedAt), 3000);
       return;
     }
   }
   ai.generating = false;
   stopPolling();
-  if (job?.state === "done") {
+  if (job?.state === "running") {
+    // Server hali yozyapti — bu xato emas, tayyor bo'lgach ro'yxatda chiqadi
+    ElMessage({
+      type: "warning",
+      message:
+        "⏳ Qoralama hali yozilmoqda — bir necha daqiqadan keyin sahifani yangilang",
+      duration: 10000,
+    });
+  } else if (job?.state === "done") {
     ai.topic = "";
     ElMessage({ type: "success", message: `✍️ Qoralama tayyor: ${job.title}` });
     if (ai.open) {
