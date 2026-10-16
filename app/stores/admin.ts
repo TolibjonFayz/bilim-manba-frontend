@@ -269,7 +269,7 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
-  // AI qoralama: mavzu yoki Wikipedia havolasi (bo'sh — kunlik tanlangan maqola)
+  // AI qoralama: mavzu yoki Wikipedia havolasi (bo'sh — AI bo'lim uchun o'zi mavzu tanlaydi)
   async function generateDraft(topic: string, categoryId?: number | "") {
     try {
       const res = await $fetch<any>("/admin/drafts/generate", {

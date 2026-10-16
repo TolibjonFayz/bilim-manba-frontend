@@ -244,7 +244,7 @@
             @keyup.enter="handleGenerate"
           />
           <small class="ai-box__small">
-            Bo'sh qoldirsangiz — Wikipedia'ning bugungi tanlangan maqolasi.
+            Bo'sh qoldirsangiz — AI tanlangan kategoriya (yoki navbatdagi bo'lim) uchun o'zi mavzu topadi.
           </small>
 
           <label class="ai-box__label" for="ai-category">Kategoriya</label>
@@ -298,7 +298,7 @@
               placeholder="Fotosintez&#10;Messi va 2022 yilgi jahon chempionati&#10;https://en.wikipedia.org/wiki/Silk_Road"
             />
             <small class="ai-box__small">
-              Navbat bo'sh bo'lsa — Wikipedia'ning kunlik tanlangan maqolasi.
+              Navbat bo'sh bo'lsa — AI bo'limlar bo'yicha navbat bilan o'zi mavzu tanlaydi: har bo'limdan bittadan, Kino'dan ikkita. 18+ va Islom qadriyatlariga zid mavzular yozilmaydi.
               Ko'rib chiqilmagan {{ aiSettings.maxPending }} ta AI qoralama
               to'planib qolsa, yangisi yozilmaydi.
             </small>
