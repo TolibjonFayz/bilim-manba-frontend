@@ -399,6 +399,23 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Adminga shaxsiy Telegram xabarlari: action — "" (holat) | link | check | test | unlink
+  async function telegramAlerts(action: "" | "link" | "check" | "test" | "unlink" = "") {
+    try {
+      const res = await $fetch<any>(
+        `/admin/alerts/telegram${action && action !== "unlink" ? `/${action}` : ""}`,
+        {
+          method: action === "" ? "GET" : action === "unlink" ? "DELETE" : "POST",
+          baseURL: useRuntimeConfig().public.apiBase,
+          headers: getAuthHeaders(),
+        },
+      );
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   async function getArticle(id: number) {
     try {
       const res = await $fetch<any>(`/admin/articles/${id}`, {
@@ -441,6 +458,7 @@ export const useAdminStore = defineStore("admin", () => {
     getSearchConsoleIndexing,
     getDraftSettings,
     updateDraftSettings,
+    telegramAlerts,
     getSocialPreview,
     getPublishingStatus,
   };

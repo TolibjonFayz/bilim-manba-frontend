@@ -56,6 +56,7 @@
           >
         </template>
       </span>
+      <AdminTelegramAlerts />
       <span class="pub-status__item">
         ⏰
         {{
