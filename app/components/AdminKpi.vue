@@ -102,10 +102,10 @@ const deltaClass = computed(() => {
     font-weight: 600;
 
     &.is-good {
-      color: #15803d;
+      color: var(--c-success-text);
     }
     &.is-bad {
-      color: #b91c1c;
+      color: var(--c-danger-text);
     }
     &.is-flat {
       color: $text-muted;

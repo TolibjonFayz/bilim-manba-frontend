@@ -499,7 +499,7 @@ const handleSubmit = async () => {
     color: $text-muted;
 
     &--warn {
-      color: #d97706;
+      color: var(--c-warning-text);
       font-weight: 600;
     }
   }
@@ -514,7 +514,7 @@ const handleSubmit = async () => {
 
 .upload-success {
   font-size: 0.8rem;
-  color: #1a9e5e;
+  color: var(--c-success-strong);
   margin-top: 0.35rem;
   word-break: break-all;
 
@@ -574,7 +574,7 @@ const handleSubmit = async () => {
   &--success {
     background: rgba(#43d98b, 0.08);
     border: 1px solid rgba(#43d98b, 0.3);
-    color: #1a9e5e;
+    color: var(--c-success-strong);
   }
 
   &--danger {

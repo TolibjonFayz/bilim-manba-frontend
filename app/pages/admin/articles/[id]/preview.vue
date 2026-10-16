@@ -314,7 +314,7 @@ const handleDelete = async () => {
 
     &.is-published {
       background: rgba(#43d98b, 0.12);
-      color: #1a9e5e;
+      color: var(--c-success-strong);
     }
     &.is-scheduled {
       background: rgba(var(--c-primary-rgb), 0.1);
@@ -385,7 +385,7 @@ const handleDelete = async () => {
   &--warn {
     background: rgba(180, 83, 9, 0.06);
     border: 1px solid rgba(180, 83, 9, 0.3);
-    color: #b45309;
+    color: var(--c-warning-text);
   }
 }
 

@@ -831,7 +831,7 @@ onMounted(async () => {
   width: 52px;
   height: 28px;
   border-radius: 100px;
-  background: #d1d5db; // 👈 off holat — kulrang
+  background: var(--c-toggle-off); // 👈 off holat — kulrang
   position: relative;
   transition: background 0.25s ease;
   flex-shrink: 0;
@@ -1398,7 +1398,7 @@ onMounted(async () => {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    background: rgba(#fff, 0.95);
+    background: rgba(var(--c-bg-rgb), 0.95);
     border: 1px solid rgba(var(--c-border-rgb), 0.6);
     font-size: 0.85rem;
     cursor: pointer;
@@ -1609,7 +1609,7 @@ onMounted(async () => {
   &--success {
     background: rgba(#43d98b, 0.08);
     border: 1px solid rgba(#43d98b, 0.3);
-    color: #1a9e5e;
+    color: var(--c-success-strong);
   }
 
   &--danger {

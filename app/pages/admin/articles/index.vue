@@ -728,7 +728,7 @@ const handleDelete = async (id: number, title: string) => {
 
   &__error {
     font-size: 0.8rem;
-    color: #b45309;
+    color: var(--c-warning-text);
     background: rgba(180, 83, 9, 0.06);
     border: 1px solid rgba(180, 83, 9, 0.3);
     border-radius: $border-radius-sm;
@@ -759,13 +759,13 @@ const handleDelete = async (id: number, title: string) => {
     color: $text-secondary;
 
     &.is-ok {
-      color: #15803d;
+      color: var(--c-success-text);
       border-color: rgba(21, 128, 61, 0.3);
       background: rgba(21, 128, 61, 0.06);
     }
 
     &.is-warn {
-      color: #b45309;
+      color: var(--c-warning-text);
       border-color: rgba(180, 83, 9, 0.3);
       background: rgba(180, 83, 9, 0.06);
     }
@@ -803,7 +803,7 @@ const handleDelete = async (id: number, title: string) => {
   &__done {
     font-size: 0.78rem;
     font-weight: 600;
-    color: #15803d;
+    color: var(--c-success-text);
   }
 
   &__none {
@@ -917,7 +917,7 @@ const handleDelete = async (id: number, title: string) => {
 
   &--published {
     background: rgba(#43d98b, 0.12);
-    color: #1a9e5e;
+    color: var(--c-success-strong);
     &:hover {
       background: rgba(#43d98b, 0.2);
     }

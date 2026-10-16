@@ -185,7 +185,7 @@ const handleSubscribe = async () => {
     margin-top: 0.5rem;
 
     &--success {
-      color: #1a9e5e;
+      color: var(--c-success-strong);
     }
     &--danger {
       color: $danger;

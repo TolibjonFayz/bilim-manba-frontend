@@ -417,7 +417,7 @@ const activityClass = (d: string | null) => {
 
   &--admin {
     background: rgba(#764ba2, 0.1);
-    color: #764ba2;
+    color: var(--c-violet-text);
     margin-left: 0.3rem;
   }
 
@@ -428,7 +428,7 @@ const activityClass = (d: string | null) => {
 
   &--bad {
     background: rgba($danger, 0.1);
-    color: #b91c1c;
+    color: var(--c-danger-text);
     margin-left: 0.3rem;
   }
 }
@@ -441,7 +441,7 @@ const activityClass = (d: string | null) => {
 }
 
 .fresh {
-  color: #15803d;
+  color: var(--c-success-text);
   font-weight: 600;
 }
 

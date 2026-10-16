@@ -27,6 +27,13 @@
   --c-shadow-sm: 0 1px 4px rgba(88, 80, 236, 0.06);
   --c-shadow-md: 0 4px 20px rgba(88, 80, 236, 0.1);
   --c-shadow-lg: 0 8px 40px rgba(88, 80, 236, 0.14);
+  // Holat matnlari (chop etilgan / kutilmoqda / xato): oq fonda to'q
+  --c-success-text: #15803d;
+  --c-success-strong: #1a9e5e;
+  --c-warning-text: #b45309;
+  --c-danger-text: #b91c1c;
+  --c-violet-text: #764ba2;
+  --c-toggle-off: #d1d5db;
 }
 
 // Tun rejimi: <html data-theme="dark"> (app.vue dagi skript sahifa
@@ -53,6 +60,13 @@
   --c-shadow-sm: 0 1px 4px rgba(0, 0, 0, 0.3);
   --c-shadow-md: 0 4px 20px rgba(0, 0, 0, 0.35);
   --c-shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.45);
+  // To'q fonda o'qiladigan ochroq holat ranglari
+  --c-success-text: #4ade80;
+  --c-success-strong: #4ade80;
+  --c-warning-text: #fbbf24;
+  --c-danger-text: #f87171;
+  --c-violet-text: #c4a5ff;
+  --c-toggle-off: #3a3a52;
 
   // Element Plus (xabarlar, dialoglar) ham tunga moslashadi
   --el-bg-color: #1b1b29;

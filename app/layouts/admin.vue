@@ -62,6 +62,21 @@
           ☰
         </button>
         <div class="admin-topbar__right">
+          <!-- Belgilar almashinuvi main.scss dagi global qoidada -->
+          <button
+            class="admin-topbar__theme"
+            type="button"
+            title="Kun / tun rejimi"
+            aria-label="Kun yoki tun rejimini almashtirish"
+            @click="toggleTheme"
+          >
+            <span class="navbar__theme-icon navbar__theme-icon--moon">
+              <Icon name="lucide:moon" size="1.05em" mode="css" />
+            </span>
+            <span class="navbar__theme-icon navbar__theme-icon--sun">
+              <Icon name="lucide:sun" size="1.1em" mode="css" />
+            </span>
+          </button>
           <span class="admin-topbar__user">
             👤 {{ authStore.user?.email }}
           </span>
@@ -80,6 +95,7 @@
 const authStore = useAuthStore();
 const userStore = useUserStore();
 const sidebarOpen = ref(false);
+const { toggle: toggleTheme } = useTheme();
 
 const handleLogout = () => {
   authStore.logout();
@@ -92,7 +108,7 @@ const handleLogout = () => {
 .admin-layout {
   display: flex;
   min-height: 100vh;
-  background: #f4f6fa;
+  background: $bg-secondary;
 }
 
 .admin-sidebar {
@@ -218,6 +234,35 @@ const handleLogout = () => {
 
   &__right {
     margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  &__theme {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid $border-color;
+    background: $bg-secondary;
+    color: $text-secondary;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: $primary;
+      color: $primary;
+    }
+
+    .navbar__theme-icon {
+      display: flex;
+    }
+    .navbar__theme-icon--sun {
+      display: none;
+    }
   }
 
   &__user {

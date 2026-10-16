@@ -698,11 +698,11 @@ const coverageText = (state: string | null, verdict: string) => {
 
   &--ok {
     background: rgba(21, 128, 61, 0.08);
-    color: #15803d;
+    color: var(--c-success-text);
   }
   &--warn {
     background: rgba(180, 83, 9, 0.08);
-    color: #b45309;
+    color: var(--c-warning-text);
   }
   &--info {
     background: rgba(var(--c-primary-rgb), 0.08);
@@ -710,7 +710,7 @@ const coverageText = (state: string | null, verdict: string) => {
   }
   &--bad {
     background: rgba($danger, 0.08);
-    color: #b91c1c;
+    color: var(--c-danger-text);
   }
 }
 
@@ -812,7 +812,7 @@ const coverageText = (state: string | null, verdict: string) => {
   &--danger {
     background: rgba($danger, 0.08);
     border: 1px solid rgba($danger, 0.2);
-    color: #b91c1c;
+    color: var(--c-danger-text);
   }
 
   &__more {

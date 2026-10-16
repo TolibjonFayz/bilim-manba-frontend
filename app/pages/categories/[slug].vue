@@ -1136,7 +1136,7 @@ useHead({
     position: absolute;
     top: 0.75rem;
     right: 0.75rem;
-    background: rgba(#fff, 0.95);
+    background: rgba(var(--c-bg-rgb), 0.95);
     color: $primary;
     font-size: 0.7rem;
     font-weight: 800;

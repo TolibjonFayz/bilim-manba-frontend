@@ -352,7 +352,7 @@ const handleSubmit = async () => {
   &--success {
     background: rgba(#43d98b, 0.08);
     border: 1px solid rgba(#43d98b, 0.3);
-    color: #1a9e5e;
+    color: var(--c-success-strong);
   }
 
   &--danger {
