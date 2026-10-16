@@ -192,7 +192,7 @@ const handleLogout = () => {
 }
 
 .admin-topbar {
-  background: #fff;
+  background: $bg-primary;
   border-bottom: 1px solid $border-color;
   padding: 0 1.5rem;
   height: 60px;

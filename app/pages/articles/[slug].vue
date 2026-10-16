@@ -726,7 +726,7 @@ onMounted(async () => {
 
 // HEADER
 .article-header {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -817,7 +817,7 @@ onMounted(async () => {
     font-size: 0.825rem;
     font-weight: 600;
     color: $text-secondary;
-    background: #fff;
+    background: $bg-primary;
     cursor: pointer;
     font-family: $font-primary;
     transition: all 0.2s;
@@ -836,14 +836,14 @@ onMounted(async () => {
   &__action-btn--bookmarked {
     border-color: var(--color-primary);
     color: var(--color-primary);
-    background: rgba(88, 80, 236, 0.08);
+    background: rgba(var(--c-primary-rgb), 0.08);
   }
 }
 
 // Badge overrides
 .badge {
   &--category {
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     padding: 0.3rem 0.85rem;
     border-radius: $border-radius-pill;
@@ -883,7 +883,7 @@ onMounted(async () => {
 // CONTENT
 .article-content-wrap {
   position: relative;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -951,7 +951,7 @@ onMounted(async () => {
   }
 
   :deep(code) {
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     padding: 0.15rem 0.45rem;
     border-radius: 4px;
@@ -998,7 +998,7 @@ onMounted(async () => {
   background: linear-gradient(to bottom, transparent, rgba(#f8f7ff, 0.98) 40%);
 
   &__card {
-    background: #fff;
+    background: $bg-primary;
     border: 1px solid $border-color;
     border-radius: $border-radius-lg;
     padding: 2.5rem 2rem;
@@ -1065,7 +1065,7 @@ onMounted(async () => {
 
 // ARTICLE FOOTER
 .article-footer {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem 1.5rem;
@@ -1118,7 +1118,7 @@ onMounted(async () => {
   height: 34px;
   border-radius: 50%;
   border: 1.5px solid $border-color;
-  background: #fff;
+  background: $bg-primary;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1167,7 +1167,7 @@ onMounted(async () => {
 }
 
 .related-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -1176,7 +1176,7 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-3px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
   }
 
   &:hover .related-card__cover-img {
@@ -1215,7 +1215,7 @@ onMounted(async () => {
   &__cat {
     position: relative;
     z-index: 2;
-    background: rgba(#fff, 0.95);
+    background: rgba(var(--c-bg-rgb), 0.95);
     color: $primary;
     font-size: 0.7rem;
     font-weight: 700;
@@ -1259,7 +1259,7 @@ onMounted(async () => {
 }
 
 .sidebar-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
@@ -1543,7 +1543,7 @@ onMounted(async () => {
 // AI PANEL
 .ai-panel {
   width: 340px;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-lg;
   box-shadow: $shadow-lg;

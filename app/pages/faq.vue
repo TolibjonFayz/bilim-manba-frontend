@@ -135,7 +135,7 @@ const faqs = [
 }
 
 .faq-item {
-  background: #fff;
+  background: $bg-primary;
   border: 1.5px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -143,12 +143,12 @@ const faqs = [
   transition: all 0.2s;
 
   &:hover {
-    border-color: rgba($primary, 0.4);
+    border-color: rgba(var(--c-primary-rgb), 0.4);
   }
 
   &--open {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.08);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.08);
   }
 
   &__question {

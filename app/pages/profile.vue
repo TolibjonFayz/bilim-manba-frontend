@@ -771,7 +771,7 @@ onMounted(async () => {
     font-size: 0.875rem;
     font-weight: 600;
     color: $text-secondary;
-    background: #fff;
+    background: $bg-primary;
     cursor: pointer;
     font-family: $font-primary;
     transition: all 0.2s;
@@ -837,7 +837,7 @@ onMounted(async () => {
   flex-shrink: 0;
 
   &--on {
-    background: #5850ec; // 👈 on holat — primary rang
+    background: $primary; // 👈 on holat — primary rang
   }
 
   &__knob {
@@ -847,7 +847,7 @@ onMounted(async () => {
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background: #ffffff;
+    background: $bg-primary;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
     transition: transform 0.25s ease;
     pointer-events: none; // 👈 knob click'ni blokirovka qilmasin
@@ -896,7 +896,7 @@ onMounted(async () => {
 }
 
 .sidebar-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
@@ -948,7 +948,7 @@ onMounted(async () => {
     font-size: 1rem;
 
     &--blue {
-      background: rgba($primary, 0.1);
+      background: rgba(var(--c-primary-rgb), 0.1);
     }
     &--coral {
       background: rgba($secondary, 0.1);
@@ -1086,7 +1086,7 @@ onMounted(async () => {
 }
 
 .recent-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -1098,7 +1098,7 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-3px);
     box-shadow: $shadow-md;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
 
     img {
       transform: scale(1.05);
@@ -1152,7 +1152,7 @@ onMounted(async () => {
     color: $text-muted;
     margin-top: auto;
     padding-top: 0.5rem;
-    border-top: 1px solid rgba($border-color, 0.5);
+    border-top: 1px solid rgba(var(--c-border-rgb), 0.5);
   }
 }
 
@@ -1160,7 +1160,7 @@ onMounted(async () => {
    CHART
 ───────────────────────────────────── */
 .chart-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.5rem;
@@ -1251,7 +1251,7 @@ onMounted(async () => {
 
   &__bar {
     width: 100%;
-    background: rgba($primary, 0.2);
+    background: rgba(var(--c-primary-rgb), 0.2);
     border-radius: 6px 6px 0 0;
     transition: height 0.3s ease;
     position: relative;
@@ -1323,7 +1323,7 @@ onMounted(async () => {
 }
 
 .saved-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -1335,7 +1335,7 @@ onMounted(async () => {
   &:hover {
     transform: translateY(-3px);
     box-shadow: $shadow-md;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
 
     img {
       transform: scale(1.05);
@@ -1388,7 +1388,7 @@ onMounted(async () => {
     color: $text-muted;
     margin-top: auto;
     padding-top: 0.5rem;
-    border-top: 1px solid rgba($border-color, 0.5);
+    border-top: 1px solid rgba(var(--c-border-rgb), 0.5);
   }
 
   &__like-btn {
@@ -1399,7 +1399,7 @@ onMounted(async () => {
     height: 28px;
     border-radius: 50%;
     background: rgba(#fff, 0.95);
-    border: 1px solid rgba($border-color, 0.6);
+    border: 1px solid rgba(var(--c-border-rgb), 0.6);
     font-size: 0.85rem;
     cursor: pointer;
     display: flex;
@@ -1411,7 +1411,7 @@ onMounted(async () => {
 
     &:hover {
       transform: scale(1.1);
-      background: #fff;
+      background: $bg-primary;
     }
 
     &:active {
@@ -1457,7 +1457,7 @@ onMounted(async () => {
    SETTINGS
 ───────────────────────────────────── */
 .settings-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.75rem;
@@ -1554,12 +1554,12 @@ onMounted(async () => {
   align-items: center;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   &--disabled {

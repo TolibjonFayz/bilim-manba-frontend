@@ -114,7 +114,7 @@ const format = (v: number) =>
   }
 
   &__bar {
-    fill: rgba($primary, 0.45);
+    fill: rgba(var(--c-primary-rgb), 0.45);
     transition: fill 0.15s;
 
     &:hover {
@@ -136,7 +136,7 @@ const format = (v: number) =>
     left: 0;
     font-size: 0.7rem;
     color: $text-muted;
-    background: rgba(#fff, 0.85);
+    background: rgba(var(--c-bg-rgb), 0.85);
     padding: 0 0.25rem;
     border-radius: 4px;
   }

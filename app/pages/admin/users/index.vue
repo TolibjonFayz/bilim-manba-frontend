@@ -243,7 +243,7 @@ const activityClass = (d: string | null) => {
   margin-bottom: 1.25rem;
 
   &__item {
-    background: #fff;
+    background: $bg-primary;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     padding: 0.85rem 1rem;
@@ -279,10 +279,10 @@ const activityClass = (d: string | null) => {
     border-radius: $border-radius-pill;
     font-family: $font-primary;
     font-size: 0.88rem;
-    background: #fff;
+    background: $bg-primary;
 
     &:focus {
-      outline: 2px solid rgba($primary, 0.3);
+      outline: 2px solid rgba(var(--c-primary-rgb), 0.3);
       border-color: $primary;
     }
   }
@@ -295,7 +295,7 @@ const activityClass = (d: string | null) => {
 
   &__btn {
     border: 1px solid $border-color;
-    background: #fff;
+    background: $bg-primary;
     border-radius: $border-radius-pill;
     padding: 0.35rem 0.8rem;
     font-family: $font-primary;
@@ -312,14 +312,14 @@ const activityClass = (d: string | null) => {
 
     &.is-active {
       border-color: $primary;
-      background: rgba($primary, 0.08);
+      background: rgba(var(--c-primary-rgb), 0.08);
       color: $primary;
     }
   }
 }
 
 .table-wrap {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow-x: auto;

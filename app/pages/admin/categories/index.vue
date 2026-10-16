@@ -223,7 +223,7 @@ const handleDelete = async (id: number, name: string) => {
 }
 
 .admin-form-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.75rem;
@@ -241,7 +241,7 @@ const handleDelete = async (id: number, name: string) => {
 }
 
 .admin-table-wrap {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -300,9 +300,9 @@ const handleDelete = async (id: number, name: string) => {
     transition: all 0.15s;
 
     &--edit {
-      background: rgba($primary, 0.1);
+      background: rgba(var(--c-primary-rgb), 0.1);
       &:hover {
-        background: rgba($primary, 0.2);
+        background: rgba(var(--c-primary-rgb), 0.2);
       }
     }
 
@@ -331,12 +331,12 @@ const handleDelete = async (id: number, name: string) => {
   display: flex;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   input,

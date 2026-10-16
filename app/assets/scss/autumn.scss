@@ -140,3 +140,49 @@ html.season-autumn {
     }
   }
 }
+
+// ---------- Tun rejimi: krem fonlar o'rniga iliq to'q fon ----------
+html.season-autumn[data-theme="dark"] {
+  .hero {
+    background:
+      radial-gradient(
+        1100px 420px at 50% -10%,
+        rgba($autumn-gold, 0.14),
+        transparent 70%
+      ),
+      linear-gradient(180deg, #221a14 0%, #1a1720 70%, $bg-secondary 100%);
+    border-bottom-color: rgba($autumn-amber, 0.18);
+  }
+
+  .hero__badge {
+    background: rgba(#000, 0.25);
+    color: $autumn-gold;
+  }
+
+  // Sarlavha gradienti to'q fonda ochroq
+  .hero__title-gradient {
+    background: linear-gradient(
+      120deg,
+      #fb923c 0%,
+      $autumn-gold 45%,
+      #fb7185 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  .category-chip:hover {
+    color: $autumn-gold;
+    background: rgba($autumn-amber, 0.12);
+  }
+
+  .footer {
+    background:
+      radial-gradient(
+        900px 300px at 85% 0%,
+        rgba($autumn-gold, 0.08),
+        transparent 70%
+      ),
+      #1d1813;
+  }
+}

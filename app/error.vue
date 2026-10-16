@@ -37,6 +37,10 @@ if (import.meta.server) {
 
 useHead({
   title: () => `${code.value} — ${title.value} | Bilim Manba`,
+  // Xato sahifasi app.vue'siz chiziladi — kun/tun skripti shu yerda ham kerak
+  script: [
+    { key: "theme-init", innerHTML: THEME_INIT_SCRIPT, tagPriority: "critical" },
+  ],
 });
 </script>
 
@@ -59,7 +63,7 @@ useHead({
     font-weight: 900;
     line-height: 1;
     letter-spacing: -0.05em;
-    background: linear-gradient(135deg, #5850ec, #f59e0b);
+    background: linear-gradient(135deg, $primary, #f59e0b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;

@@ -142,7 +142,7 @@ useHead({
 .about-hero {
   background: linear-gradient(
     135deg,
-    rgba(88, 80, 236, 0.06),
+    rgba(var(--c-primary-rgb), 0.06),
     rgba(245, 158, 11, 0.04)
   );
   border-bottom: 1px solid $border-color;
@@ -157,7 +157,7 @@ useHead({
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(88, 80, 236, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     font-size: 0.82rem;
     font-weight: 700;
@@ -209,7 +209,7 @@ useHead({
 }
 
 .about-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-lg;
   padding: 2rem 1.75rem;
@@ -218,7 +218,7 @@ useHead({
   &:hover {
     transform: translateY(-4px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
   }
 
   &__icon {
@@ -245,7 +245,7 @@ useHead({
   max-width: 760px;
   margin: 0 auto;
   text-align: center;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-lg;
   padding: 2.5rem 2rem;
@@ -257,7 +257,7 @@ useHead({
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: $primary;
-    background: rgba($primary, 0.08);
+    background: rgba(var(--c-primary-rgb), 0.08);
     padding: 0.3rem 0.85rem;
     border-radius: $border-radius-pill;
     margin-bottom: 1rem;
@@ -338,7 +338,7 @@ useHead({
   }
 
   &__inner {
-    background: linear-gradient(135deg, #5850ec, #f59e0b);
+    background: linear-gradient(135deg, $primary, #f59e0b);
     border-radius: $border-radius-lg;
     padding: 3.5rem 2rem;
     text-align: center;

@@ -304,15 +304,15 @@ onMounted(() => {
   gap: 0.85rem;
   margin-bottom: 2rem;
   padding: 1.25rem;
-  background: #f8f7ff;
-  border: 1px solid #eeedf5;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
   border-radius: $border-radius;
 
   &__avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #5850ec, #f59e0b);
+    background: linear-gradient(135deg, $primary, #f59e0b);
     color: #fff;
     display: flex;
     align-items: center;
@@ -333,17 +333,17 @@ onMounted(() => {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
     font-family: $font-primary;
-    color: #1a1a2e;
-    background: #ffffff;
+    color: $text-primary;
+    background: $bg-primary;
     resize: vertical;
     outline: none;
     transition: border-color 0.2s;
 
     &:focus {
-      border-color: #5850ec;
+      border-color: $primary;
     }
     &::placeholder {
-      color: #6b7280;
+      color: $text-muted;
     }
   }
 
@@ -357,7 +357,7 @@ onMounted(() => {
 
   &__counter {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: $text-muted;
     margin-right: auto;
   }
 
@@ -368,17 +368,17 @@ onMounted(() => {
 }
 
 .comment-login-prompt {
-  background: #f8f7ff;
-  border: 1px solid #eeedf5;
+  background: $bg-secondary;
+  border: 1px solid $border-color;
   border-radius: $border-radius-sm;
   padding: 1rem;
   text-align: center;
   font-size: 0.9rem;
-  color: #4a5568;
+  color: $text-secondary;
   margin-bottom: 2rem;
 
   &__link {
-    color: #5850ec;
+    color: $primary;
     font-weight: 700;
   }
 }
@@ -393,14 +393,14 @@ onMounted(() => {
   display: flex;
   gap: 0.85rem;
   padding: 1.1rem;
-  background: #ffffff;
-  border: 1px solid #e5e4ef;
+  background: $bg-primary;
+  border: 1px solid var(--c-skeleton-2);
   border-radius: $border-radius;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
 
   &--reply {
-    background: #f8f7ff;
-    border-color: #e5e4ef;
+    background: $bg-secondary;
+    border-color: var(--c-skeleton-2);
     margin-top: 0;
     padding: 0.85rem;
     gap: 0.65rem;
@@ -410,7 +410,7 @@ onMounted(() => {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: #5850ec;
+    background: $primary;
     color: #fff;
     display: flex;
     align-items: center;
@@ -441,7 +441,7 @@ onMounted(() => {
   &__author {
     font-size: 0.85rem;
     font-weight: 700;
-    color: #1a1a2e;
+    color: $text-primary;
     display: flex;
     align-items: center;
     gap: 0.4rem;
@@ -449,7 +449,7 @@ onMounted(() => {
 
   &__badge {
     font-size: 0.65rem;
-    background: #5850ec;
+    background: $primary;
     color: #fff;
     padding: 0.1rem 0.45rem;
     border-radius: $border-radius-pill;
@@ -459,12 +459,12 @@ onMounted(() => {
 
   &__date {
     font-size: 0.65rem;
-    color: #6b7280;
+    color: $text-muted;
   }
 
   &__content {
     font-size: 0.80rem;
-    color: #4a5568;
+    color: $text-secondary;
     line-height: 1.6;
     word-break: break-word;
   }
@@ -482,9 +482,9 @@ onMounted(() => {
     gap: 0.3rem;
     font-size: 0.75rem;
     font-weight: 600;
-    color: #6b7280;
+    color: $text-muted;
     background: #f4f3fb;
-    border: 1px solid #e5e4ef;
+    border: 1px solid var(--c-skeleton-2);
     border-radius: $border-radius-pill;
     padding: 0.3rem 0.75rem;
     cursor: pointer;
@@ -508,8 +508,8 @@ onMounted(() => {
 
     &:hover {
       background: #eef2ff;
-      border-color: #5850ec;
-      color: #5850ec;
+      border-color: $primary;
+      color: $primary;
     }
 
     &--danger {
@@ -531,56 +531,10 @@ onMounted(() => {
 .comment-replies {
   margin-top: 0.85rem;
   padding-left: 0.85rem;
-  border-left: 2px solid #e5e4ef;
+  border-left: 2px solid var(--c-skeleton-2);
   display: flex;
   flex-direction: column;
   gap: 0.65rem;
-}
-
-/* ─────────────────────────────────────
-   DARK MODE
-───────────────────────────────────── */
-:global(.dark) .comment-form {
-  background: #1a1a2e;
-  border-color: #2d2d44;
-}
-:global(.dark) .comment-form__input {
-  background: #0f0f1a;
-  border-color: #2d2d44;
-  color: #f1f5f9;
-}
-:global(.dark) .comment-login-prompt {
-  background: #1a1a2e;
-  border-color: #2d2d44;
-  color: #a0aec0;
-}
-:global(.dark) .comment {
-  background: #1a1a2e;
-  border-color: #2d2d44;
-  box-shadow: none;
-}
-:global(.dark) .comment--reply {
-  background: #0f0f1a;
-}
-:global(.dark) .comment__author {
-  color: #f1f5f9;
-}
-:global(.dark) .comment__content {
-  color: #a0aec0;
-}
-:global(.dark) .comment-replies {
-  border-left-color: #2d2d44;
-}
-:global(.dark) .comment__action {
-  background: #252538;
-  border-color: #2d2d44;
-  color: #a0aec0;
-
-  &:hover {
-    background: #2d2d44;
-    border-color: #818cf8;
-    color: #818cf8;
-  }
 }
 
 /* ─────────────────────────────────────

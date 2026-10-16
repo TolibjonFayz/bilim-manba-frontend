@@ -225,7 +225,7 @@ const handleSubmit = async () => {
 }
 
 .support-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1.5px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -236,7 +236,7 @@ const handleSubmit = async () => {
   cursor: pointer;
 
   &:hover {
-    border-color: rgba($primary, 0.4);
+    border-color: rgba(var(--c-primary-rgb), 0.4);
     transform: translateY(-3px);
     box-shadow: $shadow-md;
   }
@@ -309,12 +309,12 @@ const handleSubmit = async () => {
   align-items: center;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   &--textarea {

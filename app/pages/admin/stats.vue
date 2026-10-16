@@ -336,7 +336,7 @@ const share = (v: number) => {
 
 .tabs {
   display: inline-flex;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-pill;
   padding: 0.25rem;
@@ -379,7 +379,7 @@ const share = (v: number) => {
 }
 
 .card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.1rem 1.25rem;
@@ -412,7 +412,7 @@ const share = (v: number) => {
 
   &__btn {
     border: 1px solid $border-color;
-    background: #fff;
+    background: $bg-primary;
     border-radius: $border-radius-pill;
     padding: 0.3rem 0.75rem;
     font-family: $font-primary;
@@ -423,7 +423,7 @@ const share = (v: number) => {
 
     &.is-active {
       border-color: $primary;
-      background: rgba($primary, 0.08);
+      background: rgba(var(--c-primary-rgb), 0.08);
       color: $primary;
     }
   }
@@ -547,8 +547,8 @@ const share = (v: number) => {
   }
 
   &--info {
-    background: rgba($primary, 0.06);
-    border: 1px solid rgba($primary, 0.2);
+    background: rgba(var(--c-primary-rgb), 0.06);
+    border: 1px solid rgba(var(--c-primary-rgb), 0.2);
     color: $text-primary;
   }
 }

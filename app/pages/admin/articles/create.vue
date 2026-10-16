@@ -414,7 +414,7 @@ const handleSubmit = async () => {
 }
 
 .admin-form-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -455,12 +455,12 @@ const handleSubmit = async () => {
   align-items: center;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   &--textarea {
@@ -539,7 +539,7 @@ const handleSubmit = async () => {
 
   &:hover {
     border-color: $primary;
-    background: rgba($primary, 0.02);
+    background: rgba(var(--c-primary-rgb), 0.02);
   }
 
   &__preview {

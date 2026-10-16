@@ -93,7 +93,7 @@ const placeholderStyle = computed(() => ({
   &:hover {
     transform: translateY(-5px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
 
     .article-card__cover img {
       transform: scale(1.05);

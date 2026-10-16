@@ -512,7 +512,7 @@ const coverageText = (state: string | null, verdict: string) => {
 
 .tabs {
   display: inline-flex;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-pill;
   padding: 0.25rem;
@@ -555,7 +555,7 @@ const coverageText = (state: string | null, verdict: string) => {
 }
 
 .card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.1rem 1.25rem;
@@ -594,7 +594,7 @@ const coverageText = (state: string | null, verdict: string) => {
 
   &__btn {
     border: 1px solid $border-color;
-    background: #fff;
+    background: $bg-primary;
     border-radius: $border-radius-pill;
     padding: 0.3rem 0.75rem;
     font-family: $font-primary;
@@ -605,7 +605,7 @@ const coverageText = (state: string | null, verdict: string) => {
 
     &.is-active {
       border-color: $primary;
-      background: rgba($primary, 0.08);
+      background: rgba(var(--c-primary-rgb), 0.08);
       color: $primary;
     }
   }
@@ -705,7 +705,7 @@ const coverageText = (state: string | null, verdict: string) => {
     color: #b45309;
   }
   &--info {
-    background: rgba($primary, 0.08);
+    background: rgba(var(--c-primary-rgb), 0.08);
     color: $primary;
   }
   &--bad {

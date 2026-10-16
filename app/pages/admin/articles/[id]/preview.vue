@@ -317,11 +317,11 @@ const handleDelete = async () => {
       color: #1a9e5e;
     }
     &.is-scheduled {
-      background: rgba($primary, 0.1);
+      background: rgba(var(--c-primary-rgb), 0.1);
       color: $primary;
     }
     &.is-draft {
-      background: rgba($text-muted, 0.12);
+      background: rgba(var(--c-muted-rgb), 0.12);
       color: $text-muted;
     }
   }
@@ -330,7 +330,7 @@ const handleDelete = async () => {
 .btn--danger-outline {
   border: 1px solid rgba($danger, 0.35);
   color: $danger;
-  background: #fff;
+  background: $bg-primary;
 
   &:hover:not(:disabled) {
     background: rgba($danger, 0.08);
@@ -342,7 +342,7 @@ const handleDelete = async () => {
   gap: 0.6rem;
   align-items: center;
   flex-wrap: wrap;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 0.85rem 1rem;
@@ -377,8 +377,8 @@ const handleDelete = async () => {
   }
 
   &--info {
-    background: rgba($primary, 0.06);
-    border: 1px solid rgba($primary, 0.25);
+    background: rgba(var(--c-primary-rgb), 0.06);
+    border: 1px solid rgba(var(--c-primary-rgb), 0.25);
     color: $text-primary;
   }
 
@@ -392,7 +392,7 @@ const handleDelete = async () => {
 .preview-article {
   max-width: 780px;
   margin: 0 auto;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -421,7 +421,7 @@ const handleDelete = async () => {
   }
 
   &__badge {
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     padding: 0.2rem 0.6rem;
     border-radius: $border-radius-pill;

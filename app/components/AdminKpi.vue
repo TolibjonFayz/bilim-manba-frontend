@@ -65,7 +65,7 @@ const deltaClass = computed(() => {
 
 <style lang="scss" scoped>
 .kpi {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1rem 1.1rem;

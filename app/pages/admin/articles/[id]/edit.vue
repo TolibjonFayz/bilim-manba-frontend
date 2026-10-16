@@ -454,7 +454,7 @@ const handleSubmit = async () => {
 }
 
 .admin-form-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 2rem;
@@ -495,12 +495,12 @@ const handleSubmit = async () => {
   align-items: center;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   &--textarea {
@@ -579,7 +579,7 @@ const handleSubmit = async () => {
 
   &:hover {
     border-color: $primary;
-    background: rgba($primary, 0.02);
+    background: rgba(var(--c-primary-rgb), 0.02);
   }
 
   &__preview {
@@ -624,8 +624,8 @@ const handleSubmit = async () => {
   }
 
   &--info {
-    background: rgba($primary, 0.06);
-    border: 1px solid rgba($primary, 0.25);
+    background: rgba(var(--c-primary-rgb), 0.06);
+    border: 1px solid rgba(var(--c-primary-rgb), 0.25);
     color: $text-primary;
     line-height: 1.5;
   }
@@ -637,7 +637,7 @@ const handleSubmit = async () => {
   padding: 1.25rem 1.5rem;
   border: 1px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   max-height: 70vh;
   overflow: auto;
   font-size: 1rem;

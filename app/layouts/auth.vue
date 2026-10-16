@@ -70,7 +70,7 @@ const title = computed(() =>
 
   // CHAP — gradient
   &__left {
-    background: linear-gradient(135deg, #5850ec 0%, #a855f7 50%, #ff6584 100%);
+    background: linear-gradient(135deg, $primary 0%, #a855f7 50%, #ff6584 100%);
     padding: 3rem;
     display: flex;
     flex-direction: column;
@@ -175,7 +175,7 @@ const title = computed(() =>
 
   // O'NG — form
   &__right {
-    background: #fff;
+    background: $bg-primary;
     display: flex;
     flex-direction: column;
     padding: 2.5rem;

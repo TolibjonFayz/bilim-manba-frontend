@@ -411,7 +411,7 @@ useHead({
   &__icon {
     width: 56px;
     height: 56px;
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     border-radius: $border-radius;
     display: flex;
     align-items: center;
@@ -580,7 +580,7 @@ useHead({
     color: $text-primary;
     outline: none;
     cursor: pointer;
-    background: #fff;
+    background: $bg-primary;
     transition: all 0.2s;
 
     @media (max-width: $mobile) {
@@ -589,7 +589,7 @@ useHead({
 
     &:focus {
       border-color: $primary;
-      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.1);
     }
   }
 }
@@ -605,7 +605,7 @@ useHead({
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 1.25rem;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -615,10 +615,10 @@ useHead({
   &:hover {
     transform: translateY(-2px);
     box-shadow: $shadow-md;
-    border-color: rgba($primary, 0.25);
+    border-color: rgba(var(--c-primary-rgb), 0.25);
 
     .article-row__read-link {
-      color: darken($primary, 10%);
+      color: $primary-dark;
     }
   }
 
@@ -754,7 +754,7 @@ useHead({
   font-size: 0.9rem;
   font-weight: 600;
   color: $text-secondary;
-  background: #fff;
+  background: $bg-primary;
   cursor: pointer;
   transition: all 0.2s;
   font-family: $font-primary;
@@ -821,7 +821,7 @@ useHead({
 }
 
 .sidebar-block {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
@@ -874,7 +874,7 @@ useHead({
   &__btn {
     width: 100%;
     padding: 0.7rem;
-    background: #fff;
+    background: $bg-primary;
     color: $primary;
     border-radius: $border-radius-pill;
     font-weight: 700;
@@ -1050,7 +1050,7 @@ useHead({
   border-radius: $border-radius;
   overflow: hidden;
   border: 1.5px solid transparent;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.3s ease;
   position: relative;
 
@@ -1063,7 +1063,7 @@ useHead({
     bottom: 0;
     background: linear-gradient(
       135deg,
-      rgba($primary, 0.05),
+      rgba(var(--c-primary-rgb), 0.05),
       rgba($secondary, 0.05)
     );
     pointer-events: none;
@@ -1073,8 +1073,8 @@ useHead({
 
   &:hover {
     transform: translateY(-4px);
-    box-shadow: 0 12px 24px rgba($primary, 0.15);
-    border-color: rgba($primary, 0.2);
+    box-shadow: 0 12px 24px rgba(var(--c-primary-rgb), 0.15);
+    border-color: rgba(var(--c-primary-rgb), 0.2);
 
     &::before {
       opacity: 1;
@@ -1221,7 +1221,7 @@ useHead({
     font-size: 0.8rem;
     font-weight: 700;
     color: $primary;
-    background: rgba($primary, 0.05);
+    background: rgba(var(--c-primary-rgb), 0.05);
     cursor: pointer;
     font-family: $font-primary;
     transition: all 0.3s ease;

@@ -674,11 +674,11 @@ const handleDelete = async (id: number, title: string) => {
     border-radius: $border-radius-sm;
     font-family: $font-primary;
     font-size: 0.9rem;
-    background: #fff;
+    background: $bg-primary;
     resize: vertical;
 
     &:focus {
-      outline: 2px solid rgba($primary, 0.35);
+      outline: 2px solid rgba(var(--c-primary-rgb), 0.35);
       border-color: $primary;
     }
   }
@@ -738,7 +738,7 @@ const handleDelete = async (id: number, title: string) => {
 }
 
 .admin-table-wrap {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow-x: auto;
@@ -814,8 +814,8 @@ const handleDelete = async (id: number, title: string) => {
   &__btn,
   &__eye {
     height: 26px;
-    border: 1px solid rgba($primary, 0.25);
-    background: rgba($primary, 0.06);
+    border: 1px solid rgba(var(--c-primary-rgb), 0.25);
+    background: rgba(var(--c-primary-rgb), 0.06);
     color: $primary;
     border-radius: 6px;
     font-size: 0.75rem;
@@ -825,7 +825,7 @@ const handleDelete = async (id: number, title: string) => {
     transition: background 0.15s;
 
     &:hover:not(:disabled) {
-      background: rgba($primary, 0.14);
+      background: rgba(var(--c-primary-rgb), 0.14);
     }
 
     &:disabled {
@@ -855,7 +855,7 @@ const handleDelete = async (id: number, title: string) => {
   padding: 1rem;
 
   &__box {
-    background: #fff;
+    background: $bg-primary;
     border-radius: $border-radius;
     padding: 1.25rem;
     max-width: 760px;
@@ -924,19 +924,19 @@ const handleDelete = async (id: number, title: string) => {
   }
 
   &--scheduled {
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     white-space: nowrap;
     &:hover {
-      background: rgba($primary, 0.18);
+      background: rgba(var(--c-primary-rgb), 0.18);
     }
   }
 
   &--draft {
-    background: rgba($text-muted, 0.12);
+    background: rgba(var(--c-muted-rgb), 0.12);
     color: $text-muted;
     &:hover {
-      background: rgba($text-muted, 0.2);
+      background: rgba(var(--c-muted-rgb), 0.2);
     }
   }
 }
@@ -1009,7 +1009,7 @@ const handleDelete = async (id: number, title: string) => {
   }
 
   &__badge {
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
     padding: 0.2rem 0.6rem;
     border-radius: $border-radius-pill;
@@ -1036,9 +1036,9 @@ const handleDelete = async (id: number, title: string) => {
     transition: all 0.15s;
 
     &--edit {
-      background: rgba($primary, 0.1);
+      background: rgba(var(--c-primary-rgb), 0.1);
       &:hover {
-        background: rgba($primary, 0.2);
+        background: rgba(var(--c-primary-rgb), 0.2);
       }
     }
 

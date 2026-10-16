@@ -187,9 +187,9 @@ useNoStoreUnless(loaded.value === true);
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba($primary, 0.1);
+    background: rgba(var(--c-primary-rgb), 0.1);
     color: $primary;
-    border: 1px solid rgba($primary, 0.2);
+    border: 1px solid rgba(var(--c-primary-rgb), 0.2);
     padding: 0.4rem 1rem;
     border-radius: $border-radius-pill;
     font-size: 0.85rem;
@@ -240,7 +240,7 @@ useNoStoreUnless(loaded.value === true);
     &--1 {
       width: 400px;
       height: 400px;
-      background: radial-gradient(circle, rgba($primary, 0.15), transparent);
+      background: radial-gradient(circle, rgba(var(--c-primary-rgb), 0.15), transparent);
       top: -100px;
       right: -100px;
     }
@@ -320,7 +320,7 @@ useNoStoreUnless(loaded.value === true);
 
   &:focus {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.1);
   }
 }
 

@@ -272,7 +272,7 @@ const handleSubscribe = async () => {
         border-radius: $border-radius-pill;
         font-size: 0.875rem;
         outline: none;
-        background: #fff;
+        background: $bg-primary;
         box-sizing: border-box;
 
         &:focus {

@@ -451,7 +451,7 @@ useNoStoreUnless(loaded.value === true);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #fff;
+  background: $bg-primary;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-pill;
   padding: 0.65rem 1.25rem;
@@ -460,7 +460,7 @@ useNoStoreUnless(loaded.value === true);
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.1);
   }
 
   &__icon {
@@ -544,7 +544,7 @@ useNoStoreUnless(loaded.value === true);
   font-size: 0.875rem;
   font-weight: 500;
   border: 1.5px solid $border-color;
-  background: #fff;
+  background: $bg-primary;
   color: $text-secondary;
   cursor: pointer;
   transition: all 0.2s;
@@ -603,7 +603,7 @@ useNoStoreUnless(loaded.value === true);
     font-weight: 600;
     outline: none;
     cursor: pointer;
-    background: #fff;
+    background: $bg-primary;
 
     &:focus {
       border-color: $primary;
@@ -622,7 +622,7 @@ useNoStoreUnless(loaded.value === true);
 .article-card-h {
   display: grid;
   grid-template-columns: 200px 1fr;
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   overflow: hidden;
@@ -632,7 +632,7 @@ useNoStoreUnless(loaded.value === true);
   &:hover {
     transform: translateY(-3px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.25);
+    border-color: rgba(var(--c-primary-rgb), 0.25);
 
     .article-card-h__read {
       color: $primary-dark;
@@ -682,7 +682,7 @@ useNoStoreUnless(loaded.value === true);
   }
 
   &__cat-badge {
-    background: rgba(#fff, 0.9);
+    background: rgba(var(--c-bg-rgb), 0.9);
     color: $primary;
     font-size: 0.7rem;
     font-weight: 700;
@@ -811,7 +811,7 @@ useNoStoreUnless(loaded.value === true);
     font-size: 0.875rem;
     font-weight: 600;
     color: $text-secondary;
-    background: #fff;
+    background: $bg-primary;
     cursor: pointer;
     font-family: $font-primary;
     transition: all 0.2s;
@@ -838,7 +838,7 @@ useNoStoreUnless(loaded.value === true);
     height: 36px;
     border-radius: 50%;
     border: 1.5px solid $border-color;
-    background: #fff;
+    background: $bg-primary;
     font-size: 0.875rem;
     font-weight: 600;
     color: $text-secondary;
@@ -882,7 +882,7 @@ useNoStoreUnless(loaded.value === true);
 }
 
 .sidebar-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.25rem;
@@ -1020,7 +1020,7 @@ useNoStoreUnless(loaded.value === true);
     font-size: 0.8rem;
     font-weight: 700;
     color: $text-muted;
-    background: #fff;
+    background: $bg-primary;
     padding: 0.2rem 0.6rem;
     border-radius: $border-radius-pill;
   }

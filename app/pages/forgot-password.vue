@@ -129,7 +129,7 @@ const validateEmail = () => {
 }
 
 .auth-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius-lg;
   padding: 2.5rem 2rem;
@@ -214,12 +214,12 @@ const validateEmail = () => {
 .form-input-wrap {
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   input {

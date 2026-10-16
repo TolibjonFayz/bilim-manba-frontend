@@ -244,7 +244,7 @@ useNoStoreUnless(loaded.value === true);
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background: #fff;
+  background: $bg-primary;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-pill;
   padding: 0.65rem 1.25rem;
@@ -253,7 +253,7 @@ useNoStoreUnless(loaded.value === true);
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.1);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.1);
   }
 
   &__icon {
@@ -300,7 +300,7 @@ useNoStoreUnless(loaded.value === true);
 
 // CATEGORY CARD
 .cat-card {
-  background: #fff;
+  background: $bg-primary;
   border-radius: $border-radius;
   border: 1px solid $border-color;
   overflow: hidden;
@@ -311,7 +311,7 @@ useNoStoreUnless(loaded.value === true);
   &:hover {
     transform: translateY(-4px);
     box-shadow: $shadow-lg;
-    border-color: rgba($primary, 0.3);
+    border-color: rgba(var(--c-primary-rgb), 0.3);
 
     .cat-card__arrow {
       transform: translateX(4px);
@@ -454,7 +454,7 @@ useNoStoreUnless(loaded.value === true);
     }
 
     &--purple {
-      background: rgba($primary, 0.12);
+      background: rgba(var(--c-primary-rgb), 0.12);
       font-size: 1.2rem;
       font-weight: 700;
       color: $primary;

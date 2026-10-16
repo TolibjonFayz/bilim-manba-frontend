@@ -108,7 +108,7 @@ onMounted(async () => {
 }
 
 .admin-stat-card {
-  background: #fff;
+  background: $bg-primary;
   border: 1px solid $border-color;
   border-radius: $border-radius;
   padding: 1.5rem;
@@ -127,7 +127,7 @@ onMounted(async () => {
     flex-shrink: 0;
 
     &--blue {
-      background: rgba($primary, 0.1);
+      background: rgba(var(--c-primary-rgb), 0.1);
     }
     &--purple {
       background: rgba(#764ba2, 0.1);
@@ -183,7 +183,7 @@ onMounted(async () => {
   }
 
   &__card {
-    background: #fff;
+    background: $bg-primary;
     border: 1.5px solid $border-color;
     border-radius: $border-radius;
     padding: 1.5rem;

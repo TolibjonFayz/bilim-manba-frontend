@@ -112,6 +112,23 @@
         </ClientOnly>
       </div>
 
+      <!-- Kun/tun rejimi: server mavzuni bilmaydi — ikkala belgi chiziladi,
+           qaysi biri ko'rinishini CSS ([data-theme]) hal qiladi -->
+      <button
+        class="navbar__icon-btn navbar__theme-btn"
+        type="button"
+        title="Kun / tun rejimi"
+        aria-label="Kun yoki tun rejimini almashtirish"
+        @click="toggleTheme"
+      >
+        <span class="navbar__theme-icon navbar__theme-icon--moon">
+          <Icon name="lucide:moon" size="1.1em" mode="css" />
+        </span>
+        <span class="navbar__theme-icon navbar__theme-icon--sun">
+          <Icon name="lucide:sun" size="1.15em" mode="css" />
+        </span>
+      </button>
+
       <!-- Mobile search btn -->
       <button
         class="navbar__icon-btn navbar__icon-btn--mobile"
@@ -373,6 +390,8 @@ const openSearch = () => {
   searchOpen.value = true;
 };
 
+const { toggle: toggleTheme } = useTheme();
+
 onMounted(async () => {
   document.addEventListener("click", handleClickOutside);
   window.addEventListener("keydown", (e: KeyboardEvent) => {
@@ -411,7 +430,7 @@ onUnmounted(() => {
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(#fff, 0.95);
+  background: rgba(var(--c-bg-rgb), 0.95);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid $border-color;
   transition: box-shadow 0.2s;
@@ -516,6 +535,26 @@ onUnmounted(() => {
     }
   }
 
+  // Kun/tun tugmasi: kompyuterda o'ng chekkada, telefonda qidiruvdan oldin
+  &__theme-btn {
+    margin-left: 0.6rem;
+    @media (max-width: $tablet) {
+      width: 40px;
+      height: 40px;
+      margin-left: auto;
+      & + .navbar__icon-btn--mobile {
+        margin-left: 0.5rem;
+      }
+    }
+  }
+  // Tunda qaysi belgi ko'rinishi — main.scss da (global [data-theme] selektori)
+  &__theme-icon {
+    display: flex;
+    &--sun {
+      display: none;
+    }
+  }
+
   // Mobile notif — faqat tablet da ko'rinadi
   &__notif-mobile {
     display: none;
@@ -570,7 +609,7 @@ onUnmounted(() => {
     position: absolute;
     top: calc(100% + 0.5rem);
     right: 0;
-    background: #fff;
+    background: $bg-primary;
     border: 1px solid $border-color;
     border-radius: $border-radius;
     box-shadow: $shadow-lg;
@@ -690,7 +729,7 @@ onUnmounted(() => {
     overflow: hidden;
     max-height: 0;
     transition: max-height 0.3s ease;
-    background: #fff;
+    background: $bg-primary;
     border-top: 1px solid $border-color;
     &--open {
       max-height: 500px;
@@ -835,44 +874,6 @@ onUnmounted(() => {
   }
 }
 
-// ─────────────────────────────────────
-// DARK MODE
-// ─────────────────────────────────────
-:global(.dark) {
-  .navbar {
-    background: rgba(15, 15, 26, 0.95);
-    border-color: #2d2d44;
-  }
-  .navbar__dropdown {
-    background: #1a1a2e;
-    border-color: #2d2d44;
-  }
-  .navbar__dropdown-item {
-    color: #f1f5f9;
-    &:hover {
-      background: #0f0f1a;
-    }
-  }
-  .navbar__dropdown-name {
-    color: #f1f5f9;
-  }
-  .navbar__dropdown-divider {
-    background: #2d2d44;
-  }
-  .navbar__mobile-menu {
-    background: #1a1a2e;
-    border-color: #2d2d44;
-  }
-  .navbar__mobile-divider {
-    background: #2d2d44;
-  }
-  .navbar__mobile-link {
-    color: #f1f5f9;
-  }
-  .navbar__notif-badge {
-    border-color: #0f0f1a;
-  }
-}
 </style>
 
 <style>
@@ -882,8 +883,8 @@ onUnmounted(() => {
   top: 70px;
   right: 1rem;
   width: 340px;
-  background: #ffffff;
-  border: 1px solid #eeedf5;
+  background: $bg-primary;
+  border: 1px solid $border-color;
   border-radius: 12px;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   overflow: hidden;
@@ -902,19 +903,19 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0.9rem 1.1rem;
-  border-bottom: 1px solid #eeedf5;
-  background: #f8f7ff;
+  border-bottom: 1px solid $border-color;
+  background: $bg-secondary;
 }
 
 .notif-dropdown__title {
   font-weight: 700;
   font-size: 0.9rem;
-  color: #1a1a2e;
+  color: $text-primary;
 }
 
 .notif-dropdown__mark-all {
   font-size: 0.75rem;
-  color: #5850ec;
+  color: $primary;
   font-weight: 600;
   background: none;
   border: none;
@@ -925,7 +926,7 @@ onUnmounted(() => {
 }
 
 .notif-dropdown__mark-all:hover {
-  background: rgba(88, 80, 236, 0.1);
+  background: rgba(var(--c-primary-rgb), 0.1);
 }
 
 .notif-dropdown__list {
@@ -942,7 +943,7 @@ onUnmounted(() => {
   display: flex;
   gap: 0.6rem;
   padding: 0.85rem 1.1rem;
-  border-bottom: 1px solid #f0eff8;
+  border-bottom: 1px solid var(--c-skeleton);
   align-items: flex-start;
 }
 
@@ -950,7 +951,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #e5e4ef;
+  background: var(--c-skeleton-2);
   flex-shrink: 0;
   margin-top: 5px;
   animation: notif-shimmer 1.2s ease-in-out infinite;
@@ -965,7 +966,7 @@ onUnmounted(() => {
 
 .notif-loading__line {
   border-radius: 4px;
-  background: linear-gradient(90deg, #f0eff8 25%, #e5e4ef 50%, #f0eff8 75%);
+  background: linear-gradient(90deg, var(--c-skeleton) 25%, var(--c-skeleton-2) 50%, var(--c-skeleton) 75%);
   background-size: 200% 100%;
   animation: notif-shimmer-slide 1.4s ease-in-out infinite;
 }
@@ -987,7 +988,7 @@ onUnmounted(() => {
   display: flex;
   gap: 0.6rem;
   padding: 0.85rem 1.1rem;
-  border-bottom: 1px solid #f0eff8;
+  border-bottom: 1px solid var(--c-skeleton);
   cursor: pointer;
   transition: background 0.15s;
   align-items: flex-start;
@@ -997,17 +998,17 @@ onUnmounted(() => {
   border-bottom: none;
 }
 .notif-item:hover {
-  background: #f8f7ff;
+  background: $bg-secondary;
 }
 .notif-item--unread {
-  background: rgba(88, 80, 236, 0.04);
+  background: rgba(var(--c-primary-rgb), 0.04);
 }
 
 .notif-item__dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #5850ec;
+  background: $primary;
   flex-shrink: 0;
   margin-top: 5px;
 }
@@ -1023,12 +1024,12 @@ onUnmounted(() => {
 .notif-item__title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: #1a1a2e;
+  color: $text-primary;
   line-height: 1.3;
 }
 .notif-item__msg {
   font-size: 0.78rem;
-  color: #4a5568;
+  color: $text-secondary;
   line-height: 1.4;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -1037,14 +1038,14 @@ onUnmounted(() => {
 }
 .notif-item__time {
   font-size: 0.7rem;
-  color: #6b7280;
+  color: $text-muted;
   margin-top: 0.1rem;
 }
 
 .notif-empty {
   text-align: center;
   padding: 2.5rem 1rem;
-  color: #6b7280;
+  color: $text-muted;
 }
 .notif-empty span {
   font-size: 1.75rem;
@@ -1053,45 +1054,6 @@ onUnmounted(() => {
 }
 .notif-empty p {
   font-size: 0.85rem;
-}
-
-/* Dark mode */
-.dark .notif-dropdown {
-  background: #1a1a2e;
-  border-color: #2d2d44;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-.dark .notif-dropdown__header {
-  background: #0f0f1a;
-  border-color: #2d2d44;
-}
-.dark .notif-dropdown__title {
-  color: #f1f5f9;
-}
-.dark .notif-loading__skeleton {
-  border-color: #2d2d44;
-}
-.dark .notif-loading__dot {
-  background: #2d2d44;
-}
-.dark .notif-loading__line {
-  background: linear-gradient(90deg, #1a1a2e 25%, #2d2d44 50%, #1a1a2e 75%);
-  background-size: 200% 100%;
-}
-.dark .notif-item {
-  border-color: #2d2d44;
-}
-.dark .notif-item:hover {
-  background: #0f0f1a;
-}
-.dark .notif-item--unread {
-  background: rgba(88, 80, 236, 0.08);
-}
-.dark .notif-item__title {
-  color: #f1f5f9;
-}
-.dark .notif-item__msg {
-  color: #a0aec0;
 }
 
 @keyframes notif-shimmer {

@@ -134,7 +134,7 @@ const handleLogin = async () => {
 
 <style lang="scss" scoped>
 .auth-card {
-  background: #fff;
+  background: $bg-primary;
   border-radius: $border-radius-lg;
   padding: 2.5rem;
   width: 100%;
@@ -227,13 +227,13 @@ const handleLogin = async () => {
   align-items: center;
   border: 1.5px solid $border-color;
   border-radius: $border-radius-sm;
-  background: #fff;
+  background: $bg-primary;
   transition: all 0.2s;
   overflow: hidden;
 
   &:focus-within {
     border-color: $primary;
-    box-shadow: 0 0 0 3px rgba($primary, 0.12);
+    box-shadow: 0 0 0 3px rgba(var(--c-primary-rgb), 0.12);
   }
 
   input {

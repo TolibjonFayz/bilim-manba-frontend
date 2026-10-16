@@ -339,8 +339,8 @@ onUnmounted(() => {
     max-width: 600px;
     height: fit-content;
     max-height: 70vh;
-    background: #ffffff;
-    border: 1px solid #eeedf5;
+    background: $bg-primary;
+    border: 1px solid $border-color;
     border-radius: $border-radius-lg;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     display: flex;
@@ -671,26 +671,11 @@ onUnmounted(() => {
 
 // ── Highlight (global — v-html ichidagi mark uchun) ──
 :deep(.search-hl) {
-  background: rgba(88, 80, 236, 0.18);
+  background: rgba(var(--c-primary-rgb), 0.18);
   color: var(--color-primary);
   font-weight: 700;
   border-radius: 3px;
   padding: 0 1px;
 }
 
-// ── Dark mode ──
-:global(.dark) .search-modal__box {
-  background: #1a1a2e;
-  border-color: #2d2d44;
-}
-:global(.dark) .search-modal__input {
-  color: #f1f5f9;
-}
-:global(.dark) .search-result__title {
-  color: #f1f5f9;
-}
-:global(.dark) .search-result:hover,
-:global(.dark) .search-result--active {
-  background: #0f0f1a;
-}
 </style>
