@@ -422,6 +422,25 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Seriyalar (admin): path — "" | "/:id" | "/:id/plan" | "/:id/enqueue"
+  async function seriesApi(
+    method: "GET" | "POST" | "PUT" | "DELETE",
+    path = "",
+    body?: Record<string, unknown>,
+  ) {
+    try {
+      const res = await $fetch<any>(`/admin/series${path}`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   async function getArticle(id: number) {
     try {
       const res = await $fetch<any>(`/admin/articles/${id}`, {
@@ -465,6 +484,7 @@ export const useAdminStore = defineStore("admin", () => {
     getDraftSettings,
     updateDraftSettings,
     telegramAlerts,
+    seriesApi,
     getSocialPreview,
     getPublishingStatus,
   };

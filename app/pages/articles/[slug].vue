@@ -83,6 +83,13 @@
               </div>
             </div>
 
+            <!-- Seriya: nechanchi qism va qismlar ro'yxati -->
+            <ArticleSeries
+              v-if="article?.series"
+              :series="article.series"
+              mode="top"
+            />
+
             <!-- COVER IMAGE -->
             <div class="article-cover">
               <img
@@ -114,6 +121,13 @@
               :key="article.slug"
               :questions="article.quiz"
               :slug="article.slug"
+            />
+
+            <!-- Seriyaning keyingi qismi -->
+            <ArticleSeries
+              v-if="article?.series"
+              :series="article.series"
+              mode="bottom"
             />
 
             <!-- ARTICLE FOOTER -->

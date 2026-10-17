@@ -4,6 +4,7 @@ const staticPages = [
   { url: "/", priority: "1.0", changefreq: "daily" },
   { url: "/articles", priority: "0.9", changefreq: "daily" },
   { url: "/categories", priority: "0.8", changefreq: "weekly" },
+  { url: "/series", priority: "0.7", changefreq: "weekly" },
   { url: "/about", priority: "0.6", changefreq: "monthly" },
   { url: "/faq", priority: "0.5", changefreq: "monthly" },
   { url: "/support", priority: "0.5", changefreq: "monthly" },
@@ -54,6 +55,13 @@ export default defineEventHandler(async (event) => {
       )
       .join("");
 
+    // Seriyalar (faqat chop etilgan qismi borlari — backend o'zi tanlaydi)
+    const seriesUrls = (data?.series || [])
+      .map((s: any) =>
+        urlTag(`/series/${s.slug}`, "0.7", "weekly", day(s.updatedAt)),
+      )
+      .join("");
+
     setHeader(event, "Content-Type", "application/xml");
     // Vercel CDN 1 soat keshlaydi — backend uxlab qolsa ham Google tez javob oladi
     setHeader(
@@ -67,6 +75,7 @@ export default defineEventHandler(async (event) => {
 ${staticUrls}
 ${articleUrls}
 ${categoryUrls}
+${seriesUrls}
 </urlset>`;
   } catch (err) {
     // Backend ishlamasa — 503. Google eski sitemap'ni saqlab, keyinroq qayta urinadi

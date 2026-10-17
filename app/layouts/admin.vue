@@ -27,6 +27,9 @@
         <NuxtLink to="/admin/categories" class="admin-sidebar__link">
           📂 Kategoriyalar
         </NuxtLink>
+        <NuxtLink to="/admin/series" class="admin-sidebar__link">
+          📚 Seriyalar
+        </NuxtLink>
         <NuxtLink to="/admin/users" class="admin-sidebar__link">
           👥 Foydalanuvchilar
         </NuxtLink>
