@@ -108,6 +108,14 @@
               <div class="article-content" v-html="content?.message" />
             </div>
 
+            <!-- O'zingizni sinang: AI maqola matnidan tuzgan 3 ta savol -->
+            <ArticleQuiz
+              v-if="article?.quiz?.length"
+              :key="article.slug"
+              :questions="article.quiz"
+              :slug="article.slug"
+            />
+
             <!-- ARTICLE FOOTER -->
             <div class="article-footer">
               <!-- Teglar -->
