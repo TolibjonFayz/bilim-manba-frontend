@@ -8,7 +8,8 @@
       Seriya — bir mavzudagi ketma-ket maqolalar. O'quvchi maqola tepasida
       "2-qism / 4" belgisini va oxirida "Keyingi qism →" kartasini ko'radi,
       hamma seriyalar <NuxtLink to="/series" target="_blank">/series</NuxtLink>
-      sahifasida. Saytda kamida 2 ta chop etilgan qismi bor seriya ko'rinadi.
+      sahifasida. Seriya saytda birinchi qismi chop etilgach ko'rinadi; maqola
+      ichidagi seriya bloki esa 2-qism chop etilgach chiqadi.
     </p>
 
     <!-- Yangi seriya -->
