@@ -246,6 +246,7 @@
           />
           <small class="ai-box__small">
             Bo'sh qoldirsangiz — AI tanlangan kategoriya (yoki navbatdagi bo'lim) uchun o'zi mavzu topadi.
+            "Google qidiruvidan" — odamlar Google'da qidirayotgan, lekin saytda hali maqolasi yo'q mavzu.
           </small>
 
           <label class="ai-box__label" for="ai-category">Kategoriya</label>
@@ -256,6 +257,7 @@
             :disabled="ai.generating"
           >
             <option value="">AI o'zi tanlasin</option>
+            <option value="search">🔎 Google qidiruvidan (mavzusiz)</option>
             <option
               v-for="c in adminStore.categories"
               :key="c.id"
@@ -299,7 +301,7 @@
               placeholder="Fotosintez&#10;Messi va 2022 yilgi jahon chempionati&#10;https://en.wikipedia.org/wiki/Silk_Road"
             />
             <small class="ai-box__small">
-              Navbat bo'sh bo'lsa — AI bo'limlar bo'yicha navbat bilan o'zi mavzu tanlaydi: har bo'limdan bittadan, Kino'dan ikkita. 18+ va Islom qadriyatlariga zid mavzular yozilmaydi.
+              Navbat bo'sh bo'lsa — AI kunma-kun o'zi mavzu tanlaydi: bir kun Google'da qidirilayotgan, lekin saytda yo'q mavzu, keyingi kun bo'limlar navbati (har bo'limdan bittadan, Kino'dan ikkita). Har maqolaga saytdagi yaqin maqolalarga havolalar qo'shiladi. 18+ va Islom qadriyatlariga zid mavzular yozilmaydi.
               Ko'rib chiqilmagan {{ aiSettings.maxPending }} ta AI qoralama
               to'planib qolsa, yangisi yozilmaydi.
             </small>
@@ -388,7 +390,7 @@ const aiSettings = ref<any>(null);
 const ai = reactive({
   open: false,
   topic: "",
-  categoryId: "" as number | "",
+  categoryId: "" as number | "" | "search",
   generating: false,
   daily: true,
   topicsText: "",
