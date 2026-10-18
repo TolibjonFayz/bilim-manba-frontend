@@ -376,6 +376,7 @@ export const useAdminStore = defineStore("admin", () => {
   async function updateDraftSettings(body: {
     daily?: boolean;
     topics?: string[];
+    autoSeries?: boolean;
   }) {
     try {
       const res = await $fetch<any>("/admin/drafts/settings", {

@@ -290,6 +290,11 @@
               Har kuni {{ String(aiSettings.dailyHour).padStart(2, "0") }}:00 da
               bitta qoralama yozilsin
             </label>
+            <label class="ai-box__check">
+              <input v-model="ai.autoSeries" type="checkbox" />
+              Har {{ aiSettings.autoSeriesEveryDays ?? 10 }} kunda AI yangi
+              seriya boshlasin (qismlari navbatga qo'yiladi)
+            </label>
             <label class="ai-box__label" for="ai-topics"
               >Navbatdagi mavzular (har qatorda bitta)</label
             >
@@ -393,6 +398,7 @@ const ai = reactive({
   categoryId: "" as number | "" | "search",
   generating: false,
   daily: true,
+  autoSeries: true,
   topicsText: "",
   saving: false,
   elapsed: 0,
@@ -403,6 +409,7 @@ const loadAiSettings = async () => {
   if (res.success) {
     aiSettings.value = res.data;
     ai.daily = res.data.daily;
+    ai.autoSeries = res.data.autoSeries !== false;
     ai.topicsText = (res.data.topics ?? []).join("\n");
   }
 };
@@ -489,6 +496,7 @@ const handleSaveAi = async () => {
   ai.saving = true;
   const res = await adminStore.updateDraftSettings({
     daily: ai.daily,
+    autoSeries: ai.autoSeries,
     topics: ai.topicsText.split("\n"),
   });
   ai.saving = false;

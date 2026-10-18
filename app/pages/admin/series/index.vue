@@ -12,6 +12,21 @@
       ichidagi seriya bloki esa 2-qism chop etilgach chiqadi.
     </p>
 
+    <!-- AI: avtomatik seriyalar -->
+    <div class="card auto">
+      <strong>🤖 AI yordamida</strong>
+      <button class="btn btn--outline" :disabled="autoBusy !== ''" @click="autoExisting">
+        {{ autoBusy === "existing" ? "⏳ AI qidiryapti…" : "📎 Mavjud maqolalardan seriya topish" }}
+      </button>
+      <button class="btn btn--outline" :disabled="autoBusy !== ''" @click="autoNew">
+        {{ autoBusy === "new" ? "⏳ AI o'ylayapti…" : "✨ Yangi seriya boshlash" }}
+      </button>
+      <small>
+        AI har 10 kunda o'zi ham yangi seriya boshlaydi (oldingisining qismlari
+        yozib bo'lingach). O'chirish: Maqolalar → AI qoralama → Kunlik qoralama.
+      </small>
+    </div>
+
     <!-- Yangi seriya -->
     <form class="card new-series" @submit.prevent="create">
       <strong>➕ Yangi seriya</strong>
@@ -159,6 +174,37 @@ const list = ref<any[]>([]);
 const loading = ref(true);
 const busy = ref(false);
 const form = reactive({ title: "", description: "" });
+const autoBusy = ref<"" | "existing" | "new">("");
+
+const autoExisting = async () => {
+  autoBusy.value = "existing";
+  const res = await adminStore.seriesApi("POST", "/auto/existing");
+  autoBusy.value = "";
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 8000 });
+  const n = res.data?.length ?? 0;
+  ElMessage(
+    n
+      ? { type: "success", message: `📎 ${n} ta seriya yig'ildi: ${res.data.map((s: any) => s.title).join(", ")}` }
+      : { type: "info", message: "AI ketma-ket o'qiladigan maqolalar guruhini topmadi" },
+  );
+  await load();
+};
+
+const autoNew = async () => {
+  autoBusy.value = "new";
+  const res = await adminStore.seriesApi("POST", "/auto/new");
+  autoBusy.value = "";
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 8000 });
+  const c = res.data?.created;
+  ElMessage(
+    c
+      ? { type: "success", message: `✨ «${c.title}» — ${c.parts.length} qism kunlik navbatga qo'yildi`, duration: 6000 }
+      : { type: "warning", message: "Yangi seriya boshlanmadi: oldingisining qismlari hali navbatda yoki AI mos reja topmadi" },
+  );
+  await load();
+};
 
 const decorate = (s: any) => ({
   ...s,
@@ -315,6 +361,28 @@ onMounted(async () => {
   &:focus {
     outline: none;
     border-color: $primary;
+  }
+}
+
+// Kartochka foni tugma foni bilan bir xil — chegara bilan ajratamiz
+.card .btn--outline {
+  border: 1.5px solid $border-color;
+
+  &:hover:not(:disabled) {
+    border-color: $primary;
+  }
+}
+
+.auto {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+
+  small {
+    flex-basis: 100%;
+    color: $text-muted;
+    font-size: 0.82rem;
   }
 }
 
