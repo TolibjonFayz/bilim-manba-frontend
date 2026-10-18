@@ -36,6 +36,7 @@
         <div class="profile-main__grid">
           <!-- CHAP: Sidebar -->
           <aside class="profile-sidebar">
+            <ProfileQuizStats />
             <div class="sidebar-card">
               <h3 class="sidebar-card__title">Tezkor statistika</h3>
               <div class="stats-list">

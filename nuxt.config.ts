@@ -132,6 +132,9 @@ export default defineNuxtConfig({
     "/series": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/series/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/maktab": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    // Service worker yangilanishi darhol yetib borsin
+    "/sw.js": { headers: { "cache-control": "no-cache" } },
+    "/reyting": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/maktab/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/about": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
     "/faq": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
@@ -158,6 +161,8 @@ export default defineNuxtConfig({
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       // Mavsumiy bezak: "auto" (kuz — 1-sentabr–30-noyabr) | "autumn" | "off"
       season: process.env.NUXT_PUBLIC_SEASON || "auto",
+      // Ilova (service worker): "on" | "off" — muammo bo'lsa o'chirish uchun
+      pwa: process.env.NUXT_PUBLIC_PWA || "on",
     },
   },
 

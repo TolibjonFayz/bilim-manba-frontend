@@ -39,6 +39,9 @@
             <Icon name="skill-icons:instagram" size="1em" mode="css" />
           </a>
         </div>
+        <div class="footer__install">
+          <InstallAppButton variant="footer" />
+        </div>
       </div>
 
       <div class="footer__col">
@@ -46,6 +49,8 @@
         <NuxtLink to="/">Bosh sahifa</NuxtLink>
         <NuxtLink to="/articles">Maqolalar</NuxtLink>
         <NuxtLink to="/categories">Kategoriyalar</NuxtLink>
+        <NuxtLink to="/maktab">Maktab o'quvchilari uchun</NuxtLink>
+        <NuxtLink to="/reyting">Test reytingi</NuxtLink>
       </div>
 
       <div class="footer__col">
@@ -219,6 +224,10 @@ const handleSubscribe = async () => {
   &__socials {
     display: flex;
     gap: 0.75rem;
+  }
+
+  &__install:has(button) {
+    margin-top: 1rem;
   }
 
   &__social {

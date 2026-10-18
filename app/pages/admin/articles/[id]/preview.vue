@@ -90,6 +90,12 @@
         postlari muqova bilan chiroyliroq chiqadi).
       </div>
 
+      <AdminFactCheck
+        :article-id="article.id"
+        @issues="onIssues"
+        @focus="focusQuote"
+      />
+
       <!-- Saytdagidek ko'rinish -->
       <article class="preview-article">
         <img
@@ -109,7 +115,7 @@
         <p v-if="article.excerpt" class="preview-article__excerpt">
           {{ article.excerpt }}
         </p>
-        <div class="article-content" v-html="content" />
+        <div ref="contentEl" class="article-content" v-html="content" />
         <div v-if="tags.length" class="preview-article__tags">
           <span v-for="t in tags" :key="t">#{{ t }}</span>
         </div>
@@ -179,6 +185,53 @@ const load = async () => {
   }
   loading.value = false;
 };
+
+// Fakt-tekshiruvdagi shubhali parchalar matnda sariq bilan belgilanadi
+const contentEl = ref<HTMLElement | null>(null);
+const issueQuotes = ref<string[]>([]);
+// Tutuq belgilari va katta-kichik harf farqi e'tiborsiz (uzunlik o'zgarmaydi)
+const norm = (s: string) => s.toLowerCase().replace(/[‘’ʻʼ`]/g, "'");
+
+const highlight = () => {
+  const root = contentEl.value;
+  if (!root) return;
+  root.innerHTML = content.value;
+  for (const quote of issueQuotes.value) {
+    const q = norm(quote);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    let node: Node | null;
+    while ((node = walker.nextNode())) {
+      const idx = norm(node.nodeValue ?? "").indexOf(q);
+      if (idx < 0) continue;
+      const range = document.createRange();
+      range.setStart(node, idx);
+      range.setEnd(node, idx + q.length);
+      const mark = document.createElement("mark");
+      mark.className = "fc-mark";
+      mark.dataset.quote = q;
+      range.surroundContents(mark);
+      break;
+    }
+  }
+};
+
+const onIssues = (list: { quote: string }[]) => {
+  issueQuotes.value = list.map((i) => i.quote);
+  nextTick(highlight);
+};
+
+const focusQuote = (quote: string) => {
+  const el = [...(contentEl.value?.querySelectorAll<HTMLElement>(".fc-mark") ?? [])].find(
+    (m) => m.dataset.quote === norm(quote),
+  );
+  if (!el) return ElMessage({ type: "info", message: "Bu parcha matnda topilmadi (tahrirlangan bo'lishi mumkin)" });
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.remove("is-flash");
+  void el.offsetWidth;
+  el.classList.add("is-flash");
+};
+
+watch(content, () => nextTick(highlight));
 
 onMounted(load);
 
@@ -505,6 +558,26 @@ const handleDelete = async () => {
 
   :deep(a) {
     color: $primary;
+  }
+}
+</style>
+
+<style lang="scss">
+.admin-preview .fc-mark {
+  background: rgba(250, 204, 21, 0.45);
+  color: inherit;
+  padding: 0 0.15em;
+  border-radius: 3px;
+  scroll-margin-top: 6rem;
+
+  &.is-flash {
+    animation: fc-flash 1.2s ease 2;
+  }
+}
+
+@keyframes fc-flash {
+  50% {
+    background: rgba(245, 158, 11, 0.85);
   }
 }
 </style>

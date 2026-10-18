@@ -77,6 +77,9 @@
                   <NuxtLink to="/profile" class="navbar__dropdown-item"
                     >👤 Profil</NuxtLink
                   >
+                  <NuxtLink to="/reyting" class="navbar__dropdown-item"
+                    >🏆 Reyting</NuxtLink
+                  >
                   <button
                     class="navbar__dropdown-item navbar__dropdown-item--danger"
                     @click="handleLogout"
@@ -205,8 +208,17 @@
           @click="menuOpen = false"
           >🎒 Maktab o'quvchilari uchun</NuxtLink
         >
+        <NuxtLink
+          to="/reyting"
+          class="navbar__mobile-link"
+          @click="menuOpen = false"
+          >🏆 Test reytingi</NuxtLink
+        >
       </nav>
       <div class="navbar__mobile-divider" />
+      <div class="navbar__mobile-install">
+        <InstallAppButton variant="menu" />
+      </div>
       <div class="navbar__mobile-actions">
         <ClientOnly>
           <template #default>
@@ -793,6 +805,9 @@ onUnmounted(() => {
     height: 1px;
     background: $border-color;
     margin: 0 1rem;
+  }
+  &__mobile-install:has(button) {
+    padding: 0.75rem 1rem 0;
   }
   &__mobile-actions {
     display: flex;

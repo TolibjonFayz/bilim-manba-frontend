@@ -1,13 +1,18 @@
 {
+  "id": "/",
   "name": "Bilim Manba",
-  "short_name": "BilimManba",
-  "description": "O'zbek tilidagi bilim platformasi — TONG INC",
-  "start_url": "/",
+  "short_name": "Bilim Manba",
+  "description": "O'zbek tilidagi ilmiy-ommabop maqolalar, maktab mavzulari va testlar — TONG INC",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#ffffff",
-  "theme_color": "#6366f1",
+  "theme_color": "#5850ec",
   "lang": "uz",
+  "categories": [
+    "education",
+    "books"
+  ],
   "icons": [
     {
       "src": "/icon-192.png",
@@ -26,6 +31,40 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Maqolalar",
+      "url": "/articles?utm_source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Maktab o'quvchilari uchun",
+      "short_name": "Maktab",
+      "url": "/maktab?utm_source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Test reytingi",
+      "short_name": "Reyting",
+      "url": "/reyting?utm_source=pwa",
+      "icons": [
+        {
+          "src": "/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
     }
   ]
 }

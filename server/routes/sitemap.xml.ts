@@ -6,6 +6,7 @@ const staticPages = [
   { url: "/categories", priority: "0.8", changefreq: "weekly" },
   { url: "/series", priority: "0.7", changefreq: "weekly" },
   { url: "/maktab", priority: "0.8", changefreq: "daily" },
+  { url: "/reyting", priority: "0.5", changefreq: "daily" },
   { url: "/about", priority: "0.6", changefreq: "monthly" },
   { url: "/faq", priority: "0.5", changefreq: "monthly" },
   { url: "/support", priority: "0.5", changefreq: "monthly" },

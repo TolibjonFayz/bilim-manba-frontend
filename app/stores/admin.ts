@@ -444,6 +444,20 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // AI fakt-tekshiruvi: GET — natija, POST — qayta tekshirish (fonda)
+  async function factCheckApi(id: number, method: "GET" | "POST") {
+    try {
+      const res = await $fetch<any>(`/admin/articles/${id}/fact-check`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Telegram kanalda "Kun savoli": GET holat, PUT sozlash, POST /send hozir yuborish
   async function channelQuizApi(
     method: "GET" | "PUT" | "POST",
@@ -528,6 +542,7 @@ export const useAdminStore = defineStore("admin", () => {
     seriesApi,
     schoolApi,
     channelQuizApi,
+    factCheckApi,
     getSocialPreview,
     getPublishingStatus,
   };

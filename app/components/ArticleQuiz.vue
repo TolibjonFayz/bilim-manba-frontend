@@ -48,6 +48,25 @@
     <div v-if="done" class="quiz__result" role="status">
       <div class="quiz__score">{{ score }}/{{ questions.length }}</div>
       <p class="quiz__verdict">{{ verdict }}</p>
+      <!-- Ball: kirgan foydalanuvchiga har test uchun bir marta -->
+      <ClientOnly>
+        <p v-if="reward?.awarded" class="quiz__points">
+          🏆 <strong>+{{ reward.points }} ball!</strong>
+          <template v-if="reward.week?.rank">
+            Haftalik reytingda {{ reward.week.rank }}-o'rindasiz.</template
+          >
+          <NuxtLink to="/reyting">Reyting →</NuxtLink>
+        </p>
+        <p v-else-if="reward && reward.awarded === false" class="quiz__points is-muted">
+          Bu test uchun ball avval olingan.
+          <NuxtLink to="/reyting">Reyting →</NuxtLink>
+        </p>
+        <p v-else-if="!authStore.isLoggedIn" class="quiz__points is-muted">
+          🔒 <NuxtLink to="/register">Ro'yxatdan o'ting</NuxtLink> — har test
+          uchun ball olasiz va <NuxtLink to="/reyting">reytingga</NuxtLink>
+          chiqasiz.
+        </p>
+      </ClientOnly>
       <button type="button" class="btn btn--outline quiz__retry" @click="reset">
         🔄 Qayta urinish
       </button>
@@ -59,7 +78,8 @@
 /**
  * Maqola oxiridagi 3 savollik test (AI maqola matnidan tuzgan). Javob
  * bosilishi bilan to'g'ri/noto'g'ri va izoh ko'rinadi; oxirida natija.
- * Birinchi urinish natijasi serverga yuboriladi (statistika uchun).
+ * Birinchi urinish natijasi serverga yuboriladi: statistika uchun, kirgan
+ * foydalanuvchiga esa ball (javoblar serverda tekshiriladi).
  */
 interface QuizQuestion {
   q: string;
@@ -71,6 +91,12 @@ interface QuizQuestion {
 const props = defineProps<{ questions: QuizQuestion[]; slug: string }>();
 
 const LETTERS = ["A", "B", "C", "D"];
+const authStore = useAuthStore();
+const reward = ref<{
+  awarded?: boolean;
+  points?: number;
+  week?: { rank: number | null; points: number };
+} | null>(null);
 const round = ref(0);
 const picked = ref<(number | null)[]>(props.questions.map(() => null));
 let reported = false;
@@ -101,11 +127,17 @@ const pick = (i: number, j: number) => {
   picked.value[i] = j;
   if (done.value && !reported) {
     reported = true;
-    $fetch(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
+    const token = authStore.token;
+    $fetch<any>(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
       method: "POST",
       baseURL: useRuntimeConfig().public.apiBase,
-      body: { correct: score.value },
-    }).catch(() => {});
+      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      body: { correct: score.value, answers: [...picked.value] },
+    })
+      .then((res) => {
+        if (res && "awarded" in res) reward.value = res;
+      })
+      .catch(() => {});
   }
 };
 
@@ -280,6 +312,26 @@ const reset = () => {
   &__verdict {
     margin: 0.25rem 0 1rem;
     font-weight: 600;
+  }
+
+  &__points {
+    margin: -0.25rem 0 1rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+
+    strong {
+      color: $primary;
+    }
+
+    a {
+      color: $primary;
+      font-weight: 700;
+      margin-left: 0.25rem;
+    }
+
+    &.is-muted {
+      color: $text-secondary;
+    }
   }
 }
 </style>
