@@ -30,9 +30,11 @@ export default defineEventHandler(async (event) => {
   try {
     // Kategoriya URL'lari nom bo'yicha (/categories/Sport), shuning uchun
     // nomlarni /categories/all dan olamiz
-    const [data, categories] = await Promise.all([
+    const [data, categories, school] = await Promise.all([
       $fetch<any>(`${API_BASE}/articles/sitemap`, { timeout: 60000 }),
       $fetch<any[]>(`${API_BASE}/categories/all`, { timeout: 60000 }),
+      // Maktab bo'limi ixtiyoriy — xato bo'lsa sitemap baribir chiqsin
+      $fetch<any[]>(`${API_BASE}/school/all`, { timeout: 60000 }).catch(() => []),
     ]);
 
     const staticUrls = staticPages
@@ -63,6 +65,20 @@ export default defineEventHandler(async (event) => {
       )
       .join("");
 
+    // Maktab: /maktab/tarix, /maktab/8-sinf, /maktab/tarix/8-sinf (faqat maqolasi borlari)
+    const schoolPaths = new Set<string>();
+    for (const a of school || []) {
+      schoolPaths.add(schoolPath(a.subject));
+      if (a.grade) {
+        schoolPaths.add(schoolPath(null, a.grade));
+        schoolPaths.add(schoolPath(a.subject, a.grade));
+      }
+    }
+    const schoolUrls = [...schoolPaths]
+      .sort()
+      .map((p) => urlTag(p, "0.6", "weekly"))
+      .join("");
+
     setHeader(event, "Content-Type", "application/xml");
     // Vercel CDN 1 soat keshlaydi — backend uxlab qolsa ham Google tez javob oladi
     setHeader(
@@ -77,6 +93,7 @@ ${staticUrls}
 ${articleUrls}
 ${categoryUrls}
 ${seriesUrls}
+${schoolUrls}
 </urlset>`;
   } catch (err) {
     // Backend ishlamasa — 503. Google eski sitemap'ni saqlab, keyinroq qayta urinadi

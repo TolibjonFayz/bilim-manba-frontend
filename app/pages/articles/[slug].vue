@@ -26,7 +26,7 @@
                 <!-- Maktab o'quvchilari uchun: sinf va fan -->
                 <NuxtLink
                   v-if="article?.school"
-                  :to="`/maktab?fan=${encodeURIComponent(article.school.subject)}`"
+                  :to="schoolPath(article.school.subject, article.school.grade)"
                   class="badge badge--school"
                 >
                   🎒 O'quvchilar uchun<template v-if="article.school.grade">

@@ -47,6 +47,8 @@
       </div>
     </div>
 
+    <AdminChannelQuiz />
+
     <!-- Quick links -->
     <div class="admin-quick">
       <h2 class="admin-quick__title">Tezkor harakatlar</h2>

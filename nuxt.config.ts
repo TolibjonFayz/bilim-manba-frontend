@@ -132,6 +132,7 @@ export default defineNuxtConfig({
     "/series": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/series/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/maktab": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/maktab/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/about": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
     "/faq": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },
     "/terms": { headers: { "cache-control": "public, s-maxage=86400, stale-while-revalidate=604800" } },

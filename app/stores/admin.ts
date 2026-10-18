@@ -444,6 +444,25 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Telegram kanalda "Kun savoli": GET holat, PUT sozlash, POST /send hozir yuborish
+  async function channelQuizApi(
+    method: "GET" | "PUT" | "POST",
+    path = "",
+    body?: Record<string, unknown>,
+  ) {
+    try {
+      const res = await $fetch<any>(`/admin/channel-quiz${path}`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Maktab bo'limi: GET — ro'yxat, PUT /:articleId — fan, sinf, yashirish
   async function schoolApi(
     method: "GET" | "PUT",
@@ -508,6 +527,7 @@ export const useAdminStore = defineStore("admin", () => {
     telegramAlerts,
     seriesApi,
     schoolApi,
+    channelQuizApi,
     getSocialPreview,
     getPublishingStatus,
   };
