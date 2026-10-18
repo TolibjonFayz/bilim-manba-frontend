@@ -258,6 +258,7 @@
           >
             <option value="">AI o'zi tanlasin</option>
             <option value="search">🔎 Google qidiruvidan (mavzusiz)</option>
+            <option value="school">🎒 Maktab o'quvchilari uchun</option>
             <option
               v-for="c in adminStore.categories"
               :key="c.id"
@@ -306,7 +307,7 @@
               placeholder="Fotosintez&#10;Messi va 2022 yilgi jahon chempionati&#10;https://en.wikipedia.org/wiki/Silk_Road"
             />
             <small class="ai-box__small">
-              Navbat bo'sh bo'lsa — AI kunma-kun o'zi mavzu tanlaydi: bir kun Google'da qidirilayotgan, lekin saytda yo'q mavzu, keyingi kun bo'limlar navbati (har bo'limdan bittadan, Kino'dan ikkita). Har maqolaga saytdagi yaqin maqolalarga havolalar qo'shiladi. 18+ va Islom qadriyatlariga zid mavzular yozilmaydi.
+              Navbat bo'sh bo'lsa — AI kunma-kun o'zi mavzu tanlaydi: Google'da qidirilayotgan, lekin saytda yo'q mavzu → maktab dasturidagi mavzu (o'quvchilar uchun, /maktab) → bo'limlar navbati (har bo'limdan bittadan, Kino'dan ikkita). Har maqolaga saytdagi yaqin maqolalarga havolalar qo'shiladi. 18+ va Islom qadriyatlariga zid mavzular yozilmaydi.
               Ko'rib chiqilmagan {{ aiSettings.maxPending }} ta AI qoralama
               to'planib qolsa, yangisi yozilmaydi.
             </small>
@@ -395,7 +396,7 @@ const aiSettings = ref<any>(null);
 const ai = reactive({
   open: false,
   topic: "",
-  categoryId: "" as number | "" | "search",
+  categoryId: "" as number | "" | "search" | "school",
   generating: false,
   daily: true,
   autoSeries: true,

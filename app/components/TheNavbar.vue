@@ -19,6 +19,7 @@
         <NuxtLink to="/categories" class="navbar__link">Kategoriyalar</NuxtLink>
         <NuxtLink to="/articles" class="navbar__link">Maqolalar</NuxtLink>
         <NuxtLink to="/series" class="navbar__link">Seriyalar</NuxtLink>
+        <NuxtLink to="/maktab" class="navbar__link">Maktab</NuxtLink>
       </nav>
 
       <!-- Desktop Actions -->
@@ -197,6 +198,12 @@
           class="navbar__mobile-link"
           @click="menuOpen = false"
           >📚 Seriyalar</NuxtLink
+        >
+        <NuxtLink
+          to="/maktab"
+          class="navbar__mobile-link"
+          @click="menuOpen = false"
+          >🎒 Maktab o'quvchilari uchun</NuxtLink
         >
       </nav>
       <div class="navbar__mobile-divider" />

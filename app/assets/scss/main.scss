@@ -221,6 +221,18 @@ select {
     border: 1px solid $border-color;
   }
 
+  // Maktab o'quvchilari uchun maqola (sinf va fan) — /maktab ga havola
+  &--school {
+    background: rgba(245, 158, 11, 0.14);
+    color: var(--c-warning-text);
+    font-size: 0.72rem;
+    font-weight: 700;
+
+    &:hover {
+      background: rgba(245, 158, 11, 0.22);
+    }
+  }
+
   &--category {
     background: rgba(var(--c-primary-rgb), 0.08);
     color: $primary;

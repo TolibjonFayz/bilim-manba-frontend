@@ -23,6 +23,17 @@
                 <span class="badge badge--category">
                   💻 {{ article?.category?.name }}
                 </span>
+                <!-- Maktab o'quvchilari uchun: sinf va fan -->
+                <NuxtLink
+                  v-if="article?.school"
+                  :to="`/maktab?fan=${encodeURIComponent(article.school.subject)}`"
+                  class="badge badge--school"
+                >
+                  🎒 O'quvchilar uchun<template v-if="article.school.grade">
+                    · {{ article.school.grade }}-sinf</template
+                  >
+                  · {{ article.school.subject }}
+                </NuxtLink>
               </div>
 
               <h1 class="article-header__title">{{ article?.title }}</h1>

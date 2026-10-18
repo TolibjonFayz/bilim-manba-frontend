@@ -270,9 +270,11 @@ export const useAdminStore = defineStore("admin", () => {
   }
 
   // AI qoralama: mavzu yoki Wikipedia havolasi (bo'sh — AI bo'lim uchun o'zi mavzu tanlaydi)
-  // categoryId "search" — mavzusiz, Google qidiruvidagi talabdan
+  // categoryId "search" — mavzusiz, Google qidiruvidagi talabdan;
+  // "school" — maktab o'quvchilari uchun (mavzusiz bo'lsa maktab navbatidan)
   async function generateDraft(topic: string, categoryId?: number | string) {
-    const search = categoryId === "search";
+    const special =
+      categoryId === "search" || categoryId === "school" ? categoryId : null;
     try {
       const res = await $fetch<any>("/admin/drafts/generate", {
         method: "POST",
@@ -280,8 +282,8 @@ export const useAdminStore = defineStore("admin", () => {
         headers: getAuthHeaders(),
         body: {
           topic,
-          categoryId: search ? undefined : categoryId || undefined,
-          source: search ? "search" : undefined,
+          categoryId: special ? undefined : categoryId || undefined,
+          source: special ?? undefined,
         },
       });
       return { success: true, data: res };
