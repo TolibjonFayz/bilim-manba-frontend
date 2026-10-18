@@ -30,6 +30,9 @@
         <NuxtLink to="/admin/series" class="admin-sidebar__link">
           📚 Seriyalar
         </NuxtLink>
+        <NuxtLink to="/admin/maktab" class="admin-sidebar__link">
+          🎒 Maktab
+        </NuxtLink>
         <NuxtLink to="/admin/users" class="admin-sidebar__link">
           👥 Foydalanuvchilar
         </NuxtLink>

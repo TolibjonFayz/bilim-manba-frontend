@@ -444,6 +444,25 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Maktab bo'limi: GET — ro'yxat, PUT /:articleId — fan, sinf, yashirish
+  async function schoolApi(
+    method: "GET" | "PUT",
+    path = "",
+    body?: Record<string, unknown>,
+  ) {
+    try {
+      const res = await $fetch<any>(`/admin/school${path}`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   async function getArticle(id: number) {
     try {
       const res = await $fetch<any>(`/admin/articles/${id}`, {
@@ -488,6 +507,7 @@ export const useAdminStore = defineStore("admin", () => {
     updateDraftSettings,
     telegramAlerts,
     seriesApi,
+    schoolApi,
     getSocialPreview,
     getPublishingStatus,
   };
