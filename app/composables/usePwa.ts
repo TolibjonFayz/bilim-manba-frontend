@@ -1,20 +1,46 @@
 /**
- * Ilova sifatida o'rnatish (PWA). Android/Chrome/Edge: brauzer "o'rnatish"
- * oynasini beradi (beforeinstallprompt) — uni tugma bosilganda ochamiz.
- * iPhone/iPad Safari'da bunday oyna yo'q — "Ulashish → Bosh ekranga" yo'riqnomasi.
+ * Ilova sifatida o'rnatish (PWA).
+ *  - Chrome/Edge brauzeri "o'rnatish" oynasini bersa (beforeinstallprompt) —
+ *    tugma uni ochadi.
+ *  - Bermasa (Chrome uni saytda biroz vaqt o'tgach beradi; iPhone'da umuman
+ *    yo'q) — o'sha brauzer uchun qisqa yo'riqnoma ko'rsatiladi
+ *    (<InstallGuide /> — app.vue'da bitta).
  */
 interface InstallPromptEvent extends Event {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+export type PwaPlatform =
+  | "ios"
+  | "android-chrome"
+  | "android-edge"
+  | "android-samsung"
+  | "android-other"
+  | "desktop";
+
 const deferred = shallowRef<InstallPromptEvent | null>(null);
 const installed = ref(false);
+const platform = ref<PwaPlatform>("desktop");
+const guideOpen = ref(false);
 let listening = false;
+
+const detect = (ua: string): PwaPlatform => {
+  if (/iphone|ipad|ipod/i.test(ua)) return "ios";
+  if (/android/i.test(ua)) {
+    if (/EdgA\//.test(ua)) return "android-edge";
+    if (/SamsungBrowser/i.test(ua)) return "android-samsung";
+    if (/Chrome\//.test(ua) && !/; wv\)|Telegram|Instagram|FBAN|FBAV/i.test(ua))
+      return "android-chrome";
+    return "android-other";
+  }
+  return "desktop";
+};
 
 export function usePwa() {
   if (import.meta.client && !listening) {
     listening = true;
+    platform.value = detect(navigator.userAgent);
     installed.value =
       window.matchMedia?.("(display-mode: standalone)").matches ||
       (navigator as any).standalone === true;
@@ -25,21 +51,18 @@ export function usePwa() {
     window.addEventListener("appinstalled", () => {
       installed.value = true;
       deferred.value = null;
+      guideOpen.value = false;
     });
   }
 
-  const isIos = computed(
-    () =>
-      import.meta.client &&
-      /iphone|ipad|ipod/i.test(navigator.userAgent) &&
-      !installed.value,
-  );
+  // Telefonda doim (yo'riqnoma bilan), kompyuterda — brauzer taklif qilsa
   const canInstall = computed(
-    () => !installed.value && (Boolean(deferred.value) || isIos.value),
+    () =>
+      !installed.value &&
+      (Boolean(deferred.value) || platform.value !== "desktop"),
   );
 
-  /** true — o'rnatildi; false — rad etildi; "ios" — yo'riqnoma ko'rsatish kerak */
-  const install = async (): Promise<boolean | "ios"> => {
+  const install = async () => {
     if (deferred.value) {
       const e = deferred.value;
       deferred.value = null;
@@ -47,8 +70,9 @@ export function usePwa() {
       const { outcome } = await e.userChoice;
       return outcome === "accepted";
     }
-    return isIos.value ? "ios" : false;
+    guideOpen.value = true;
+    return false;
   };
 
-  return { canInstall, isIos, installed, install };
+  return { canInstall, installed, platform, guideOpen, install };
 }

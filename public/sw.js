@@ -9,7 +9,7 @@
  *
  * Yangi versiya: VERSION o'zgartiriladi — eski keshlar o'chadi.
  */
-const VERSION = "v1";
+const VERSION = "v2";
 const STATIC = `bm-static-${VERSION}`;
 const PAGES = `bm-pages-${VERSION}`;
 const MAX_PAGES = 40;

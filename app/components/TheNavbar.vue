@@ -905,7 +905,8 @@ onUnmounted(() => {
 
 </style>
 
-<style>
+<!-- SCSS: $bg-primary kabi o'zgaruvchilar (tun rejimi tokenlari) shu yerda ham ishlasin -->
+<style lang="scss">
 /* ── NOTIFICATION DROPDOWN — global (Teleport uchun scoped ishlamaydi) ── */
 .notif-dropdown {
   position: fixed;

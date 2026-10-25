@@ -3,6 +3,8 @@
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>
+    <!-- Ilova o'rnatish: pastdagi taklif va brauzerga mos yo'riqnoma -->
+    <InstallGuide />
   </div>
 </template>
 
