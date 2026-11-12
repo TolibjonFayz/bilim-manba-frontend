@@ -127,6 +127,11 @@ const pick = (i: number, j: number) => {
   picked.value[i] = j;
   if (done.value && !reported) {
     reported = true;
+    track("quiz_done", {
+      slug: props.slug,
+      correct: score.value,
+      total: props.questions.length,
+    });
     const token = authStore.token;
     $fetch<any>(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
       method: "POST",

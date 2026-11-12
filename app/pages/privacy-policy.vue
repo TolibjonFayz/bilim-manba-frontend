@@ -76,6 +76,15 @@
               <strong>Statistika:</strong> Google Analytics tashriflarni hisoblash
               uchun cookie ishlatadi. Vercel Analytics esa cookie'siz ishlaydi.
             </li>
+            <li>
+              <strong>Saytning o'z statistikasi:</strong> saytni yaxshilash uchun
+              qaysi sahifalar ochilgani, maqolada qancha vaqt o'qilgani va qancha
+              qismi o'qilgani, qaysi havolalar bosilgani va qaysi forma
+              ishlatilgani (masalan, ro'yxatdan o'tish yoki obuna) qayd etiladi.
+              Buning uchun brauzer xotirasida tasodifiy identifikator saqlanadi;
+              IP manzil va formaga yozilgan matn bu statistikaga yozilmaydi.
+              Yozuvlar 400 kundan keyin o'chiriladi.
+            </li>
           </ul>
           <p>
             Hozirda saytda reklama ko'rsatilmaydi. Reklama qo'shilsa, bu

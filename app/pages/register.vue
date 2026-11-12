@@ -7,7 +7,7 @@
       </p>
     </div>
 
-    <form class="auth-form" @submit.prevent="handleRegister">
+    <form class="auth-form" data-track-form="register" @submit.prevent="handleRegister">
       <!-- To'liq ism -->
       <div class="form-group" :class="{ 'form-group--error': errors.fullName }">
         <label>To'liq ism-sharifingiz</label>
@@ -207,6 +207,8 @@ const validate = () => {
   return valid;
 };
 
+const route = useRoute();
+
 const handleRegister = async () => {
   if (!validate()) return;
   loading.value = true;
@@ -216,9 +218,15 @@ const handleRegister = async () => {
     fullName: form.fullName,
     email: form.email,
     password: form.password,
+    // Statistika: ro'yxatdan o'tish qaysi sahifadan boshlangan
+    signupSource: "register",
+    signupPath: String(
+      (import.meta.client && window.history.state?.back) || route.fullPath,
+    ).slice(0, 300),
   });
 
   loading.value = false;
+  trackEmailSubmit("register", res.success, res.success ? undefined : res.message);
 
   if (res.success) {
     authStore.setAuth(res.data);

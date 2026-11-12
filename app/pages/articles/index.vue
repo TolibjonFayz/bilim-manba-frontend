@@ -36,7 +36,7 @@
     </section>
 
     <!-- MAIN -->
-    <section class="articles-section">
+    <section class="articles-section" data-track-area="maqolalar-royxati">
       <div class="container">
         <div class="articles-section__grid">
           <!-- CHAP: Maqolalar -->
@@ -173,7 +173,7 @@
           </div>
 
           <!-- O'NG: Sidebar -->
-          <aside class="articles-sidebar">
+          <aside class="articles-sidebar" data-track-area="maqolalar-yon-panel">
             <!-- Mashhur maqolalar -->
             <div class="sidebar-card popular-card">
               <div class="popular-card__header">

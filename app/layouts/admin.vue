@@ -103,6 +103,13 @@ const userStore = useUserStore();
 const sidebarOpen = ref(false);
 const { toggle: toggleTheme } = useTheme();
 
+// Admin brauzeri saytning statistikasiga qo'shilmasin (chiqib ketgandan keyin ham)
+onMounted(() => {
+  try {
+    localStorage.setItem("bm_internal", "1");
+  } catch {}
+});
+
 const handleLogout = () => {
   authStore.logout();
   userStore.oneUserInfo = null;

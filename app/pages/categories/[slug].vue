@@ -19,7 +19,7 @@
     </section>
 
     <!-- MAIN CONTENT -->
-    <section class="cat-content">
+    <section class="cat-content" data-track-area="kategoriya-royxati">
       <div class="container">
         <div class="cat-content__grid">
           <!-- CHAP: Maqolalar ro'yxati -->
@@ -117,7 +117,7 @@
           </div>
 
           <!-- O'NG: Sidebar -->
-          <aside class="cat-sidebar">
+          <aside class="cat-sidebar" data-track-area="kategoriya-yon-panel">
             <!-- Mashhur maqolalar -->
             <div class="sidebar-block">
               <h3 class="sidebar-block__title">

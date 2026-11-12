@@ -2,7 +2,7 @@
   <Teleport to="body">
     <Transition name="search-fade">
       <div v-if="open" class="search-modal" @click.self="close">
-        <div class="search-modal__box">
+        <div class="search-modal__box" data-track-area="qidiruv">
           <!-- Input -->
           <div class="search-modal__input-row">
             <Icon
@@ -234,7 +234,17 @@ const onInput = () => {
     if (res.success) results.value = res.data;
     loading.value = false;
   }, 350);
+  // Statistika: odam yozib bo'lgan so'rov (har harf emas) va natijalar soni
+  clearTimeout(trackTimer);
+  trackTimer = setTimeout(() => {
+    const q = query.value.trim();
+    if (q.length < 3 || q === lastTracked || loading.value) return;
+    lastTracked = q;
+    track("search", { q: q.slice(0, 100), results: results.value.length });
+  }, 1500);
 };
+let trackTimer: ReturnType<typeof setTimeout> | undefined;
+let lastTracked = "";
 
 // ── Keyboard navigatsiya ──
 const moveDown = () => {

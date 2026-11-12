@@ -9,7 +9,7 @@
       v-if="previous !== undefined"
       class="kpi__delta"
       :class="deltaClass"
-      :title="`Oldingi davrda: ${previous}`"
+      :title="`Oldingi davrda: ${format ? format(previous ?? 0) : previous}${suffix}`"
     >
       {{ deltaText }}
     </div>
@@ -30,14 +30,18 @@ const props = withDefaults(
     /** O'rtacha o'rin kabi — kamaygani yaxshi */
     lowerIsBetter?: boolean;
     hint?: string;
+    /** Qiymatni o'zgacha ko'rsatish (masalan, soniya → "2 daq 15 s") */
+    format?: (v: number) => string;
   }>(),
   { suffix: "", decimals: 0, lowerIsBetter: false },
 );
 
 const formatted = computed(() =>
-  Number(props.value || 0).toLocaleString("uz-UZ", {
-    maximumFractionDigits: props.decimals,
-  }),
+  props.format
+    ? props.format(Number(props.value || 0))
+    : Number(props.value || 0).toLocaleString("uz-UZ", {
+        maximumFractionDigits: props.decimals,
+      }),
 );
 
 const change = computed(() => {

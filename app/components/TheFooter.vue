@@ -65,7 +65,7 @@
       <div class="footer__col footer__subscribe">
         <h2>Yangiliklarga obuna bo'ling</h2>
         <p>Eng yangi maqolalar va yangiliklar haqida xabardor bo'ling.</p>
-        <div class="footer__subscribe-form">
+        <div class="footer__subscribe-form" data-track-form="newsletter_footer">
           <input
             v-model="email"
             type="email"
@@ -113,6 +113,7 @@
 const LOGO_SRCSET =
   "https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_50/v1776068517/Logo_no_text_transparent_uytuse.png 1x, https://res.cloudinary.com/dne7ddv2a/image/upload/f_auto,q_auto/c_scale,w_100/v1776068517/Logo_no_text_transparent_uytuse.png 2x";
 
+const route = useRoute();
 const email = ref("");
 const loading = ref(false);
 const success = ref(false);
@@ -132,18 +133,30 @@ const handleSubscribe = async () => {
     const res = await $fetch<any>("/subscribers/subscribe", {
       method: "POST",
       baseURL: useRuntimeConfig().public.apiBase,
-      body: { email: email.value },
+      // Statistika: email qaysi formada va qaysi sahifada kiritildi
+      body: {
+        email: email.value,
+        source: "newsletter_footer",
+        path: route.fullPath.slice(0, 300),
+      },
     });
 
     // Message ga qarab farqlaymiz
     if (res.message === "Obuna qayta faollashtirildi!") {
       error.value = "Siz allaqachon obuna bo'lgansiz!";
+      trackEmailSubmit("newsletter_footer", true, "qayta faollashtirildi");
     } else {
+      trackEmailSubmit("newsletter_footer", true);
       success.value = true;
       email.value = "";
     }
   } catch (err: any) {
     const status = err?.response?.status;
+    trackEmailSubmit(
+      "newsletter_footer",
+      false,
+      status === 409 ? "allaqachon obuna" : err?.data?.message || "xato",
+    );
     if (status === 409) {
       error.value = "⚠️ Bu email allaqachon obuna bo'lgan!";
     } else {

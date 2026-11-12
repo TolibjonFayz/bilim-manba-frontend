@@ -102,8 +102,10 @@ const handleSubmit = async () => {
       body: { email: form.email.trim() },
     });
     sent.value = true;
+    trackEmailSubmit("forgot_password", true);
   } catch (e: any) {
     error.value = e?.data?.message || "Xato yuz berdi";
+    trackEmailSubmit("forgot_password", false, error.value);
   } finally {
     loading.value = false;
   }

@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <!-- HERO -->
-    <section class="hero">
+    <section class="hero" data-track-area="bosh-banner">
       <div class="hero__inner container">
         <div class="hero__badge">
           {{
@@ -51,7 +51,7 @@
     </section>
 
     <!-- KATEGORIYALAR -->
-    <section class="categories-section" v-loading="loading">
+    <section class="categories-section" data-track-area="bosh-kategoriyalar" v-loading="loading">
       <div class="container">
         <div class="section-header">
           <div class="section-header__left">
@@ -90,7 +90,7 @@
     </section>
 
     <!-- MAQOLALAR -->
-    <section class="articles-section" v-loading="loading">
+    <section class="articles-section" data-track-area="bosh-songgi-maqolalar" v-loading="loading">
       <div class="container">
         <div class="section-header">
           <div class="section-header__left">

@@ -1,7 +1,7 @@
 <template>
   <div>
     <ArticleProgressBar />
-    <div class="article-page" v-loading="loading">
+    <div class="article-page">
       <div class="container">
         <!-- BREADCRUMB -->
         <nav class="breadcrumb">
@@ -17,6 +17,16 @@
         <div class="article-page__grid">
           <!-- CHAP: Asosiy kontent -->
           <div class="article-main">
+            <!-- Ma'lumot kelguncha (sahifadan sahifaga o'tganda) — skelet -->
+            <div v-if="!article" class="article-skeleton" aria-busy="true">
+              <span class="sk sk--badge" />
+              <span class="sk sk--title" />
+              <span class="sk sk--title sk--short" />
+              <span class="sk sk--line" />
+              <span class="sk sk--cover" />
+              <span v-for="i in 6" :key="i" class="sk sk--line" />
+            </div>
+            <template v-else>
             <!-- HEADER -->
             <div class="article-header">
               <div class="article-header__badges">
@@ -97,6 +107,7 @@
             <!-- Seriya: nechanchi qism va qismlar ro'yxati -->
             <ArticleSeries
               v-if="article?.series"
+              data-track-area="seriya"
               :series="article.series"
               mode="top"
             />
@@ -123,7 +134,7 @@
 
             <!-- CONTENT -->
             <div class="article-content-wrap">
-              <div class="article-content" v-html="content?.message" />
+              <div class="article-content" data-track-read v-html="articleHtml" />
             </div>
 
             <!-- O'zingizni sinang: AI maqola matnidan tuzgan 3 ta savol -->
@@ -137,6 +148,7 @@
             <!-- Seriyaning keyingi qismi -->
             <ArticleSeries
               v-if="article?.series"
+              data-track-area="seriya"
               :series="article.series"
               mode="bottom"
             />
@@ -164,9 +176,10 @@
             </div>
 
             <CommentsSection v-if="article?.id" :article-id="article.id" />
+            </template>
 
             <!-- RELATED ARTICLES -->
-            <div class="related-section">
+            <div class="related-section" data-track-area="oxshash-maqolalar">
               <div class="related-section__header">
                 <h2 class="related-section__title">O'xshash maqolalar</h2>
                 <NuxtLink
@@ -227,7 +240,7 @@
             </div>
 
             <!-- Mashhur maqolalar -->
-            <div class="sidebar-card">
+            <div class="sidebar-card" data-track-area="mashhur-maqolalar">
               <h3 class="sidebar-card__title">🔥 Mashhur maqolalar</h3>
               <div class="popular-items-list">
                 <NuxtLink
@@ -333,7 +346,6 @@ const likeStore = useLikeStore();
 const authStore = useAuthStore();
 const route = useRoute();
 
-const loading = ref(false);
 const isLiked = ref(false);
 const likeCount = ref(0);
 const showAiPanel = ref(false);
@@ -366,6 +378,8 @@ const toggleBookmark = async () => {
     ElNotification({ title: "Xato", message: res.message, type: "error" });
   } else {
     isBookmarked.value = res.data.isBookmarked;
+    forgetArticle(slug);
+    track("bookmark", { slug, on: res.data.isBookmarked });
     ElNotification({
       title: res.data.isBookmarked ? "Saqlandi" : "O'chirildi",
       message: res.data.isBookmarked
@@ -384,50 +398,51 @@ const gradients = [
   "linear-gradient(135deg, #a18cd1, #fbc2eb)",
 ];
 
-// SSR — SEO uchun. Maqola matni (R2 dagi JSON) ham serverda yuklanadi,
-// aks holda Google sahifani bo'sh ko'radi
-const { data: content, error: articleError } = await useAsyncData(
-  `article-${route.params.slug}`,
+// SSR — SEO uchun: maqola va matni (R2 dagi JSON) serverda yuklanadi,
+// aks holda Google sahifani bo'sh ko'radi.
+// Brauzerda (sahifadan sahifaga o'tish) esa KUTMAYMIZ: sahifa darhol ochiladi,
+// ma'lumot kelguncha skelet turadi. Ma'lumot ko'pincha allaqachon keshda —
+// havolaga barmoq tekkanda oldindan yuklangan (plugins/prefetch.client.ts).
+const slug = route.params.slug as string;
+const apiBase = useRuntimeConfig().public.apiBase as string;
+let bundlePromise: ReturnType<typeof getArticleBundle> | undefined;
+const getBundle = () => (bundlePromise ??= getArticleBundle(slug, apiBase));
+
+const articleData = useAsyncData(
+  `article-${slug}`,
   async () => {
-    const res = await articleStore.getArticleBySlug(
-      route.params.slug as string,
-    );
-    if (!res.success) {
+    const b = await getBundle();
+    if (!b.ok) {
       // Maqola yo'q — haqiqiy 404 (bo'sh sahifa + 200 = "soft 404").
       // Backend ishlamasa — 503, Google sahifani o'chirmay keyinroq qaytadi
       throw createError({
-        statusCode: res.status === 404 ? 404 : 503,
+        statusCode: b.status === 404 ? 404 : 503,
         statusMessage:
-          res.status === 404 ? "Maqola topilmadi" : "Vaqtincha mavjud emas",
+          b.status === 404 ? "Maqola topilmadi" : "Vaqtincha mavjud emas",
       });
     }
-    return res.data?.content ? await fetchContent(res.data.content) : null;
+    return { article: b.article, content: b.content ?? null };
   },
-);
-if (articleError.value) {
-  // 404/503 sahifa CDN keshiga tushmasin
-  useNoStoreUnless(false);
-  throw createError({ ...articleError.value, fatal: true });
-}
-
-const article = computed(() => articleStore.oneArticle);
-
-const articleGradient = computed(
-  () => gradients[(article.value?.id ?? 0) % gradients.length],
+  { lazy: import.meta.client },
 );
 
 // O'xshash va mashhur maqolalar SSR'da tanlanadi — maqolalar bir-biriga
 // havola bersin (Google ichki havolalar orqali sahifalarni bog'laydi).
-// Payload yengil bo'lishi uchun 71 ta maqolani emas, faqat 3+5 tasining
-// kerakli maydonlarini qaytaramiz
-const { data: links } = await useAsyncData(
-  `article-links-${route.params.slug}`,
+// Payload yengil bo'lishi uchun hamma maqolani emas, faqat 3+5 tasining
+// kerakli maydonlarini qaytaramiz. Brauzerda ro'yxat keshdan olinadi.
+const linksData = useAsyncData(
+  `article-links-${slug}`,
   async () => {
-    const all = await $fetch<any[]>("/articles/all", {
-      baseURL: useRuntimeConfig().public.apiBase,
-    }).catch(() => null);
+    const [all, b] = await Promise.all([
+      import.meta.client
+        ? articleStore.getAllArticles().then((r) => (r.success ? r.data : null))
+        : $fetch<any[]>("/articles/all", { baseURL: apiBase }).catch(
+            () => null,
+          ),
+      getBundle(),
+    ]);
     if (!all) return null;
-    const current = articleStore.oneArticle;
+    const current = b.ok ? b.article : null;
     const slim = (a: any) => ({
       id: a.id,
       slug: a.slug,
@@ -448,11 +463,43 @@ const { data: links } = await useAsyncData(
         .map(slim),
     };
   },
+  { lazy: import.meta.client },
 );
 
-useNoStoreUnless(
-  !!links.value && (!articleStore.oneArticle?.content || !!content.value),
+if (import.meta.server) await Promise.all([articleData, linksData]);
+const { data: bundle, error: articleError } = articleData;
+const { data: links } = linksData;
+
+if (import.meta.server && articleError.value) {
+  // 404/503 sahifa CDN keshiga tushmasin
+  useNoStoreUnless(false);
+  throw createError({ ...articleError.value, fatal: true });
+}
+// Brauzerda: maqola topilmasa — xato sahifasi
+watch(
+  articleError,
+  (err) => {
+    if (import.meta.client && err) showError({ ...err, fatal: true });
+  },
+  { immediate: true },
 );
+
+const article = computed(() => bundle.value?.article ?? null);
+// Matn localhost'da R2 CORS sabab brauzerda kelmasligi mumkin — SSR'dan yoki keyin yuklanadi
+const lateContent = ref<any>(null);
+const content = computed(() => bundle.value?.content ?? lateContent.value);
+// Ba'zi eski maqolalar HTML emas, oddiy matn/markdown bo'lib yuklangan — chiroyli ko'rinsin
+const articleHtml = computed(() => toArticleHtml(content.value?.message));
+
+const articleGradient = computed(
+  () => gradients[(article.value?.id ?? 0) % gradients.length],
+);
+
+if (import.meta.server) {
+  useNoStoreUnless(
+    !!links.value && (!article.value?.content || !!content.value),
+  );
+}
 
 const withGradient = (list: any[] = []) =>
   list.map((a: any, i: number) => ({
@@ -549,16 +596,6 @@ useHead({
   ],
 });
 
-async function fetchContent(url: string): Promise<any | null> {
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    return await response.json();
-  } catch {
-    return null;
-  }
-}
-
 const toggleLike = async () => {
   if (!authStore.isLoggedIn) {
     ElNotification({
@@ -586,10 +623,13 @@ const toggleLike = async () => {
   } else {
     isLiked.value = res.data.isLiked;
     likeCount.value = res.data.likeCount;
+    forgetArticle(slug);
+    track("like", { slug, on: res.data.isLiked });
   }
 };
 
 const handleShare = () => {
+  track("share", { slug });
   if (process.client) {
     navigator.clipboard.writeText(window.location.href);
     ElNotification({
@@ -619,6 +659,7 @@ const askAi = async () => {
 
   const question = aiQuestion.value;
   aiQuestion.value = "";
+  track("ai_question", { slug, len: question.length });
   aiLoading.value = true;
 
   try {
@@ -674,44 +715,85 @@ const askAi = async () => {
   }
 };
 
+// Maqola kelganda (SSR'dan yoki keyinroq brauzerda) — like holati, teglar
+watch(
+  article,
+  async (a) => {
+    if (!a) return;
+    likeCount.value = a.likeCount ?? 0;
+    isLiked.value = a.isLiked ?? false;
+    isBookmarked.value = a.isBookmarked ?? false;
+    tags.value = a.tags
+      ? String(a.tags)
+          .split(",")
+          .map((t: string) => t.trim())
+          .filter(Boolean)
+      : [];
+    // Matn — odatda SSR/keshdan keladi, faqat bo'sh qolsa qayta yuklaymiz
+    if (import.meta.client && !bundle.value?.content && a.content) {
+      lateContent.value = await fetchArticleContent(a.content);
+    }
+  },
+  { immediate: true },
+);
+
 onMounted(async () => {
-  loading.value = true;
-
-  // Client da token bilan qayta so'rov — isLiked to'g'ri keladi
-  // (o'xshash/mashhur maqolalar endi SSR'da keladi)
-  await articleStore.getArticleBySlug(route.params.slug as string);
-
-  const token = process.client ? localStorage.getItem("access_token") : null;
-  $fetch(`/articles/view/${route.params.slug}`, {
+  const token = localStorage.getItem("access_token");
+  $fetch(`/articles/view/${slug}`, {
     method: "POST",
-    baseURL: useRuntimeConfig().public.apiBase,
+    baseURL: apiBase,
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   }).catch(() => {});
 
-  // Like state
-  likeCount.value = articleStore.oneArticle?.likeCount ?? 0;
-  isLiked.value = articleStore.oneArticle?.isLiked ?? false;
-  isBookmarked.value = articleStore.oneArticle?.isBookmarked ?? false;
-
-  // Content — odatda SSR dan keladi, faqat bo'sh qolsa qayta yuklaymiz
-  if (!content.value && articleStore.oneArticle?.content) {
-    content.value = await fetchContent(articleStore.oneArticle.content);
+  // Kirgan foydalanuvchi: like/saqlash holati uning tokeni bilan (SSR tokenni
+  // bilmaydi). Fonda — sahifa kutib turmaydi
+  if (token) {
+    const res = await articleStore.getArticleBySlug(slug);
+    if (res.success) {
+      isLiked.value = res.data?.isLiked ?? false;
+      isBookmarked.value = res.data?.isBookmarked ?? false;
+      likeCount.value = res.data?.likeCount ?? likeCount.value;
+    }
   }
-
-  // Tags
-  if (articleStore.oneArticle?.tags) {
-    tags.value = articleStore.oneArticle.tags
-      .split(",")
-      .map((t: string) => t.trim());
-  }
-
-  loading.value = false;
 });
 </script>
 
 <style lang="scss" scoped>
 .article-page {
   padding: 2rem 0 4rem;
+}
+
+// Skelet — ma'lumot kelguncha
+.article-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 70vh;
+}
+.sk {
+  display: block;
+  border-radius: 8px;
+  height: 1rem;
+  background: linear-gradient(
+    90deg,
+    rgba(var(--c-primary-rgb), 0.06) 25%,
+    rgba(var(--c-primary-rgb), 0.13) 50%,
+    rgba(var(--c-primary-rgb), 0.06) 75%
+  );
+  background-size: 200% 100%;
+  animation: sk-shine 1.2s ease-in-out infinite;
+
+  &--badge { width: 7rem; height: 1.6rem; border-radius: 999px; }
+  &--title { height: 2.2rem; width: 92%; }
+  &--short { width: 60%; }
+  &--cover { height: clamp(180px, 40vw, 420px); margin: 0.6rem 0; border-radius: 16px; }
+  &--line:nth-of-type(odd) { width: 96%; }
+}
+@keyframes sk-shine {
+  to { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sk { animation: none; }
 }
 
 // BREADCRUMB

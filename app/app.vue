@@ -1,5 +1,7 @@
 <template>
   <div>
+    <!-- Sahifa almashayotganini tepada ingichka chiziq bilan ko'rsatadi -->
+    <NuxtLoadingIndicator color="#5850ec" :height="3" :throttle="150" />
     <NuxtLayout>
       <NuxtPage />
     </NuxtLayout>

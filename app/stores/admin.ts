@@ -477,6 +477,39 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  // Saytning o'z statistikasi: GET ?period= | /live | /session/:id
+  async function analyticsApi(path = "", query?: Record<string, string>) {
+    try {
+      const res = await $fetch<any>(`/admin/analytics${path}`, {
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        query,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
+  // Kino navbati: GET — holat, PUT — navbat/yoqish, POST /run — hozir yozish
+  async function kinoApi(
+    method: "GET" | "PUT" | "POST",
+    path = "",
+    body?: Record<string, unknown>,
+  ) {
+    try {
+      const res = await $fetch<any>(`/admin/kino${path}`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      return { success: false, message: error?.data?.message || "Xato" };
+    }
+  }
+
   // Maktab bo'limi: GET — ro'yxat, PUT /:articleId — fan, sinf, yashirish
   async function schoolApi(
     method: "GET" | "PUT",
@@ -542,6 +575,8 @@ export const useAdminStore = defineStore("admin", () => {
     seriesApi,
     schoolApi,
     channelQuizApi,
+    analyticsApi,
+    kinoApi,
     factCheckApi,
     getSocialPreview,
     getPublishingStatus,

@@ -5,7 +5,7 @@
       <p class="auth-card__subtitle">Akkauntingizga kiring</p>
     </div>
 
-    <form class="auth-form" @submit.prevent="handleLogin">
+    <form data-track-form="login" class="auth-form" @submit.prevent="handleLogin">
       <!-- Email -->
       <div class="form-group" :class="{ 'form-group--error': errors.email }">
         <label>Email</label>
@@ -122,6 +122,7 @@ const handleLogin = async () => {
   });
 
   loading.value = false;
+  trackEmailSubmit("login", res.success, res.success ? undefined : res.message);
 
   if (res.success) {
     authStore.setAuth(res.data);
