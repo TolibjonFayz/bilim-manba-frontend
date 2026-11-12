@@ -4,12 +4,13 @@
       <div>
         <h2 class="kq__title">🎬 Kino maqolalari</h2>
         <p class="kq__sub">
-          Navbatdagi filmlar haqida AI har kuni bittadan maqola yozadi va u
-          soat {{ pad(st.publishHour) }}:00 da saytga, Telegram va Instagram'ga
-          o'zi chiqadi (yozilgach sizga Telegram'da xabar keladi — xohlasangiz
-          tahrirlaysiz yoki bekor qilasiz). Navbat bo'sh bo'lsa — har
-          {{ st.everyDays }} kunda kamida bitta kino maqola AI o'zi tanlagan
-          film haqida.
+          Navbatda film bor kunlari AI odatdagi kunlik maqoladan
+          <strong>tashqari</strong> yana bitta kino maqola yozadi va u soat
+          {{ pad(st.publishHour) }}:00 da saytga, Telegram va Instagram'ga o'zi
+          chiqadi (yozilgach Telegram'da xabar keladi — xohlasangiz
+          tahrirlaysiz yoki bekor qilasiz). Navbat tugagach yana kuniga bitta
+          maqola qoladi; faqat {{ st.everyDays }} kun kino chiqmagan bo'lsa,
+          o'sha kungi kunlik qoralama kino haqida bo'ladi.
         </p>
       </div>
       <label class="switch" :class="{ 'is-on': st.daily }">
@@ -36,7 +37,8 @@
       </li>
     </ol>
     <p v-else class="kq__empty">
-      Navbat bo'sh — haftasiga bitta kino maqolani AI o'zi tanlaydi.
+      Navbat bo'sh — qo'shimcha kino maqola chiqmaydi. Haftasiga bir marta
+      kunlik qoralama kino haqida bo'ladi (filmni AI tanlaydi).
     </p>
 
     <form class="kq__add" @submit.prevent="add">
