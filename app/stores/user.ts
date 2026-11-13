@@ -100,6 +100,11 @@ export const useUserStore = defineStore("users", () => {
           newPassword: passwordForm.new,
         },
       });
+      // Parol o'zgarganda eski tokenlar bekor bo'ladi — server shu qurilma
+      // uchun yangisini beradi, aks holda keyingi so'rovda tizimdan chiqib ketardi
+      if (res?.token?.access_token) {
+        useAuthStore().setAuth({ token: res.token, userId });
+      }
       return { success: true, data: res };
     } catch (error: any) {
       return {

@@ -16,9 +16,17 @@ const staticPages = [
 
 const day = (d: string) => new Date(d).toISOString().split("T")[0];
 
+const xml = (s: string) =>
+  String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
 const urlTag = (loc: string, priority: string, changefreq: string, lastmod?: string) => `
   <url>
-    <loc>${BASE}${loc}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
+    <loc>${xml(BASE + loc)}</loc>${lastmod ? `\n    <lastmod>${lastmod}</lastmod>` : ""}
     <changefreq>${changefreq}</changefreq>
     <priority>${priority}</priority>
   </url>`;
@@ -44,7 +52,7 @@ export default defineEventHandler(async (event) => {
 
     const articleUrls = (data?.articles || [])
       .map((a: any) =>
-        urlTag(`/articles/${a.slug}`, "0.8", "monthly", day(a.updatedAt)),
+        urlTag(`/articles/${encodeURIComponent(a.slug)}`, "0.8", "monthly", day(a.updatedAt)),
       )
       .join("");
 
@@ -62,7 +70,7 @@ export default defineEventHandler(async (event) => {
     // Seriyalar (faqat chop etilgan qismi borlari — backend o'zi tanlaydi)
     const seriesUrls = (data?.series || [])
       .map((s: any) =>
-        urlTag(`/series/${s.slug}`, "0.7", "weekly", day(s.updatedAt)),
+        urlTag(`/series/${encodeURIComponent(s.slug)}`, "0.7", "weekly", day(s.updatedAt)),
       )
       .join("");
 

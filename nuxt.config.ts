@@ -119,6 +119,19 @@ export default defineNuxtConfig({
   // bitta sahifani chizadi, middleware boshqasiga yo'naltiradi va sahifa
   // "sakraydi" (hydration mismatch). Bu sahifalar robots.txt da yopiq.
   routeRules: {
+    // Xavfsizlik sarlavhalari (hamma sahifa): saytni begona sahifa ichiga
+    // (iframe) joylab, tugmalarni aldab bostirishga (clickjacking) va fayl
+    // turini noto'g'ri taxmin qilishga qarshi; boshqa saytga o'tganda to'liq
+    // manzil (masalan parol tiklash kodi) uzatilmaydi.
+    "/**": {
+      headers: {
+        "X-Frame-Options": "SAMEORIGIN",
+        "X-Content-Type-Options": "nosniff",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+        "Content-Security-Policy": "frame-ancestors 'self'; base-uri 'self'; object-src 'none'",
+      },
+    },
     // Ommaviy sahifalar Vercel CDN'da keshlanadi: har tashrifda AQShdagi
     // funksiya + Render backend chaqirilmaydi (TTFB 1.2-2.2s edi). Login
     // holati faqat brauzerda — server HTML hamma uchun bir xil, keshlash xavfsiz.
@@ -147,6 +160,8 @@ export default defineNuxtConfig({
     "/login": { ssr: false },
     "/register": { ssr: false },
     "/forgot-password": { ssr: false },
+    "/reset-password": { ssr: false },
+    "/unsubscribe": { ssr: false },
   },
 
   plugins: ["~/plugins/auth.interceptor.ts"],
