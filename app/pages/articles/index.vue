@@ -126,6 +126,11 @@
                       </span>
                     </div>
                     <div class="article-card-h__stats">
+                      <time
+                        v-if="article.createdAt"
+                        :datetime="article.createdAt"
+                        >📅 {{ formatDate(article.createdAt) }}</time
+                      >
                       <span>👁 {{ article.viewCount }}</span>
                     </div>
                     <span class="article-card-h__read">O'qish →</span>

@@ -49,6 +49,8 @@
 
     <AdminKinoQueue />
     <AdminChannelQuiz />
+    <AdminIgRepost />
+    <AdminMailStatus />
 
     <!-- Quick links -->
     <div class="admin-quick">

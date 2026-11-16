@@ -87,7 +87,10 @@
           <div class="school-card__body">
             <span class="school-card__meta"
               ><template v-if="a.grade">{{ a.grade }}-sinf · </template
-              >{{ a.subject }}</span
+              >{{ a.subject
+              }}<template v-if="a.createdAt">
+                · {{ formatDate(a.createdAt) }}</template
+              ></span
             >
             <h2 class="school-card__title">{{ a.title }}</h2>
             <p v-if="a.excerpt" class="school-card__excerpt">{{ a.excerpt }}</p>

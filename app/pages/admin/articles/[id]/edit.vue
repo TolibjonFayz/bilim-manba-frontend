@@ -180,6 +180,8 @@
           </div>
         </div>
 
+        <AdminAttachments v-model="form.attachments" />
+
         <div class="form-group">
           <label
             >Teglar
@@ -261,6 +263,7 @@ const form = reactive({
   content: "",
   coverImage: "",
   tags: "",
+  attachments: [] as ArticleAttachment[],
   readTime: 5,
 });
 
@@ -321,6 +324,9 @@ onMounted(async () => {
     form.content = article.content ?? "";
     form.coverImage = article.coverImage ?? "";
     form.tags = article.tags ?? "";
+    form.attachments = Array.isArray(article.attachments)
+      ? article.attachments
+      : [];
     form.readTime = article.readTime ?? 5;
     form.status = article.status ?? "published";
     scheduleLocal.value = isoToTashkentLocal(article.scheduledAt);

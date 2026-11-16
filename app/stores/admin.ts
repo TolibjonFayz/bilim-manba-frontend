@@ -477,6 +477,50 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
+  /** Umumiy admin so'rovi: adminApi("GET", "/mail"), adminApi("PUT", "/ig-repost", {...}) */
+  async function adminApi(
+    method: "GET" | "PUT" | "POST" | "DELETE",
+    path: string,
+    body?: Record<string, unknown>,
+  ) {
+    try {
+      const res = await $fetch<any>(`/admin${path}`, {
+        method,
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      const m = error?.data?.message;
+      return { success: false, message: (Array.isArray(m) ? m[0] : m) || "Xato" };
+    }
+  }
+
+  /** Maqolaga biriktiriladigan fayl (kitob, hujjat) → { name, url, size, ext } */
+  async function uploadFile(file: File) {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await $fetch<any>("/admin/upload/file", {
+        method: "POST",
+        baseURL: useRuntimeConfig().public.apiBase,
+        headers: getAuthHeaders(),
+        body: formData,
+      });
+      return { success: true, data: res };
+    } catch (error: any) {
+      const m = error?.data?.message;
+      return {
+        success: false,
+        message:
+          error?.status === 413
+            ? "Fayl juda katta (ko'pi bilan 40 MB)"
+            : (Array.isArray(m) ? m[0] : m) || "Fayl yuklanmadi",
+      };
+    }
+  }
+
   // Saytning o'z statistikasi: GET ?period= | /live | /session/:id
   async function analyticsApi(path = "", query?: Record<string, string>) {
     try {
@@ -558,6 +602,8 @@ export const useAdminStore = defineStore("admin", () => {
     deleteCategory,
     getUsers,
     uploadImage,
+    uploadFile,
+    adminApi,
     uploadContent,
     getArticle,
     generateExcerpt,

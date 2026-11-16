@@ -132,6 +132,8 @@
       </button>
     </form>
 
+    <GoogleSignIn source="register" />
+
     <p class="auth-card__footer">
       Akkauntingiz bormi?
       <NuxtLink to="/login">Kiring</NuxtLink>

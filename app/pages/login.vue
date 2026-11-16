@@ -67,6 +67,8 @@
       </button>
     </form>
 
+    <GoogleSignIn source="login" />
+
     <p class="auth-card__footer">
       Akkauntingiz yo'qmi?
       <NuxtLink to="/register">Ro'yxatdan o'ting</NuxtLink>

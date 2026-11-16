@@ -39,6 +39,12 @@
           <span>{{ sourceName }}</span>
         </div>
         <div class="article-card__stats">
+          <time
+            v-if="article.createdAt"
+            :datetime="article.createdAt"
+            :title="`Chiqqan sana: ${formatDate(article.createdAt)}`"
+            >📅 {{ formatDate(article.createdAt) }}</time
+          >
           <span>👁 {{ article.viewCount }}</span>
         </div>
       </div>
@@ -57,6 +63,7 @@ const props = defineProps<{
     coverImage?: string;
     type: "free";
     viewCount: number;
+    createdAt?: string;
     category?: { name: string; slug: string; icon?: string };
     author?: { fullName: string };
   };
@@ -193,6 +200,9 @@ const placeholderStyle = computed(() => ({
   &__stats {
     font-size: 0.8rem;
     color: $text-muted;
+    display: flex;
+    gap: 0.75rem;
+    white-space: nowrap;
   }
 }
 </style>

@@ -137,6 +137,12 @@
               <div class="article-content" data-track-read v-html="articleHtml" />
             </div>
 
+            <!-- Ilova fayllar: kitob, qo'llanma, jadval -->
+            <ArticleAttachments
+              v-if="article?.attachments?.length"
+              :files="article.attachments"
+            />
+
             <!-- O'zingizni sinang: AI maqola matnidan tuzgan 3 ta savol -->
             <ArticleQuiz
               v-if="article?.quiz?.length"

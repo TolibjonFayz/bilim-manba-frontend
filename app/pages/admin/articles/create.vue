@@ -157,6 +157,8 @@
           </div>
         </div>
 
+        <AdminAttachments v-model="form.attachments" />
+
         <div class="form-group">
           <label
             >Teglar
@@ -234,6 +236,7 @@ const form = reactive({
   content: "",
   coverImage: "",
   tags: "",
+  attachments: [] as ArticleAttachment[],
   readTime: 5,
   status: "published",
 });
