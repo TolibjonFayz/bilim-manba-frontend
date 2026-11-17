@@ -45,21 +45,35 @@
           >, {{ st.lastNewsletter.failed }} ta xato</template
         >
       </p>
+      <button
+        v-if="st.ok && st.lastNewsletter && st.lastNewsletter.sent < st.lastNewsletter.total"
+        class="btn btn--outline cq__send cq__resend"
+        :disabled="busy"
+        @click="resendLatest"
+      >
+        {{ busy ? "⏳ Yuborilmoqda…" : "🔁 Oxirgi maqolani obunachilarga qayta yuborish" }}
+      </button>
       <p v-if="!st.ok && st.error" class="cq__warn">⚠️ {{ st.error }}</p>
+      <p
+        v-else-if="st.lastNewsletter?.error && st.lastNewsletter.failed"
+        class="cq__warn"
+      >
+        ⚠️ Oxirgi tarqatmadagi xato: {{ st.lastNewsletter.error }}
+      </p>
       <details v-if="!st.ok" class="cq__help">
         <summary>Qanday tuzatiladi?</summary>
         <p>
-          Outlook/Hotmail pochtasi endi saytlardan xat yuborishga ruxsat
-          bermaydi. Bepul <b>Resend</b> xizmatini ulang (kuniga 100 ta xat):
+          Xat <b>Resend</b> orqali ketadi (bepul, kuniga 100 ta). Render
+          oddiy pochta (SMTP) portlarini yopgani uchun Resend'ning HTTP API'si
+          ishlatiladi:
         </p>
         <ol>
-          <li>resend.com da ro'yxatdan o'ting → Domains → bilimmanba.uz ni qo'shing va ko'rsatilgan DNS yozuvlarini Cloudflare'ga qo'ying.</li>
-          <li>API Keys → yangi kalit yarating.</li>
+          <li>resend.com → Domains → bilimmanba.uz (DNS yozuvlari Vercel'da) → Verified bo'lsin.</li>
+          <li>API Keys → yangi kalit ("Sending access").</li>
           <li>
             Render → backend → Environment:
             <code>MAIL_HOST=smtp.resend.com</code>,
-            <code>MAIL_PORT=465</code>, <code>MAIL_USER=resend</code>,
-            <code>MAIL_PASS=</code>&lt;kalit&gt;,
+            <code>MAIL_PASS=</code>&lt;re_... kalit&gt;,
             <code>MAIL_FROM=noreply@bilimmanba.uz</code>
           </li>
           <li>Shu yerda "O'zimga sinov xati" ni bosing.</li>
@@ -113,6 +127,21 @@ const sendTest = async () => {
   });
 };
 
+const resendLatest = async () => {
+  busy.value = true;
+  const res = await adminStore.adminApi("POST", "/mail/resend-latest");
+  busy.value = false;
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 10000 });
+  const r = res.data;
+  ElMessage({
+    type: r.sent ? "success" : "error",
+    message: `«${r.title}» — ${r.sent} / ${r.total} ta xat ketdi${r.failed ? `, ${r.failed} ta xato: ${r.error}` : ""}`,
+    duration: 8000,
+  });
+  await load();
+};
+
 onMounted(load);
 </script>
 
@@ -135,6 +164,10 @@ onMounted(load);
     background: rgba(239, 68, 68, 0.12);
     color: var(--c-danger-text, #dc2626);
   }
+}
+
+.cq__resend {
+  margin: 0.75rem 0 0;
 }
 
 .small {
