@@ -40,13 +40,16 @@
       <p v-if="st.lastNewsletter" class="cq__last">
         <span>Oxirgi tarqatma ({{ fmt(st.lastNewsletter.at) }}):</span>
         «{{ st.lastNewsletter.title }}» — {{ st.lastNewsletter.sent }} /
-        {{ st.lastNewsletter.total }} ta xat ketdi<template
-          v-if="st.lastNewsletter.failed"
+        {{ st.lastNewsletter.total - (st.lastNewsletter.invalid ?? 0) }} ta xat
+        ketdi<template v-if="st.lastNewsletter.failed"
           >, {{ st.lastNewsletter.failed }} ta xato</template
+        ><template v-if="st.lastNewsletter.invalid"
+          >. {{ st.lastNewsletter.invalid }} ta manzil noto'g'ri yozilgan —
+          o'tkazib yuborildi</template
         >
       </p>
       <button
-        v-if="st.ok && st.lastNewsletter && st.lastNewsletter.sent < st.lastNewsletter.total"
+        v-if="st.ok && st.lastNewsletter && st.lastNewsletter.failed > 0"
         class="btn btn--outline cq__send cq__resend"
         :disabled="busy"
         @click="resendLatest"
@@ -99,6 +102,7 @@ interface Status {
     total: number;
     sent: number;
     failed: number;
+    invalid?: number;
     error: string | null;
   } | null;
 }
