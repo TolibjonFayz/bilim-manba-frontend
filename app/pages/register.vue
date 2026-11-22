@@ -136,7 +136,7 @@
 
     <p class="auth-card__footer">
       Akkauntingiz bormi?
-      <NuxtLink to="/login">Kiring</NuxtLink>
+      <NuxtLink :to="{ path: '/login', query: route.query.next ? { next: route.query.next } : {} }">Kiring</NuxtLink>
     </p>
   </div>
 </template>
@@ -232,7 +232,7 @@ const handleRegister = async () => {
 
   if (res.success) {
     authStore.setAuth(res.data);
-    navigateTo("/");
+    navigateTo(safeNext(route.query.next));
   } else {
     serverError.value = res.message;
   }

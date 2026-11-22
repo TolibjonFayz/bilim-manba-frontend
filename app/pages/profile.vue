@@ -27,6 +27,11 @@
             ✏️ Profilni tahrirlash
           </button>
         </div>
+        <VerifyEmailBanner
+          :loaded="!!userStore?.oneUserInfo"
+          :email="userStore?.oneUserInfo?.email"
+          :verified-at="userStore?.oneUserInfo?.emailVerifiedAt"
+        />
       </div>
     </section>
 

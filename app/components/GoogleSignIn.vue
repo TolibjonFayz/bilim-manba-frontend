@@ -4,15 +4,21 @@
   umuman ko'rinmaydi. Google bergan ID token backendda tekshiriladi.
 -->
 <template>
-  <div v-show="enabled" class="gsi">
-    <div class="gsi__divider"><span>yoki</span></div>
+  <div v-show="enabled" class="gsi" :class="{ 'gsi--bare': bare }">
+    <div v-if="!bare" class="gsi__divider"><span>yoki</span></div>
     <div ref="btn" class="gsi__btn" />
     <p v-if="error" class="gsi__error">⚠️ {{ error }}</p>
   </div>
 </template>
 
 <script setup lang="ts">
-const props = defineProps<{ source: "login" | "register" }>();
+const props = defineProps<{
+  source: "login" | "register";
+  /** Kirgandan keyin qaytiladigan sahifa (bo'lmasa ?next= yoki bosh sahifa) */
+  next?: string;
+  /** "yoki" ajratgichisiz (masalan test natijasi ichida) */
+  bare?: boolean;
+}>();
 
 const btn = ref<HTMLElement | null>(null);
 const enabled = ref(false);
@@ -53,7 +59,7 @@ const onCredential = async (resp: { credential?: string }) => {
     });
     trackEmailSubmit(res.isNew ? "register" : "login", true);
     authStore.setAuth(res);
-    navigateTo("/");
+    navigateTo(props.next ?? safeNext(route.query.next));
   } catch (e: any) {
     const m = e?.data?.message;
     error.value = (Array.isArray(m) ? m[0] : m) || "Google orqali kirib bo'lmadi";
@@ -96,6 +102,10 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .gsi {
   margin-top: 1.25rem;
+
+  &--bare {
+    margin-top: 0.75rem;
+  }
 
   &__divider {
     display: flex;

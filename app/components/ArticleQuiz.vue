@@ -22,7 +22,8 @@
             type="button"
             class="quiz__opt"
             :class="optionClass(i, j)"
-            :disabled="picked[i] !== null"
+            :disabled="picked[i] !== null || checking[i]"
+            :aria-busy="checking[i] && pendingChoice[i] === j"
             @click="pick(i, j)"
           >
             <span class="quiz__letter">{{ LETTERS[j] }}</span>
@@ -30,17 +31,20 @@
           </button>
         </div>
         <p
-          v-if="picked[i] !== null"
+          v-if="results[i]"
           class="quiz__explain"
-          :class="picked[i] === q.answer ? 'is-right' : 'is-wrong'"
+          :class="results[i]!.correct ? 'is-right' : 'is-wrong'"
           role="status"
         >
           <strong>{{
-            picked[i] === q.answer
+            results[i]!.correct
               ? "✅ To'g'ri!"
-              : `❌ To'g'ri javob: ${LETTERS[q.answer]}.`
+              : `❌ To'g'ri javob: ${LETTERS[results[i]!.answer]}.`
           }}</strong>
-          {{ q.explain }}
+          {{ results[i]!.explain }}
+        </p>
+        <p v-else-if="errors[i]" class="quiz__explain is-wrong" role="alert">
+          ⚠️ Javobni tekshirib bo'lmadi — internetni tekshirib, qayta bosing.
         </p>
       </li>
     </ol>
@@ -61,11 +65,28 @@
           Bu test uchun ball avval olingan.
           <NuxtLink to="/reyting">Reyting →</NuxtLink>
         </p>
-        <p v-else-if="!authStore.isLoggedIn" class="quiz__points is-muted">
-          🔒 <NuxtLink to="/register">Ro'yxatdan o'ting</NuxtLink> — har test
-          uchun ball olasiz va <NuxtLink to="/reyting">reytingga</NuxtLink>
-          chiqasiz.
-        </p>
+        <!-- Mehmon: ishlagan bali yo'qolmasin — ro'yxatdan o'tsa saqlanadi -->
+        <div v-else-if="!authStore.isLoggedIn" class="quiz__claim">
+          <p class="quiz__claim-title">
+            🏆 Siz <strong>{{ guestPoints }} ball</strong> ishladingiz!
+          </p>
+          <p class="quiz__claim-text">
+            Ballingizni saqlang va
+            <NuxtLink to="/reyting">reytingga</NuxtLink> chiqing — keyingi har
+            bir test uchun ham ball olasiz. Bir bosishda:
+          </p>
+          <GoogleSignIn source="register" :next="returnPath" bare />
+          <p class="quiz__claim-alt">
+            yoki
+            <NuxtLink :to="`/register?next=${encodeURIComponent(returnPath)}`"
+              >email bilan ro'yxatdan o'ting</NuxtLink
+            >
+            ·
+            <NuxtLink :to="`/login?next=${encodeURIComponent(returnPath)}`"
+              >kirish</NuxtLink
+            >
+          </p>
+        </div>
       </ClientOnly>
       <button type="button" class="btn btn--outline quiz__retry" @click="reset">
         🔄 Qayta urinish
@@ -76,14 +97,19 @@
 
 <script setup lang="ts">
 /**
- * Maqola oxiridagi 3 savollik test (AI maqola matnidan tuzgan). Javob
- * bosilishi bilan to'g'ri/noto'g'ri va izoh ko'rinadi; oxirida natija.
- * Birinchi urinish natijasi serverga yuboriladi: statistika uchun, kirgan
- * foydalanuvchiga esa ball (javoblar serverda tekshiriladi).
+ * Maqola oxiridagi 3 savollik test (AI maqola matnidan tuzgan). To'g'ri
+ * javob sahifaga oldindan berilmaydi: har bosishda server tekshiradi
+ * (POST /quiz/check) va javob + izohni qaytaradi. Kirgan foydalanuvchining
+ * birinchi tanlovlari serverda yoziladi — ball shundan hisoblanadi.
+ * Mehmon natijasi brauzerda saqlanadi va ro'yxatdan o'tgach ballga aylanadi
+ * (utils/pendingQuiz.ts + plugins/quiz-claim.client.ts).
  */
 interface QuizQuestion {
   q: string;
   options: string[];
+}
+interface CheckResult {
+  correct: boolean;
   answer: number;
   explain: string;
 }
@@ -92,18 +118,29 @@ const props = defineProps<{ questions: QuizQuestion[]; slug: string }>();
 
 const LETTERS = ["A", "B", "C", "D"];
 const authStore = useAuthStore();
+const route = useRoute();
+const apiBase = useRuntimeConfig().public.apiBase;
 const reward = ref<{
   awarded?: boolean;
   points?: number;
   week?: { rank: number | null; points: number };
 } | null>(null);
 const round = ref(0);
-const picked = ref<(number | null)[]>(props.questions.map(() => null));
+function fill<T>(v: T): T[] {
+  return props.questions.map(() => v);
+}
+const picked = ref<(number | null)[]>(fill<number | null>(null));
+const results = ref<(CheckResult | null)[]>(fill<CheckResult | null>(null));
+const checking = ref<boolean[]>(fill(false));
+const pendingChoice = ref<(number | null)[]>(fill<number | null>(null));
+const errors = ref<boolean[]>(fill(false));
 let reported = false;
 
-const done = computed(() => picked.value.every((p) => p !== null));
-const score = computed(
-  () => picked.value.filter((p, i) => p === props.questions[i]?.answer).length,
+const returnPath = computed(() => route.path);
+const done = computed(() => results.value.every((r) => r !== null));
+const score = computed(() => results.value.filter((r) => r?.correct).length);
+const guestPoints = computed(() =>
+  quizPoints(score.value, props.questions.length),
 );
 const verdict = computed(() => {
   const n = props.questions.length;
@@ -115,39 +152,80 @@ const verdict = computed(() => {
 });
 
 const optionClass = (i: number, j: number) => {
-  const p = picked.value[i];
-  if (p === null) return "";
-  if (j === props.questions[i]?.answer) return "is-right";
-  if (j === p) return "is-wrong";
+  const r = results.value[i];
+  if (!r)
+    return checking.value[i] && pendingChoice.value[i] === j ? "is-busy" : "";
+  if (j === r.answer) return "is-right";
+  if (j === picked.value[i]) return "is-wrong";
   return "is-dim";
 };
 
-const pick = (i: number, j: number) => {
-  if (picked.value[i] !== null) return;
-  picked.value[i] = j;
-  if (done.value && !reported) {
-    reported = true;
-    track("quiz_done", {
-      slug: props.slug,
-      correct: score.value,
-      total: props.questions.length,
-    });
-    const token = authStore.token;
-    $fetch<any>(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
-      method: "POST",
-      baseURL: useRuntimeConfig().public.apiBase,
-      headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-      body: { correct: score.value, answers: [...picked.value] },
-    })
-      .then((res) => {
-        if (res && "awarded" in res) reward.value = res;
-      })
-      .catch(() => {});
+const authHeaders = () =>
+  authStore.token ? { Authorization: `Bearer ${authStore.token}` } : undefined;
+
+const pick = async (i: number, j: number) => {
+  if (picked.value[i] !== null || checking.value[i]) return;
+  checking.value[i] = true;
+  pendingChoice.value[i] = j;
+  errors.value[i] = false;
+  try {
+    const res = await $fetch<CheckResult>(
+      `/quiz/check/${encodeURIComponent(props.slug)}`,
+      {
+        method: "POST",
+        baseURL: apiBase,
+        headers: authHeaders(),
+        body: { i, choice: j },
+      },
+    );
+    picked.value[i] = j;
+    results.value[i] = res;
+  } catch {
+    errors.value[i] = true;
+  } finally {
+    checking.value[i] = false;
   }
+  if (done.value && !reported) report();
 };
 
+const report = () => {
+  reported = true;
+  const answers = picked.value.map((p) => p ?? -1);
+  track("quiz_done", {
+    slug: props.slug,
+    correct: score.value,
+    total: props.questions.length,
+  });
+  if (!authStore.isLoggedIn) {
+    savePendingQuiz({ slug: props.slug, answers, points: guestPoints.value });
+    track("quiz_claim_offer", { slug: props.slug, points: guestPoints.value });
+  }
+  $fetch<any>(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
+    method: "POST",
+    baseURL: apiBase,
+    headers: authHeaders(),
+    body: { correct: score.value, answers },
+  })
+    .then((res) => {
+      if (res && "awarded" in res) reward.value = res;
+    })
+    .catch(() => {});
+};
+
+// Shu sahifada turib kirsa (Google tugmasi) — plugin natijani saqlaydi va
+// "quiz-claimed" hodisasini yuboradi; shu yerda ham ko'rsatamiz
+const onClaimed = (e: Event) => {
+  const d = (e as CustomEvent).detail;
+  if (d?.slug === props.slug) reward.value = d.result;
+};
+onMounted(() => window.addEventListener("quiz-claimed", onClaimed));
+onBeforeUnmount(() => window.removeEventListener("quiz-claimed", onClaimed));
+
 const reset = () => {
-  picked.value = props.questions.map(() => null);
+  picked.value = fill<number | null>(null);
+  results.value = fill<CheckResult | null>(null);
+  errors.value = fill(false);
+  pendingChoice.value = fill<number | null>(null);
   round.value++;
 };
 </script>
@@ -269,6 +347,11 @@ const reset = () => {
     &.is-dim {
       opacity: 0.55;
     }
+
+    &.is-busy {
+      border-color: $primary;
+      opacity: 0.75;
+    }
   }
 
   &__letter {
@@ -336,6 +419,43 @@ const reset = () => {
 
     &.is-muted {
       color: $text-secondary;
+    }
+  }
+
+  &__claim {
+    margin: -0.25rem auto 1rem;
+    max-width: 26rem;
+  }
+
+  &__claim-title {
+    font-size: 1.05rem;
+    font-weight: 700;
+
+    strong {
+      color: $primary;
+    }
+  }
+
+  &__claim-text {
+    margin: 0.35rem 0 0.25rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: $text-secondary;
+
+    a {
+      color: $primary;
+      font-weight: 700;
+    }
+  }
+
+  &__claim-alt {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: $text-secondary;
+
+    a {
+      color: $primary;
+      font-weight: 600;
     }
   }
 }

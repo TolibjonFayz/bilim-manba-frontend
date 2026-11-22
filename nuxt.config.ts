@@ -162,6 +162,7 @@ export default defineNuxtConfig({
     "/forgot-password": { ssr: false },
     "/reset-password": { ssr: false },
     "/unsubscribe": { ssr: false },
+    "/verify-email": { ssr: false },
   },
 
   plugins: ["~/plugins/auth.interceptor.ts"],

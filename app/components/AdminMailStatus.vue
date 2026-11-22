@@ -56,6 +56,29 @@
       >
         {{ busy ? "⏳ Yuborilmoqda…" : "🔁 Oxirgi maqolani obunachilarga qayta yuborish" }}
       </button>
+      <!-- Haftalik dayjest: har dushanba 10:00 -->
+      <div v-if="st.digest" class="cq__last digest">
+        <span>
+          🗞️ Haftalik dayjest (dushanba 10:00):
+          <b>{{ st.digest.enabled ? "yoqilgan" : "o'chirilgan" }}</b>
+        </span>
+        <template v-if="st.digest.last">
+          — oxirgisi {{ fmt(st.digest.last.at) }}: {{ st.digest.last.sent }} /
+          {{ st.digest.last.total }} ta xat<template v-if="st.digest.last.failed"
+            >, {{ st.digest.last.failed }} ta xato</template
+          ><template v-if="st.digest.last.error && !st.digest.last.total">
+            ({{ st.digest.last.error }})</template
+          >
+        </template>
+        <button
+          type="button"
+          class="digest__toggle"
+          :disabled="busy"
+          @click="toggleDigest"
+        >
+          {{ st.digest.enabled ? "O'chirish" : "Yoqish" }}
+        </button>
+      </div>
       <p v-if="!st.ok && st.error" class="cq__warn">⚠️ {{ st.error }}</p>
       <p
         v-else-if="st.lastNewsletter?.error && st.lastNewsletter.failed"
@@ -105,6 +128,18 @@ interface Status {
     invalid?: number;
     error: string | null;
   } | null;
+  digest?: {
+    enabled: boolean;
+    last: {
+      week: string;
+      at: string;
+      items: number;
+      total: number;
+      sent: number;
+      failed: number;
+      error?: string | null;
+    } | null;
+  } | null;
 }
 
 const adminStore = useAdminStore();
@@ -146,11 +181,39 @@ const resendLatest = async () => {
   await load();
 };
 
+const toggleDigest = async () => {
+  if (!st.value?.digest) return;
+  busy.value = true;
+  const res = await adminStore.adminApi("PUT", "/mail/digest", {
+    enabled: !st.value.digest.enabled,
+  });
+  busy.value = false;
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 8000 });
+  st.value.digest = res.data;
+};
+
 onMounted(load);
 </script>
 
 <style lang="scss" scoped>
 @use "~/assets/scss/admin-card" as *;
+
+.digest__toggle {
+  margin-left: 0.5rem;
+  border: 1px solid $border-color;
+  background: transparent;
+  color: $primary;
+  font-weight: 700;
+  font-size: 0.8rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.6;
+  }
+}
 
 .pill {
   font-size: 0.82rem;

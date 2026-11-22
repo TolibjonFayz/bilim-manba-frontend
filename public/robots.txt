@@ -12,6 +12,7 @@ Disallow: /api/
 Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /unsubscribe
+Disallow: /verify-email
 
 # Profil sahifasi (shaxsiy ma'lumot)
 Disallow: /profile
@@ -30,6 +31,7 @@ Disallow: /api/
 Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /unsubscribe
+Disallow: /verify-email
 Disallow: /profile
 Crawl-delay: 1
 Sitemap: https://bilimmanba.uz/sitemap.xml
@@ -45,6 +47,7 @@ Disallow: /api/
 Disallow: /reset-password
 Disallow: /forgot-password
 Disallow: /unsubscribe
+Disallow: /verify-email
 Disallow: /profile
 Sitemap: https://bilimmanba.uz/sitemap.xml
 

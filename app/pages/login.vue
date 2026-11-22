@@ -71,7 +71,7 @@
 
     <p class="auth-card__footer">
       Akkauntingiz yo'qmi?
-      <NuxtLink to="/register">Ro'yxatdan o'ting</NuxtLink>
+      <NuxtLink :to="{ path: '/register', query: route.query.next ? { next: route.query.next } : {} }">Ro'yxatdan o'ting</NuxtLink>
     </p>
   </div>
 </template>
@@ -80,6 +80,7 @@
 definePageMeta({ layout: "auth", middleware: "guest" });
 
 const authStore = useAuthStore();
+const route = useRoute();
 const userStore = useUserStore();
 
 const form = reactive({ email: "", password: "" });
@@ -128,7 +129,7 @@ const handleLogin = async () => {
 
   if (res.success) {
     authStore.setAuth(res.data);
-    navigateTo("/");
+    navigateTo(safeNext(route.query.next));
   } else {
     serverError.value = res.message;
   }
