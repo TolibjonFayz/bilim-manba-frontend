@@ -20,6 +20,7 @@
         <NuxtLink to="/articles" class="navbar__link">Maqolalar</NuxtLink>
         <NuxtLink to="/series" class="navbar__link">Seriyalar</NuxtLink>
         <NuxtLink to="/maktab" class="navbar__link">Maktab</NuxtLink>
+        <NuxtLink to="/audio" class="navbar__link">Audio</NuxtLink>
       </nav>
 
       <!-- Desktop Actions -->
@@ -207,6 +208,12 @@
           class="navbar__mobile-link"
           @click="menuOpen = false"
           >🎒 Maktab o'quvchilari uchun</NuxtLink
+        >
+        <NuxtLink
+          to="/audio"
+          class="navbar__mobile-link"
+          @click="menuOpen = false"
+          >🎧 Audio maqolalar</NuxtLink
         >
         <NuxtLink
           to="/reyting"

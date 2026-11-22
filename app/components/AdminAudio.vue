@@ -70,7 +70,29 @@
           <span>Jami audio</span>
           <strong>{{ st.minutes }} daq</strong>
         </div>
+        <label
+          v-if="st.telegramConfigured"
+          class="switch"
+          :class="{ 'is-on': st.telegram }"
+        >
+          <input
+            type="checkbox"
+            :checked="st.telegram"
+            :disabled="busy"
+            @change="update({ telegram: !st.telegram })"
+          />
+          <span class="switch__track"><span class="switch__dot" /></span>
+          <span>Yangi maqola audiosi kanalga</span>
+        </label>
       </div>
+      <p class="cq__last">
+        Podkast lentasi:
+        <a href="https://bilimmanba.uz/podcast.xml" target="_blank" rel="noopener"
+          >bilimmanba.uz/podcast.xml</a
+        >
+        — Spotify / Apple Podcasts'ga shu manzil beriladi. Hammaga ochiq ro'yxat:
+        <NuxtLink to="/audio" target="_blank">/audio</NuxtLink>
+      </p>
 
       <p v-if="st.pausedUntil" class="cq__warn">
         ⏸ Gemini bepul limiti tugadi — {{ fmt(st.pausedUntil) }} gacha kutiladi.
@@ -96,6 +118,8 @@ interface Status {
   voice: string;
   voices: { id: string; label: string }[];
   dailyMax: number;
+  telegram: boolean;
+  telegramConfigured: boolean;
   today: number;
   pausedUntil: string | null;
   lastError: { at: string; articleId: number; message: string } | null;
@@ -118,7 +142,11 @@ const load = async () => {
   if (res.success) st.value = res.data;
 };
 
-const update = async (body: { enabled?: boolean; voice?: string }) => {
+const update = async (body: {
+  enabled?: boolean;
+  voice?: string;
+  telegram?: boolean;
+}) => {
   busy.value = true;
   const res = await adminStore.adminApi("PUT", "/audio", body);
   busy.value = false;
@@ -147,6 +175,11 @@ onMounted(load);
 
 <style lang="scss" scoped>
 @use "~/assets/scss/admin-card" as *;
+
+.cq__last a {
+  color: $primary;
+  font-weight: 600;
+}
 
 .aud-select {
   width: auto !important;

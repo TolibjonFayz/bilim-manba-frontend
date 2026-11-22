@@ -50,6 +50,7 @@
         <NuxtLink to="/articles">Maqolalar</NuxtLink>
         <NuxtLink to="/categories">Kategoriyalar</NuxtLink>
         <NuxtLink to="/maktab">Maktab o'quvchilari uchun</NuxtLink>
+        <NuxtLink to="/audio">Audio maqolalar</NuxtLink>
         <NuxtLink to="/reyting">Test reytingi</NuxtLink>
       </div>
 

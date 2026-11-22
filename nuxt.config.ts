@@ -145,6 +145,7 @@ export default defineNuxtConfig({
     "/series": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/series/**": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     "/maktab": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
+    "/audio": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
     // Service worker yangilanishi darhol yetib borsin
     "/sw.js": { headers: { "cache-control": "no-cache" } },
     "/reyting": { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=86400" } },
@@ -173,6 +174,8 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     apiBase: process.env.NUXT_PUBLIC_API_BASE,
+    // Podkast egasining emaili (Spotify/Apple tasdiqlash kodi shunga keladi)
+    podcastEmail: process.env.NUXT_PODCAST_EMAIL || "",
     public: {
       apiBase: process.env.NUXT_PUBLIC_API_BASE,
       // Mavsumiy bezak: "auto" (kuz — 1-sentabr–30-noyabr) | "autumn" | "off"
