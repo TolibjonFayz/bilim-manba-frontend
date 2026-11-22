@@ -118,6 +118,12 @@ onMounted(async () => {
     display: flex;
     justify-content: center;
     min-height: 44px;
+
+    // Tungi rejimda sahifa color-scheme: dark, Google iframe esa light —
+    // farq bo'lsa brauzer iframe ortiga oq fon chizadi (oq to'rtburchak).
+    :deep(iframe) {
+      color-scheme: light;
+    }
   }
 
   &__error {
