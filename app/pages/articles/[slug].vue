@@ -135,6 +135,18 @@
             <!-- CONTENT -->
             <div class="article-content-wrap">
               <div class="article-content" data-track-read v-html="articleHtml" />
+              <!--
+                Faqat Telegram Instant View uchun (saytda yashirin): IV shabloni
+                buni maqola oxiriga qo'shadi — o'quvchini saytga chaqiradi.
+                Shablon: backend docs/instant-view.txt
+              -->
+              <p class="iv-site-cta" hidden>
+                <a :href="`${articleUrl}?utm_source=telegram&utm_medium=iv`"
+                  ><b>🧠 Bilimingizni sinang!</b> Shu maqola bo'yicha test, ball
+                  to'plash, reyting va o'xshash maqolalar — Bilim Manba saytida
+                  →</a
+                >
+              </p>
             </div>
 
             <!-- Ilova fayllar: kitob, qo'llanma, jadval -->
