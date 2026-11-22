@@ -49,7 +49,6 @@
 
     <AdminKinoQueue />
     <AdminChannelQuiz />
-    <AdminIgRepost />
     <AdminMailStatus />
     <AdminAudio />
 

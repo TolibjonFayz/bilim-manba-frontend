@@ -477,7 +477,7 @@ export const useAdminStore = defineStore("admin", () => {
     }
   }
 
-  /** Umumiy admin so'rovi: adminApi("GET", "/mail"), adminApi("PUT", "/ig-repost", {...}) */
+  /** Umumiy admin so'rovi: adminApi("GET", "/mail"), adminApi("PUT", "/audio", {...}) */
   async function adminApi(
     method: "GET" | "PUT" | "POST" | "DELETE",
     path: string,
