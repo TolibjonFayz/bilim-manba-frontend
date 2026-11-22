@@ -179,7 +179,7 @@ export default defineNuxtConfig({
       // Ilova (service worker): "on" | "off" — muammo bo'lsa o'chirish uchun
       pwa: process.env.NUXT_PUBLIC_PWA || "on",
       // Yandex Metrica hisoblagich raqami (metrika.yandex.ru). Bo'sh — o'chiq.
-      ymId: process.env.NUXT_PUBLIC_YM_ID || "",
+      ymId: process.env.NUXT_PUBLIC_YM_ID || "114067779",
     },
   },
 
