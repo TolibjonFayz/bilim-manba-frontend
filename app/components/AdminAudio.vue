@@ -1,0 +1,161 @@
+<!--
+  Admin bosh sahifa: audio maqolalar (Gemini TTS). Avval ovoz namunasini
+  tinglab tanlanadi, keyin yoqiladi — maqolalar kuniga bir nechtadan
+  ovozlashtiriladi (yangilari birinchi, keyin eng ko'p o'qilganlar).
+-->
+<template>
+  <section class="cq">
+    <div class="cq__head">
+      <div>
+        <h2 class="cq__title">🎧 Audio maqolalar</h2>
+        <p class="cq__sub">
+          Maqola sahifasida "Maqolani tinglang" pleyeri chiqadi. Ovozni Gemini
+          yaratadi (o'zbekcha). Avval ovozni tanlab, namunasini tinglang.
+        </p>
+      </div>
+      <label v-if="st" class="switch" :class="{ 'is-on': st.enabled }">
+        <input
+          type="checkbox"
+          :checked="st.enabled"
+          :disabled="busy || !st.configured"
+          @change="update({ enabled: !st.enabled })"
+        />
+        <span class="switch__track"><span class="switch__dot" /></span>
+        <span>{{ st.enabled ? "Yoqilgan" : "O'chirilgan" }}</span>
+      </label>
+    </div>
+
+    <p v-if="!st" class="cq__last">⏳ Yuklanmoqda…</p>
+    <template v-else>
+      <p v-if="!st.configured" class="cq__warn">
+        GEMINI_API_KEY sozlanmagan — ovoz yaratib bo'lmaydi.
+      </p>
+
+      <div class="cq__row">
+        <label class="cq__field">
+          Ovoz
+          <select
+            class="input aud-select"
+            :value="st.voice"
+            :disabled="busy"
+            @change="update({ voice: ($event.target as HTMLSelectElement).value })"
+          >
+            <option v-for="v in st.voices" :key="v.id" :value="v.id">
+              {{ v.label }}
+            </option>
+          </select>
+        </label>
+        <button
+          class="btn btn--outline cq__send"
+          :disabled="sampling || !st.configured"
+          @click="sample"
+        >
+          {{ sampling ? "⏳ Ovoz yaratilmoqda (≈20 s)…" : "▶️ Namunani tinglash" }}
+        </button>
+      </div>
+
+      <audio v-if="sampleUrl" :src="sampleUrl" controls autoplay class="aud-sample" />
+      <p v-if="sampleInfo" class="cq__last">{{ sampleInfo }}</p>
+
+      <div class="cq__row">
+        <div class="cq__stat">
+          <span>Ovozlashtirilgan</span>
+          <strong>{{ st.done }} / {{ st.total }}</strong>
+        </div>
+        <div class="cq__stat">
+          <span>Bugun</span>
+          <strong>{{ st.today }} / {{ st.dailyMax }}</strong>
+        </div>
+        <div class="cq__stat">
+          <span>Jami audio</span>
+          <strong>{{ st.minutes }} daq</strong>
+        </div>
+      </div>
+
+      <p v-if="st.pausedUntil" class="cq__warn">
+        ⏸ Gemini bepul limiti tugadi — {{ fmt(st.pausedUntil) }} gacha kutiladi.
+      </p>
+      <p v-if="st.lastError" class="cq__warn">
+        ⚠️ Oxirgi xato ({{ fmt(st.lastError.at) }}, maqola #{{ st.lastError.articleId }}):
+        {{ st.lastError.message }}
+      </p>
+      <p v-if="st.enabled && st.done < st.total && !st.pausedUntil" class="cq__last">
+        Navbat har 20 daqiqada tekshiriladi: kuniga {{ st.dailyMax }} tagacha
+        maqola, yangi chiqqanlari birinchi.
+      </p>
+    </template>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { ElMessage } from "element-plus";
+
+interface Status {
+  configured: boolean;
+  enabled: boolean;
+  voice: string;
+  voices: { id: string; label: string }[];
+  dailyMax: number;
+  today: number;
+  pausedUntil: string | null;
+  lastError: { at: string; articleId: number; message: string } | null;
+  done: number;
+  total: number;
+  minutes: number;
+}
+
+const adminStore = useAdminStore();
+const st = ref<Status | null>(null);
+const busy = ref(false);
+const sampling = ref(false);
+const sampleUrl = ref("");
+const sampleInfo = ref("");
+
+const fmt = (iso: string) => formatDateTime(iso);
+
+const load = async () => {
+  const res = await adminStore.adminApi("GET", "/audio");
+  if (res.success) st.value = res.data;
+};
+
+const update = async (body: { enabled?: boolean; voice?: string }) => {
+  busy.value = true;
+  const res = await adminStore.adminApi("PUT", "/audio", body);
+  busy.value = false;
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 8000 });
+  st.value = res.data;
+  if (body.voice) sampleUrl.value = "";
+};
+
+const sample = async () => {
+  if (!st.value) return;
+  sampling.value = true;
+  sampleInfo.value = "";
+  const res = await adminStore.adminApi("POST", "/audio/sample", {
+    voice: st.value.voice,
+  });
+  sampling.value = false;
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 12000 });
+  sampleUrl.value = res.data.audio;
+  sampleInfo.value = `Ovoz: ${res.data.voice} · ${res.data.seconds} s · model: ${res.data.model}`;
+};
+
+onMounted(load);
+</script>
+
+<style lang="scss" scoped>
+@use "~/assets/scss/admin-card" as *;
+
+.aud-select {
+  width: auto !important;
+  min-width: 260px;
+}
+
+.aud-sample {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 0.75rem;
+}
+</style>

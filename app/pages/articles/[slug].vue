@@ -112,6 +112,15 @@
               mode="top"
             />
 
+            <!-- Audio: maqolani tinglash (bo'lsa) -->
+            <ArticleAudio
+              v-if="article?.audio?.url"
+              :audio="article.audio"
+              :title="article.title"
+              :slug="article.slug"
+              :cover="article.coverImage ? cldImg(article.coverImage, 512) : null"
+            />
+
             <!-- COVER IMAGE -->
             <div class="article-cover">
               <img

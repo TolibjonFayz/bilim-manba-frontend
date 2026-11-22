@@ -51,6 +51,7 @@
     <AdminChannelQuiz />
     <AdminIgRepost />
     <AdminMailStatus />
+    <AdminAudio />
 
     <!-- Quick links -->
     <div class="admin-quick">
