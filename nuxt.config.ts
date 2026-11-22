@@ -178,6 +178,8 @@ export default defineNuxtConfig({
       season: process.env.NUXT_PUBLIC_SEASON || "auto",
       // Ilova (service worker): "on" | "off" — muammo bo'lsa o'chirish uchun
       pwa: process.env.NUXT_PUBLIC_PWA || "on",
+      // Yandex Metrica hisoblagich raqami (metrika.yandex.ru). Bo'sh — o'chiq.
+      ymId: process.env.NUXT_PUBLIC_YM_ID || "",
     },
   },
 

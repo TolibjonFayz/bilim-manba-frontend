@@ -3,7 +3,7 @@
     <div class="container">
       <div class="privacy-content">
         <h1 class="privacy-content__title">Maxfiylik Siyosati</h1>
-        <p class="privacy-content__date">Oxirgi yangilanish: 1-oktabr 2026</p>
+        <p class="privacy-content__date">Oxirgi yangilanish: 22-noyabr 2026</p>
 
         <section class="privacy-section">
           <h2>1. Biz kimmiz</h2>
@@ -73,8 +73,10 @@
               "Chiqish" tugmasi uni o'chiradi.
             </li>
             <li>
-              <strong>Statistika:</strong> Google Analytics tashriflarni hisoblash
-              uchun cookie ishlatadi. Vercel Analytics esa cookie'siz ishlaydi.
+              <strong>Statistika:</strong> Google Analytics va Yandex Metrica
+              tashriflarni hisoblash uchun cookie ishlatadi (Yandex Metrica'da
+              ekran yozuvi — "Vebvizor" — o'chirilgan). Vercel Analytics esa
+              cookie'siz ishlaydi.
             </li>
             <li>
               <strong>Saytning o'z statistikasi:</strong> saytni yaxshilash uchun
@@ -118,13 +120,14 @@
           <ul>
             <li><strong>Vercel</strong> — sayt hostingi va Vercel Analytics</li>
             <li><strong>Render</strong> — server (API)</li>
-            <li><strong>Neon</strong> — ma'lumotlar bazasi</li>
+            <li><strong>Supabase</strong> — ma'lumotlar bazasi</li>
             <li>
               <strong>Cloudflare R2</strong> — maqola matnlari va shifrlangan
               zaxira nusxalar
             </li>
             <li><strong>Cloudinary</strong> — rasmlar</li>
             <li><strong>Google Analytics</strong> — tashriflar statistikasi</li>
+            <li><strong>Yandex Metrica</strong> — tashriflar statistikasi</li>
             <li><strong>Groq</strong> — sun'iy intellekt javoblari</li>
           </ul>
         </section>
