@@ -52,12 +52,12 @@
     <div v-if="done" class="quiz__result" role="status">
       <div class="quiz__score">{{ score }}/{{ questions.length }}</div>
       <p class="quiz__verdict">{{ verdict }}</p>
-      <!-- Ball: kirgan foydalanuvchiga har test uchun bir marta -->
+      <!-- Ball: har o'quvchiga (mehmonga ham) har test uchun bir marta -->
       <ClientOnly>
         <p v-if="reward?.awarded" class="quiz__points">
           🏆 <strong>+{{ reward.points }} ball!</strong>
           <template v-if="reward.week?.rank">
-            Haftalik reytingda {{ reward.week.rank }}-o'rindasiz.</template
+            Haftalik reytingda <b>{{ reward.week.rank }}-o'rin</b>dasiz.</template
           >
           <NuxtLink to="/reyting">Reyting →</NuxtLink>
         </p>
@@ -65,15 +65,18 @@
           Bu test uchun ball avval olingan.
           <NuxtLink to="/reyting">Reyting →</NuxtLink>
         </p>
-        <!-- Mehmon: ishlagan bali yo'qolmasin — ro'yxatdan o'tsa saqlanadi -->
+
+        <p v-if="merged" class="quiz__points">
+          ✅ Ballaringiz profilingizga saqlandi.
+        </p>
+        <!-- Mehmon: reytingda taxallus bilan; ism bilan chiqish uchun — ro'yxatdan o'tish -->
         <div v-else-if="!authStore.isLoggedIn" class="quiz__claim">
-          <p class="quiz__claim-title">
-            🏆 Siz <strong>{{ guestPoints }} ball</strong> ishladingiz!
+          <p v-if="guestName" class="quiz__claim-title">
+            Reytingda siz — <strong>{{ guestName }}</strong>
           </p>
           <p class="quiz__claim-text">
-            Ballingizni saqlang va
-            <NuxtLink to="/reyting">reytingga</NuxtLink> chiqing — keyingi har
-            bir test uchun ham ball olasiz. Bir bosishda:
+            O'z ismingiz bilan chiqing va ballaringiz hech qachon yo'qolmasin —
+            hammasi profilingizga o'tadi. Bir bosishda:
           </p>
           <GoogleSignIn source="register" :next="returnPath" bare />
           <p class="quiz__claim-alt">
@@ -101,8 +104,9 @@
  * javob sahifaga oldindan berilmaydi: har bosishda server tekshiradi
  * (POST /quiz/check) va javob + izohni qaytaradi. Kirgan foydalanuvchining
  * birinchi tanlovlari serverda yoziladi — ball shundan hisoblanadi.
- * Mehmon natijasi brauzerda saqlanadi va ro'yxatdan o'tgach ballga aylanadi
- * (utils/pendingQuiz.ts + plugins/quiz-claim.client.ts).
+ * Mehmon ham ball oladi va reytingda taxallus bilan chiqadi (brauzer ID —
+ * utils/quizGuest.ts); kirsa — ballari akkauntga ko'chadi
+ * (plugins/quiz-merge.client.ts).
  */
 interface QuizQuestion {
   q: string;
@@ -123,8 +127,9 @@ const apiBase = useRuntimeConfig().public.apiBase;
 const reward = ref<{
   awarded?: boolean;
   points?: number;
-  week?: { rank: number | null; points: number };
+  week?: { rank: number | null; points: number; name?: string };
 } | null>(null);
+const merged = ref(false);
 const round = ref(0);
 function fill<T>(v: T): T[] {
   return props.questions.map(() => v);
@@ -139,9 +144,7 @@ let reported = false;
 const returnPath = computed(() => route.path);
 const done = computed(() => results.value.every((r) => r !== null));
 const score = computed(() => results.value.filter((r) => r?.correct).length);
-const guestPoints = computed(() =>
-  quizPoints(score.value, props.questions.length),
-);
+const guestName = computed(() => reward.value?.week?.name ?? "");
 const verdict = computed(() => {
   const n = props.questions.length;
   if (score.value === n) return "Ajoyib! Maqolani a'lo darajada tushunibsiz 🎉";
@@ -162,6 +165,8 @@ const optionClass = (i: number, j: number) => {
 
 const authHeaders = () =>
   authStore.token ? { Authorization: `Bearer ${authStore.token}` } : undefined;
+// Kirmagan o'quvchi — mehmon ID bilan (ball va reyting uchun)
+const guest = () => (authStore.isLoggedIn ? undefined : quizGuestId());
 
 const pick = async (i: number, j: number) => {
   if (picked.value[i] !== null || checking.value[i]) return;
@@ -175,7 +180,7 @@ const pick = async (i: number, j: number) => {
         method: "POST",
         baseURL: apiBase,
         headers: authHeaders(),
-        body: { i, choice: j },
+        body: { i, choice: j, guest: guest() },
       },
     );
     picked.value[i] = j;
@@ -196,15 +201,12 @@ const report = () => {
     correct: score.value,
     total: props.questions.length,
   });
-  if (!authStore.isLoggedIn) {
-    savePendingQuiz({ slug: props.slug, answers, points: guestPoints.value });
-    track("quiz_claim_offer", { slug: props.slug, points: guestPoints.value });
-  }
+  if (!authStore.isLoggedIn) track("quiz_guest_done", { slug: props.slug });
   $fetch<any>(`/articles/quiz-result/${encodeURIComponent(props.slug)}`, {
     method: "POST",
     baseURL: apiBase,
     headers: authHeaders(),
-    body: { correct: score.value, answers },
+    body: { correct: score.value, answers, guest: guest() },
   })
     .then((res) => {
       if (res && "awarded" in res) reward.value = res;
@@ -212,14 +214,13 @@ const report = () => {
     .catch(() => {});
 };
 
-// Shu sahifada turib kirsa (Google tugmasi) — plugin natijani saqlaydi va
-// "quiz-claimed" hodisasini yuboradi; shu yerda ham ko'rsatamiz
-const onClaimed = (e: Event) => {
-  const d = (e as CustomEvent).detail;
-  if (d?.slug === props.slug) reward.value = d.result;
+// Shu sahifada turib kirsa (Google tugmasi) — plugin ballarni akkauntga
+// ko'chiradi va "quiz-merged" hodisasini yuboradi
+const onMerged = () => {
+  if (done.value) merged.value = true;
 };
-onMounted(() => window.addEventListener("quiz-claimed", onClaimed));
-onBeforeUnmount(() => window.removeEventListener("quiz-claimed", onClaimed));
+onMounted(() => window.addEventListener("quiz-merged", onMerged));
+onBeforeUnmount(() => window.removeEventListener("quiz-merged", onMerged));
 
 const reset = () => {
   picked.value = fill<number | null>(null);

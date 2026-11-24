@@ -94,6 +94,14 @@
         <NuxtLink to="/audio" target="_blank">/audio</NuxtLink>
       </p>
 
+      <p v-if="st.freshPending" class="cq__last">
+        🆕 Navbatda {{ st.freshPending }} ta yangi maqola — ular kunlik limitga
+        kirmaydi, 20 daqiqa ichida ovozlashtiriladi.
+      </p>
+      <p v-if="st.skipped" class="cq__warn">
+        {{ st.skipped }} ta maqola 3 marta ovozlashtirilmadi va o'tkazib
+        yuborildi (xatosi pastda). Audioni o'chirib-yoqsangiz qayta urinadi.
+      </p>
       <p v-if="st.pausedUntil" class="cq__warn">
         ⏸ Gemini bepul limiti tugadi — {{ fmt(st.pausedUntil) }} gacha kutiladi.
       </p>
@@ -102,8 +110,8 @@
         {{ st.lastError.message }}
       </p>
       <p v-if="st.enabled && st.done < st.total && !st.pausedUntil" class="cq__last">
-        Navbat har 20 daqiqada tekshiriladi: kuniga {{ st.dailyMax }} tagacha
-        maqola, yangi chiqqanlari birinchi.
+        Navbat har 20 daqiqada tekshiriladi. Yangi maqolalar darhol, eski
+        maqolalar — kuniga {{ st.dailyMax }} tagacha.
       </p>
     </template>
   </section>
@@ -120,6 +128,8 @@ interface Status {
   dailyMax: number;
   telegram: boolean;
   telegramConfigured: boolean;
+  freshPending: number;
+  skipped: number;
   today: number;
   pausedUntil: string | null;
   lastError: { at: string; articleId: number; message: string } | null;
