@@ -94,6 +94,27 @@
         <NuxtLink to="/audio" target="_blank">/audio</NuxtLink>
       </p>
 
+      <div class="cq__row aud-run">
+        <p class="cq__last">
+          <template v-if="st.running">⏳ Hozir ovozlashtiryapti…</template>
+          <template v-else-if="st.lastTick">
+            Oxirgi tekshiruv: {{ fmt(st.lastTick.at) }} —
+            <b>{{ RESULT[st.lastTick.result] ?? st.lastTick.result }}</b>
+            ({{ st.lastTick.reason }}<template v-if="st.lastTick.articleId">,
+              maqola #{{ st.lastTick.articleId }}</template>)
+          </template>
+          <template v-else>Server yaqinda qayta ishga tushdi — birinchi tekshiruv bir necha daqiqada.</template>
+          <template v-if="st.nextCheckAt && !st.running">
+            · keyingisi {{ fmt(st.nextCheckAt) }}</template>
+        </p>
+        <button
+          class="btn btn--outline cq__send"
+          :disabled="busy || st.running || !st.enabled"
+          @click="runNow"
+        >
+          ▶ Hozir urinish
+        </button>
+      </div>
       <p v-if="st.freshPending" class="cq__last">
         🆕 Navbatda {{ st.freshPending }} ta yangi maqola — ular kunlik limitga
         kirmaydi, 20 daqiqa ichida ovozlashtiriladi.
@@ -130,6 +151,9 @@ interface Status {
   telegramConfigured: boolean;
   freshPending: number;
   skipped: number;
+  running: boolean;
+  lastTick: { at: string; result: string; reason: string; articleId?: number } | null;
+  nextCheckAt: string | null;
   today: number;
   pausedUntil: string | null;
   lastError: { at: string; articleId: number; message: string } | null;
@@ -146,6 +170,34 @@ const sampleUrl = ref("");
 const sampleInfo = ref("");
 
 const fmt = (iso: string) => formatDateTime(iso);
+const RESULT: Record<string, string> = {
+  done: "✅ audio tayyor",
+  skipped: "o'tkazildi",
+  failed: "⚠️ xato",
+  idle: "navbat bo'sh",
+};
+
+// Pauza/limitga qaramay bitta maqolani hozir ovozlashtirish (1–5 daqiqa)
+const runNow = async () => {
+  busy.value = true;
+  const res = await adminStore.adminApi("POST", "/audio/run");
+  busy.value = false;
+  if (!res.success)
+    return ElMessage({ type: "error", message: res.message, duration: 8000 });
+  ElMessage({
+    type: res.data.started ? "success" : "warning",
+    message: res.data.started
+      ? "Boshlandi — 1–5 daqiqadan keyin natija shu kartada chiqadi"
+      : res.data.reason,
+    duration: 6000,
+  });
+  // Natijani kuzatish: har 20 s, 6 daqiqagacha
+  let n = 0;
+  const t = setInterval(async () => {
+    await load();
+    if (++n >= 18 || (st.value && !st.value.running && n > 1)) clearInterval(t);
+  }, 20000);
+};
 
 const load = async () => {
   const res = await adminStore.adminApi("GET", "/audio");
